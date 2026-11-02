@@ -11,6 +11,7 @@
     "lint": "echo 'ui lint placeholder'"
   },
   "devDependencies": {
+    "@camino/config": "workspace:*",
     "typescript": "^5.7.2"
   }
 }

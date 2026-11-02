@@ -18,6 +18,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@camino/config": "workspace:*",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",

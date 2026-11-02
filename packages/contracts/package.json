@@ -12,6 +12,7 @@
     "lint": "echo 'contracts lint placeholder'"
   },
   "devDependencies": {
+    "@camino/config": "workspace:*",
     "typescript": "^5.7.2"
   }
 }

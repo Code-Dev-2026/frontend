@@ -9,7 +9,7 @@ fi
 pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
-pnpm test -- --runInBand --passWithNoTests
+pnpm test
 pnpm build
 
 bash scripts/check-invariants.sh

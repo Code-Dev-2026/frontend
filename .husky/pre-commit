@@ -1,2 +1,2 @@
-@echo off
+#!/usr/bin/env sh
 pnpm lint-staged
