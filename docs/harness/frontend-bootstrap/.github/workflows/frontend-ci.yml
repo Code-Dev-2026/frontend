@@ -1,0 +1,33 @@
+name: Frontend Bootstrap CI
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  frontend-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint, typecheck and test
+        run: |
+          pnpm lint
+          pnpm typecheck
+          pnpm test -- --runInBand --passWithNoTests
+          pnpm build
+
+      - name: Check frontend invariants
+        run: bash scripts/check-invariants.sh
