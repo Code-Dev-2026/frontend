@@ -11,11 +11,12 @@
 
 ## Decisiones vigentes
 
-- SRS canónico: `backend/docs/srs.md`. Espejos de solo lectura: `docs/backend-ref/` (srs, er, trazabilidad, supuestos; hash en la cabecera).
+- SRS canónico: `backend/docs/srs.md`. 5 espejos de solo lectura en `docs/backend-ref/` (srs, er, trazabilidad, supuestos, contrato; hash en la cabecera).
 - Precedencia: responsable > SRS (QUÉ) > ADR/architecture (CÓMO) > README (descriptivo) > `[SUPUESTO]` (ADR 0005).
 - Estados canónicos: los 4 de la BD (`EN_CASA`, `A_BORDO_VEHICULO`, `EN_COLEGIO`, `RETORNO_SEDE_POR_FALLA_ENTREGA`). §4 del SRS se traduce (ADR 0006).
 - 4 agentes: `coordinator`, `planner`, `implementer`, `reviewer`. Solo `implementer` edita código.
 - Specs: `specs/NNN-<app>-<feature>/` con `spec.md`, `plan.md`, `tasks.md`, `evidence/`.
+- Doble aprobación del contrato: `CODEOWNERS` solicita revisión, el check `contract-review` exige una aprobación por lado y el ruleset bloquea el merge.
 - Tiempo real: Socket.IO. MQTT prohibido en clientes frontend.
 - Vitest solo en `packages/domain` y `apps/portal`. RN no tiene runner todavía.
 
@@ -33,7 +34,9 @@
 - `docs/backend-ref/` está en `.prettierignore` y fuera de `lint-staged`: si Prettier lo reformatea, `--check` reporta deriva falsa.
 - El contrato backend↔frontend es canónico en `backend/docs/contrato-backend-frontend.md` y se consume como espejo en `docs/backend-ref/` (ADR 0008).
 - `docs/harness/frontend-bootstrap/` es una copia obsoleta del arnés; no es fuente de verdad.
-- Los docs restaurados del backend (`backend/docs/`) siguen sin commit: revisar `git status` antes de añadir.
+- El contrato solo se edita en backend; aquí es espejo de solo lectura y `--check` falla si se desvía.
+- El check `contract-review` lee la política del commit base: un PR no puede relajar sus propias reglas.
+- `pull_request_target` ejecuta el workflow de la rama por defecto: el PR que lo introduce no se autovalida.
 - `.turbo` puede conservar caché de la ruta antigua; usar `pnpm exec turbo run <task> --force`.
 - El SRS pide dependencias que aún no están instaladas (VisionCamera, op-sqlite, screen-capture, etc.): no se asumen; requieren spec y aprobación.
 - RNF-09 solo es mitigable en iOS (A.7.5): el lenguaje debe ser "mitigar", no "bloquear al 100 %".

@@ -1,0 +1,7 @@
+{
+  "paths": ["packages/contracts/**"],
+  "sides": {
+    "backend": ["Muchavisoy-20", "YutamasPRO"],
+    "frontend": ["jabv123", "Z-83"]
+  }
+}

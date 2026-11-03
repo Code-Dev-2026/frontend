@@ -11,6 +11,7 @@ Este directorio conserva documentos del arnés. **No todos están vigentes.** La
 | `discrepancias.md`          | divergencias abiertas y su estado según el ADR 0005      |
 | `evals/golden-scenarios.md` | escenarios de aceptación que toda spec debe poder probar |
 | `maintenance.md`            | cómo se mantiene el arnés                                |
+| `rulesets.md`               | doble aprobación del contrato y aplicación de rulesets   |
 | `failure-log.md`            | fallos recurrentes y la regla que los evita              |
 
 ## Heredados del backend (revisar antes de usar)
