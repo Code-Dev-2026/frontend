@@ -1,3 +1,10 @@
+> ESPEJO DE SOLO LECTURA — no editar aquí.
+> Fuente: `Code-Dev-2026/backend` → `docs/contrato-backend-frontend.md` @ `9367a6d`
+> SHA-256 del canónico: `cb24a1340b779119bbc1d8969658144dcea30d879981dc747c3a68284666bbe2`
+> Se actualiza en el mismo PR que cambie el documento canónico.
+
+---
+
 # Contrato backend ↔ frontend
 
 ## Propósito

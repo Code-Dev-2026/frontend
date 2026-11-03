@@ -3,7 +3,7 @@
 - Status: Proposed (aceptado por el responsable del frontend el 2026-11-03; pendiente de ratificación del equipo backend)
 - Date: 2026-11-03
 - Relacionado: `docs/adr/0005-fuente-de-verdad-y-precedencia.md`, `specs/001-portal-login/spec.md`,
-  `docs/contrato-backend-frontend.md`, `docs/propuestas/contrato-auth.md`
+  `docs/backend-ref/contrato-backend-frontend.md`, `docs/propuestas/contrato-auth.md`
 
 ## Contexto
 
@@ -12,7 +12,7 @@ aislamiento por rol (RNF-01, RNF-02). La constitución prohíbe guardar tokens o
 `localStorage`/`sessionStorage`.
 
 Sin embargo, **no existe contrato de autenticación**: `packages/contracts/openapi.json` solo declara
-`/health`, `docs/contrato-backend-frontend.md` no menciona auth y el repositorio backend todavía no
+`/health`, `docs/backend-ref/contrato-backend-frontend.md` no menciona auth y el repositorio backend todavía no
 tiene código de API. Tampoco está escrito qué roles usan el portal web frente a las apps móviles:
 el SRS describe el portal para coordinación (RF-13), rutas (RF-17) y cartera (RF-15), pero no
 enumera la matriz.
@@ -58,7 +58,7 @@ una decisión de backend/seguridad, no una invención del cliente.
 
 Las cinco capacidades (autenticar, verificar segundo factor, renovar, cerrar, obtener identidad y
 roles) deben existir en `packages/contracts/openapi.json` y en
-`docs/contrato-backend-frontend.md` antes de implementar el portal. La propuesta concreta está en
+`docs/backend-ref/contrato-backend-frontend.md` antes de implementar el portal. La propuesta concreta está en
 `docs/propuestas/contrato-auth.md` y **no es contrato vigente**.
 
 ## Alternativas descartadas

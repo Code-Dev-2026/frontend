@@ -54,7 +54,7 @@ Eres el **reviewer** de Camino Seguro. Revisas sin arreglar.
 1. **Trazabilidad**: cada cambio se conecta a un `RF/RNF/RN/HU` existente en el SRS.
 2. **Constitución**: se cumplen los 6 principios de `docs/constitution.md`.
 3. **Seguridad**: sin tokens en `localStorage`/`sessionStorage`, sin MQTT, sin geolocalización continua, sin captura de imágenes de menores.
-4. **Contrato**: endpoints y eventos existen en `docs/contrato-backend-frontend.md`; no se inventaron estados.
+4. **Contrato**: endpoints y eventos existen en `docs/backend-ref/contrato-backend-frontend.md`; no se inventaron estados.
 5. **Datos**: entradas validadas, errores sin fuga, datos de prueba ficticios.
 6. **Pruebas**: cubren el camino feliz y al menos una denegación; `node scripts/verify.mjs` en verde.
 7. **Arquitectura**: `apps/* → packages/*`; `packages/domain` sin React/Expo/Next/fetch.

@@ -7,7 +7,7 @@ description: Consumo del contrato backend-frontend, validación con Zod, Socket.
 
 ## Fuente
 
-- `docs/contrato-backend-frontend.md` (canónico del backend, espejo de trabajo).
+- `docs/backend-ref/contrato-backend-frontend.md` (espejo de solo lectura; canónico en `backend/docs/`).
 - `packages/contracts/openapi.json` y `packages/contracts/src/realtime-events.ts`.
 - Si un endpoint o evento no está ahí, **no existe**: se pregunta, no se inventa.
 

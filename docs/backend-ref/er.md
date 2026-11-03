@@ -1,5 +1,5 @@
 > ESPEJO DE SOLO LECTURA — no editar aquí.
-> Fuente: `Code-Dev-2026/backend` → `docs/er.md` @ `444ad22`
+> Fuente: `Code-Dev-2026/backend` → `docs/er.md` @ `9367a6d`
 > SHA-256 del canónico: `87a44719c43e056fc64efb5533bca0ce6b5de1714f10b55bb4673d64c6aabe6f`
 > Se actualiza en el mismo PR que cambie el documento canónico.
 

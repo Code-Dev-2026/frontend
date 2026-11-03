@@ -1,5 +1,5 @@
 > ESPEJO DE SOLO LECTURA — no editar aquí.
-> Fuente: `Code-Dev-2026/backend` → `docs/trazabilidad-srs.md` @ `444ad22`
+> Fuente: `Code-Dev-2026/backend` → `docs/trazabilidad-srs.md` @ `9367a6d`
 > SHA-256 del canónico: `bbf01aa44fdf649231a40e2f2d656c73e6def0eacc4ef8b641c00c12a6a443ee`
 > Se actualiza en el mismo PR que cambie el documento canónico.
 

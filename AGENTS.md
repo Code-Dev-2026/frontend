@@ -15,7 +15,7 @@ Los 6 principios innegociables están en `docs/constitution.md`. Si hay conflict
 - RNF-09: no se permite descargar, capturar ni compartir imágenes de menores.
 - RNF-08: los eventos de custodia y las alertas legales no se mutan ni se borran.
 - No se usa MQTT en clientes frontend; el tiempo real es Socket.IO.
-- El contrato backend↔frontend se valida con `docs/contrato-backend-frontend.md`.
+- El contrato backend↔frontend se valida con el espejo `docs/backend-ref/contrato-backend-frontend.md`.
 - No se implementa nada que no esté trazado a `RF/RNF/RN/HU` del SRS.
 
 ## Flujo SDD

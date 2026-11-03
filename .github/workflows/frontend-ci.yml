@@ -2,9 +2,9 @@ name: Frontend Bootstrap CI
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   frontend-verify:
@@ -36,3 +36,6 @@ jobs:
 
       - name: Check frontend invariants
         run: node scripts/check-invariants.mjs
+
+      - name: Test contract review script
+        run: node .github/scripts/contract-review.test.mjs .github/scripts/contract-review.mjs packages/contracts/openapi.json

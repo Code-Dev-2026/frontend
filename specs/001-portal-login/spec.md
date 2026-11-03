@@ -3,7 +3,7 @@ state: borrador
 app: portal
 requirements: [RF-13, RNF-01, RNF-02, RNF-04, HU-13]
 adr: [0007]
-owner: responsable-humano
+owner: "@jabv123"
 ---
 
 # 001 — Acceso autenticado al portal institucional (login con MFA)
@@ -95,7 +95,7 @@ Fuentes normativas: SRS §2.4 (RF-13), §3 (RNF-01, RNF-02, RNF-04), §5 (caso d
 ## Contrato requerido del backend
 
 > `[SUPUESTO] BLOQUEANTE` — Hoy **no existe ningún endpoint de autenticación**: `packages/contracts/openapi.json`
-> solo declara `/health`, `docs/contrato-backend-frontend.md` no menciona autenticación y el repo
+> solo declara `/health`, `docs/backend-ref/contrato-backend-frontend.md` no menciona autenticación y el repo
 > backend no tiene código de API (`backend/src` no existe). Por tanto esta spec describe
 > **capacidades**, no rutas.
 >
@@ -104,7 +104,7 @@ Fuentes normativas: SRS §2.4 (RF-13), §3 (RNF-01, RNF-02, RNF-04), §5 (caso d
 > verbos y esquemas está en `docs/propuestas/contrato-auth.md`.
 >
 > Lo que sigue bloqueado: el backend debe **ratificar** la propuesta y publicarla en
-> `packages/contracts/openapi.json` y en `docs/contrato-backend-frontend.md`. Hasta entonces está
+> `packages/contracts/openapi.json` y en `docs/backend-ref/contrato-backend-frontend.md`. Hasta entonces está
 > prohibido implementar rutas o esquemas inventados en el código.
 
 | Capacidad requerida             | Qué necesita el portal                                                                                                                                                    | Qué NO puede asumir el cliente                                               | Estado                  |
@@ -130,7 +130,7 @@ Notas de contrato:
 
 - `[SUPUESTO]` **El contrato de autenticación aún no está ratificado.** Hay propuesta
   (`docs/propuestas/contrato-auth.md`) y decisión de mecanismo (ADR 0007), pero el backend todavía
-  no la publicó en `packages/contracts/openapi.json` ni en `docs/contrato-backend-frontend.md`.
+  no la publicó en `packages/contracts/openapi.json` ni en `docs/backend-ref/contrato-backend-frontend.md`.
   Riesgo: implementar una ruta inventada que el backend nunca exponga. Decisión requerida: que los
   dueños de backend y frontend ratifiquen la propuesta y la publiquen en el contrato.
   **Bloqueante para implementar.**
