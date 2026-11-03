@@ -1,6 +1,6 @@
 > ESPEJO DE SOLO LECTURA — no editar aquí.
-> Fuente: `Code-Dev-2026/backend` → `docs/contrato-backend-frontend.md` @ `9367a6d`
-> SHA-256 del canónico: `cb24a1340b779119bbc1d8969658144dcea30d879981dc747c3a68284666bbe2`
+> Fuente: `Code-Dev-2026/backend` → `docs/contrato-backend-frontend.md` @ `25804df`
+> SHA-256 del canónico: `a38ba3b5fc3387db18b70d8ca2e0f3edd3acc6cc7b9d987f28f7282e39863bd7`
 > Se actualiza en el mismo PR que cambie el documento canónico.
 
 ---
@@ -18,6 +18,52 @@ Este contrato define el intercambio mínimo de información entre el backend y e
 - `POST /api/v1/custodia/abordaje` — registro de abordaje con validaciones de aforo y estados.
 - `POST /api/v1/custodia/descenso` — entrega segura y validaciones judiciales.
 - Socket.IO: `ruta:actualizada`, `alerta:judicial`, `notificacion:push`.
+
+## Autenticación del portal
+
+Base `/api/v1`. La sesión viaja en cookies `HttpOnly`; el portal nunca lee ni escribe el token
+(ADR 0007). El SRS A.2 exige JWT de vida corta con rotación y revocación por familia.
+
+### Cookies
+
+| Cookie              | Atributos                                              | Contenido                    | Vigencia              |
+| :------------------ | :----------------------------------------------------- | :--------------------------- | :-------------------- |
+| `__Host-cs_session` | `HttpOnly; Secure; SameSite=Strict; Path=/`            | JWT de acceso                | corta (p. ej. 15 min) |
+| `__Host-cs_refresh` | `HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth` | token de renovación rotativo | sesión de trabajo     |
+| `__Host-cs_mfa`     | `HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth` | desafío de segundo factor    | 5 min                 |
+
+El prefijo `__Host-` obliga a `Secure`, `Path=/` y ausencia de `Domain`; la cookie de renovación
+declara `Path=/api/v1/auth` y por eso no se envía al resto de la API en cada petición.
+
+### Endpoints
+
+| Método y ruta                 | Cuerpo                        | Respuestas                                                                                   |
+| :---------------------------- | :---------------------------- | :------------------------------------------------------------------------------------------- |
+| `POST /api/v1/auth/login`     | `{ email, password }`         | `200 { status: "authenticated" }` con sesión + renovación, `200 { status: "mfa_required" }` con desafío, `401 auth_failed`, `403 role_not_allowed`, `429 rate_limited` |
+| `POST /api/v1/auth/mfa/verify`| `{ code }` (6 dígitos)        | `200 { status: "authenticated" }` con sesión + renovación y sin desafío, `401 auth_failed`, `429 rate_limited` |
+| `GET /api/v1/auth/me`         | —                             | `200 { id, display_name, roles[] }`, `401 auth_failed`                                       |
+| `POST /api/v1/auth/refresh`   | —                             | `204` rota ambas cookies, `401 auth_failed` revoca la familia y borra las cookies             |
+| `POST /api/v1/auth/logout`    | —                             | `204` idempotente: también responde `204` si la sesión ya no existía                          |
+
+`display_name` es el mínimo para la cabecera: no incluye documento, teléfono ni correo. `roles` solo
+admite valores del catálogo `V002`; un rol desconocido se ignora y no concede acceso. Los permisos
+finos (CASL) no forman parte de esta versión.
+
+### Reglas
+
+- **Denegación por rol:** solo los cinco roles del ADR 0007 obtienen sesión de portal
+  (`COORDINADORA_CONVIVENCIA` con MFA, `RECTORIA`, `GERENCIA_TRANSPORTE`, `JEFE_OPERACIONES`,
+  `ADMINISTRADOR_CARTERA`). Un rol fuera de la lista recibe `403 role_not_allowed` aunque sus
+  credenciales sean válidas.
+- **Indistinguibilidad:** el `401` es idéntico para cuenta inexistente, contraseña incorrecta y
+  usuario inactivo; no revela cuál falló.
+- **CSRF:** `SameSite=Strict` más verificación de `Origin` en todo método que cambia estado. Si el
+  backend no puede validar `Origin`, se añade doble envío de token CSRF antes de implementar.
+- **CORS:** origen del portal explícito, `Access-Control-Allow-Credentials: true`, sin comodines.
+- **Errores:** forma única `{ code, message }`; nunca se devuelven trazas, correos ni identificadores
+  internos.
+- **Fuera de alcance:** registro público, recuperación y cambio de contraseña, enrolamiento o
+  reinicio del segundo factor, sesiones de las apps móviles y permisos finos por recurso.
 
 ## Estados canónicos
 
