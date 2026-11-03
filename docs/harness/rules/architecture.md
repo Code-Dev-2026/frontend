@@ -1,5 +1,8 @@
 # Regla de arquitectura
 
+> **Documento heredado del backend: no normativo en el frontend.** Mandan `docs/constitution.md`,
+> `docs/architecture.md`, `docs/adr/` y los skills de `.opencode/skills/`. Ver `docs/harness/README.md`.
+
 ## Fuente y mecanismo
 
 - Regla canónica: `README.md` y el diseño hexagonal del backend.

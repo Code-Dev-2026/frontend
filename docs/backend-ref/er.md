@@ -1,3 +1,10 @@
+> ESPEJO DE SOLO LECTURA — no editar aquí.
+> Fuente: `Code-Dev-2026/backend` → `docs/er.md` @ `916e71b` (árbol de trabajo con cambios sin commit)
+> SHA-256 del canónico: `87a44719c43e056fc64efb5533bca0ce6b5de1714f10b55bb4673d64c6aabe6f`
+> Se actualiza en el mismo PR que cambie el documento canónico.
+
+---
+
 # Diagrama Entidad-Relación — Backend Camino Seguro
 
 A continuación se presenta el modelo relacional definitivo para PostgreSQL 16 + PostGIS 3.4 en sintaxis Mermaid, con tipado estricto, claves primarias (PK), foráneas (FK), restricciones únicas (UK) y cardinalidades.

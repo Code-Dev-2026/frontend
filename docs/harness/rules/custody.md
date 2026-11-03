@@ -1,8 +1,11 @@
 # Regla de custodia
 
+> **Documento heredado del backend: no normativo en el frontend.** Mandan `docs/constitution.md`,
+> `docs/architecture.md`, `docs/adr/` y los skills de `.opencode/skills/`. Ver `docs/harness/README.md`.
+
 ## Fuente y mecanismo
 
-- Regla canónica: `README.md`, `docs/er.md`, `db/migrations/V006__attendance_and_custody_lifecycle.sql`.
+- Regla canónica: `README.md`, `docs/backend-ref/er.md`, `db/migrations/V006__attendance_and_custody_lifecycle.sql`.
 - Mecanismo: pruebas SQL, validadores de estado y `fn_verificar_integridad_custodia`.
 
 ## Reglas

@@ -12,18 +12,18 @@
     "packages/*"
   ],
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "invariants": "node scripts/check-invariants.mjs",
+    "specs:check": "node scripts/check-invariants.mjs --specs-only",
+    "verify": "node scripts/verify.mjs",
+    "sync:backend-ref": "node scripts/sync-backend-ref.mjs",
+    "sync:backend-ref:check": "node scripts/sync-backend-ref.mjs --check",
     "contracts:generate": "pnpm --filter @camino/contracts generate"
-  },
-  "lint-staged": {
-    "**/*.{ts,tsx,js,jsx,json,md}": [
-      "prettier --write"
-    ]
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",

@@ -1,5 +1,8 @@
 # Contrato de tarea
 
+> **Plantilla obsoleta (backend).** Las tareas nuevas se escriben en `specs/NNN-<app>-<feature>/tasks.md`
+> y citan el SRS. Ver `specs/README.md` y `docs/harness/README.md`.
+
 ## ID
 
 RF-XX / RNF-XX / HU-XX

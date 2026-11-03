@@ -1,0 +1,14 @@
+# El espejo del backend se copia byte a byte: si Prettier lo reformatea,
+# `node scripts/sync-backend-ref.mjs --check` reporta deriva falsa.
+docs/backend-ref/
+
+# Copia histórica del arnés anterior: no se edita ni se formatea.
+docs/harness/frontend-bootstrap/
+
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.turbo/
+pnpm-lock.yaml

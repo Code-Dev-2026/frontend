@@ -1,5 +1,8 @@
 # Regla de telemetría
 
+> **Documento heredado del backend: no normativo en el frontend.** Mandan `docs/constitution.md`,
+> `docs/architecture.md`, `docs/adr/` y los skills de `.opencode/skills/`. Ver `docs/harness/README.md`.
+
 ## Fuente y mecanismo
 
 - Regla canónica: `README.md`, `db/migrations/V005__trips_and_gps_partitions.sql`, `V007__notifications_and_offline_sync.sql`.

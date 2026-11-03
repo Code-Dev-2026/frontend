@@ -35,4 +35,4 @@ jobs:
           pnpm build
 
       - name: Check frontend invariants
-        run: bash scripts/check-invariants.sh
+        run: node scripts/check-invariants.mjs

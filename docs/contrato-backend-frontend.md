@@ -24,7 +24,7 @@ Se toman los estados definidos en `db/migrations/V006__attendance_and_custody_li
 ## Reglas de revisión
 
 - Los cambios de contrato requieren revisión de un dueño del backend y un dueño del frontend.
-- Todo cambio del modelo o de eventos debe pasar por `security-reviewer` y trazabilidad.
+- Todo cambio del modelo o de eventos debe pasar por el agente `reviewer` y por trazabilidad al SRS.
 
 ## Riesgos
 

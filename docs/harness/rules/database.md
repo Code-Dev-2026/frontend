@@ -1,8 +1,11 @@
 # Regla de base de datos
 
+> **Documento heredado del backend: no normativo en el frontend.** Mandan `docs/constitution.md`,
+> `docs/architecture.md`, `docs/adr/` y los skills de `.opencode/skills/`. Ver `docs/harness/README.md`.
+
 ## Fuente y mecanismo
 
-- Regla canónica: `README.md`, `db/migrations/V001__*.sql`..`V010__*.sql`, `docs/er.md`.
+- Regla canónica: `README.md`, `db/migrations/V001__*.sql`..`V010__*.sql`, `docs/backend-ref/er.md`.
 - Mecanismo de cumplimiento: verificación SQL + `scripts/check-invariants.sh`.
 
 ## Reglas
