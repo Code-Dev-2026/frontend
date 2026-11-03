@@ -1,5 +1,11 @@
 {
-  "paths": ["packages/contracts/**"],
+  "paths": [
+    "packages/contracts/**",
+    "docs/backend-ref/contrato-backend-frontend.md",
+    ".github/contract-reviewers.json",
+    ".github/scripts/contract-review.mjs",
+    ".github/workflows/contract-review.yml"
+  ],
   "sides": {
     "backend": ["Muchavisoy-20", "YutamasPRO"],
     "frontend": ["jabv123", "Z-83"]

@@ -44,6 +44,14 @@ const scenarios = {
     reviews: [{ user: { login: "jabv123" }, state: "APPROVED" }],
     expected: 1,
   },
+  "login-mayusculas": {
+    files: [contractPath],
+    reviews: [
+      { user: { login: "MUCHAVISOY-20" }, state: "APPROVED" },
+      { user: { login: "Z-83" }, state: "APPROVED" },
+    ],
+    expected: 0,
+  },
 };
 
 let current = "solo-backend";
