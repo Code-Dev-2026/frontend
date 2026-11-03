@@ -31,7 +31,7 @@
 
 - El espejo `docs/backend-ref/` no se edita a mano: se regenera con `node scripts/sync-backend-ref.mjs`.
 - `docs/backend-ref/` está en `.prettierignore` y fuera de `lint-staged`: si Prettier lo reformatea, `--check` reporta deriva falsa.
-- `docs/contrato-backend-frontend.md` no existe en `backend/docs/`: por eso sigue en `docs/` y no es un espejo.
+- El contrato backend↔frontend es canónico en `backend/docs/contrato-backend-frontend.md` y se consume como espejo en `docs/backend-ref/` (ADR 0008).
 - `docs/harness/frontend-bootstrap/` es una copia obsoleta del arnés; no es fuente de verdad.
 - Los docs restaurados del backend (`backend/docs/`) siguen sin commit: revisar `git status` antes de añadir.
 - `.turbo` puede conservar caché de la ruta antigua; usar `pnpm exec turbo run <task> --force`.

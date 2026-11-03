@@ -34,7 +34,7 @@ reviewer: verify → review  ← compuerta 2: aprobación humana y merge
 
 ## Reglas de aprobación de PR
 
-- Todo PR que toque el contrato backend↔frontend (`docs/contrato-backend-frontend.md`, OpenAPI,
+- Todo PR que toque el contrato backend↔frontend (`docs/backend-ref/contrato-backend-frontend.md`, OpenAPI,
   eventos Socket.IO) requiere aprobación conjunta de al menos un dueño del backend y uno del
   frontend (Andrés Botina Valencia o Ana Milena Zúñiga).
 - Todo cambio de esquema, RLS o migración se aprueba en el repositorio backend, no aquí.

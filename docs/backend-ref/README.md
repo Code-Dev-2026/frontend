@@ -12,17 +12,17 @@ backend y se vuelve a copiar con `node scripts/sync-backend-ref.mjs`.
 | Modelo entidad-relación | `backend/docs/er.md` | `er.md` | **espejo activo** |
 | Matriz de trazabilidad | `backend/docs/trazabilidad-srs.md` | `trazabilidad-srs.md` | **espejo activo** |
 | Supuestos y propuestas | `backend/docs/supuestos-y-propuestas.md` | `supuestos-y-propuestas.md` | **espejo activo** |
-| Contrato backend↔frontend | *(no existe en `backend/docs/`)* | — | propiedad compartida; ver abajo |
+| Contrato backend↔frontend | `backend/docs/contrato-backend-frontend.md` | `contrato-backend-frontend.md` | **espejo activo** (ADR 0008) |
 
 Los SHA-256 vigentes están en la cabecera de cada espejo y los imprime
 `node scripts/sync-backend-ref.mjs --check`.
 
 ### Contrato backend↔frontend
 
-`docs/contrato-backend-frontend.md` **no** se mueve aquí porque el repositorio backend todavía no
-tiene ese archivo en `docs/`. Guardarlo en un directorio llamado "espejo del backend" sería una
-mentira documental. Sigue en `docs/` como documento compartido y requiere un ADR conjunto para
-decidir dónde vive y quién lo aprueba.
+El contrato es canónico en el repositorio backend y aquí solo se consume. Un cambio se propone en
+un PR de backend, donde `CODEOWNERS` exige la firma de los cuatro dueños
+(`@Muchavisoy-20`, `@YutamasPRO`, `@jabv123`, `@Z-83`). El frontend **no** edita este espejo: si
+detecta un error, lo corrige en backend y ejecuta `node scripts/sync-backend-ref.mjs`.
 
 ## Cabecera obligatoria de cada espejo
 
@@ -47,7 +47,7 @@ La cabecera la genera el script; no se escribe a mano.
 ## Comandos
 
 ```bash
-node scripts/sync-backend-ref.mjs          # regenera los 4 espejos
+node scripts/sync-backend-ref.mjs          # regenera los 5 espejos
 node scripts/sync-backend-ref.mjs --check  # falla si hay deriva
 ```
 

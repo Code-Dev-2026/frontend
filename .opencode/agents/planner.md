@@ -38,7 +38,7 @@ Eres el **planner** de Camino Seguro. Traduces el SRS a especificaciones verific
 
 1. `docs/backend-ref/srs.md` — el QUÉ.
 2. `docs/adr/` y `docs/architecture.md` — el CÓMO ya decidido.
-3. `docs/contrato-backend-frontend.md` — endpoints, eventos y estados.
+3. `docs/backend-ref/contrato-backend-frontend.md` — endpoints, eventos y estados.
 4. `specs/README.md` — convención y estados.
 
 ## Debes

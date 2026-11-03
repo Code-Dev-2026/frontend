@@ -37,7 +37,7 @@ adaptador en `lib/`. Así se puede probar sin red y cambiar el transporte sin to
 
 1. La UI dispara una acción (`features/*`).
 2. El caso de uso valida la entrada con Zod y aplica reglas de dominio (`packages/domain`).
-3. El adaptador habla con el backend por HTTP o Socket.IO (`docs/contrato-backend-frontend.md`).
+3. El adaptador habla con el backend por HTTP o Socket.IO (`docs/backend-ref/contrato-backend-frontend.md`).
 4. El estado del servidor se cachea con TanStack Query; el estado local de UI no se duplica.
 5. Si no hay red, la operación entra a una cola FIFO persistente y se reintenta con backoff.
 

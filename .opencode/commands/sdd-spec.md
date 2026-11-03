@@ -9,7 +9,7 @@ Funcionalidad: **$ARGUMENTS**
 
 1. Lee `specs/README.md`, `docs/constitution.md` y `docs/architecture.md`.
 2. Lee la sección relevante de `docs/backend-ref/srs.md`.
-3. Lee `docs/contrato-backend-frontend.md` y los ADR aplicables.
+3. Lee `docs/backend-ref/contrato-backend-frontend.md` y los ADR aplicables.
 4. Revisa si ya existe una spec para esta funcionalidad; si existe, actualízala en vez de duplicar.
 
 ## Salida

@@ -33,11 +33,7 @@ const MIRRORS = [
   { file: 'er.md', enabled: true },
   { file: 'trazabilidad-srs.md', enabled: true },
   { file: 'supuestos-y-propuestas.md', enabled: true },
-  {
-    file: 'contrato-backend-frontend.md',
-    enabled: false,
-    note: 'sin canónico en backend/docs: el contrato sigue siendo propiedad compartida y requiere ADR antes de moverlo'
-  }
+  { file: 'contrato-backend-frontend.md', enabled: true }
 ];
 
 function sha256(buffer) {

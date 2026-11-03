@@ -6,7 +6,7 @@
 - Los **ADR** (`docs/adr/`) y `docs/architecture.md` definen el **CÓMO** ya decidido.
 - El `README.md` describe lo implementado y **no es normativo**.
 - La precedencia completa está en `docs/adr/0005-fuente-de-verdad-y-precedencia.md`.
-- Todo cambio en `packages/contracts/**`, `packages/domain/**` o en `docs/contrato-backend-frontend.md` requiere revisión del equipo del backend.
+- Todo cambio en `packages/contracts/**`, `packages/domain/**` o en el contrato backend↔frontend (canónico `backend/docs/contrato-backend-frontend.md`, espejo `docs/backend-ref/contrato-backend-frontend.md`) requiere revisión del equipo del backend.
 
 ## Convenciones
 

@@ -3,7 +3,7 @@
 > **No es contrato vigente y no se implementa todavía.** Este documento propone las cinco
 > capacidades que el portal necesita para `specs/001-portal-login/spec.md`. Solo se convierte en
 > contrato cuando el equipo backend lo ratifique, se publique en `packages/contracts/openapi.json`
-> y se refleje en `docs/contrato-backend-frontend.md` (ver "Ratificación" al final).
+> y se refleje en `docs/backend-ref/contrato-backend-frontend.md` (ver "Ratificación" al final).
 
 - Fecha: 2026-11-03
 - Decisiones de soporte: `docs/adr/0007-sesion-y-superficie-por-rol.md`
@@ -121,7 +121,7 @@ Para que esta propuesta pase a contrato:
 
 1. Un dueño del backend y uno del frontend la revisan (regla del contrato actual).
 2. Se publica en `packages/contracts/openapi.json` con esquemas y códigos.
-3. Se actualiza `docs/contrato-backend-frontend.md`.
+3. Se actualiza `docs/backend-ref/contrato-backend-frontend.md`.
 4. La spec `001-portal-login` pasa a `en-revision` y el `reviewer` valida trazabilidad.
 5. Solo entonces el responsable aprueba la implementación.
 
