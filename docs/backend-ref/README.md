@@ -14,17 +14,22 @@ backend y se vuelve a copiar con `node scripts/sync-backend-ref.mjs`.
 | Supuestos y propuestas | `backend/docs/supuestos-y-propuestas.md` | `supuestos-y-propuestas.md` | **espejo activo** |
 | Contrato backend↔frontend | `backend/docs/contrato-backend-frontend.md` | `contrato-backend-frontend.md` | **espejo activo** (ADR 0008) |
 
-Los SHA-256 vigentes están en la cabecera de cada espejo y los imprime
-`node scripts/sync-backend-ref.mjs --check`. La verificación compara el **contenido** del espejo con
-el canónico, no el commit del banner: un commit del backend que no toque el documento no obliga a
-regenerar los espejos.
+Los SHA-256 vigentes están en la cabecera de cada espejo; el sincronizador los imprime al escribir.
+La verificación compara el **contenido** del espejo con el canónico, no el commit del banner: un
+commit del backend que no toque el documento no obliga a regenerar los espejos. También valida que la
+cabecera declare el hash correcto.
+
+En CI no se clona el repositorio backend. Si el directorio canónico no existe, `--check` avisa y no
+falla, para que un clon aislado del frontend siga siendo verificable; usa `--require-source` cuando
+la ausencia del canónico deba ser un error.
 
 ### Contrato backend↔frontend
 
 El contrato es canónico en el repositorio backend y aquí solo se consume. Un cambio se propone en
-un PR de backend, donde `CODEOWNERS` exige la firma de los cuatro dueños
-(`@Muchavisoy-20`, `@YutamasPRO`, `@jabv123`, `@Z-83`). El frontend **no** edita este espejo: si
-detecta un error, lo corrige en backend y ejecuta `node scripts/sync-backend-ref.mjs`.
+un PR de backend, donde `CODEOWNERS` solicita revisión a los cuatro dueños
+(`@Muchavisoy-20`, `@YutamasPRO`, `@jabv123`, `@Z-83`) y el check `contract-review` exige una firma de
+cada lado. El frontend **no** edita este espejo: si detecta un error, lo corrige en backend y ejecuta
+`node scripts/sync-backend-ref.mjs`.
 
 ## Cabecera obligatoria de cada espejo
 

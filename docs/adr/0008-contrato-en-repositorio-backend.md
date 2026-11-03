@@ -52,8 +52,12 @@ El documento canónico es **`backend/docs/contrato-backend-frontend.md`**.
 
 ## Consecuencias
 
-- El equipo backend es dueño del contrato y su revisión se exige automáticamente.
-- El frontend gana un quinto espejo: `sync-backend-ref --check` falla si hay deriva.
+- El equipo backend es dueño del contrato y su revisión se exige automáticamente mediante el check
+  `contract-review` y el ruleset, no solo por `CODEOWNERS`.
+- El frontend gana un quinto espejo: `sync-backend-ref --check` falla si hay deriva cuando el repo
+  backend está disponible; en CI, sin el canónico, avisa y no falla para no romper clones aislados.
+- La política de doble aprobación se protege a sí misma: sus archivos están en `paths`, así que
+  relajarla exige también las dos firmas.
 - El PR de mudanza debe incluir el archivo en backend y, en frontend, el espejo, la eliminación del
   archivo suelto y la actualización de referencias.
 - Si el backend rechaza la propiedad del contrato, este ADR se reemplaza y se aplica la alternativa 1.

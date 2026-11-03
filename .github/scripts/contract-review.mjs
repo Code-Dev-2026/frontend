@@ -115,7 +115,8 @@ async function main() {
   );
   const latestByUser = new Map();
   for (const review of reviews) {
-    if (review.user?.login) latestByUser.set(review.user.login, review.state);
+    if (review.user?.login)
+      latestByUser.set(review.user.login.toLowerCase(), review.state);
   }
   const approved = new Set(
     [...latestByUser.entries()]
@@ -131,7 +132,9 @@ async function main() {
   ];
 
   for (const [side, members] of Object.entries(policy.sides)) {
-    const approver = members.find((member) => approved.has(member));
+    const approver = members.find((member) =>
+      approved.has(member.toLowerCase()),
+    );
     if (approver) {
       lines.push(`- ${side}: aprobado por @${approver}`);
     } else {

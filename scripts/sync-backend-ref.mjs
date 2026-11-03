@@ -44,9 +44,13 @@ function sha256(buffer) {
 // backend y cambiaría con cualquier commit ajeno al documento.
 const BANNER_SEPARATOR = Buffer.from("\n\n---\n\n");
 
-function stripBanner(buffer) {
+function readMirror(buffer) {
   const index = buffer.indexOf(BANNER_SEPARATOR);
-  return index === -1 ? null : buffer.subarray(index + BANNER_SEPARATOR.length);
+  if (index === -1) return null;
+  return {
+    header: buffer.subarray(0, index).toString("utf8"),
+    body: buffer.subarray(index + BANNER_SEPARATOR.length),
+  };
 }
 
 function git(args) {
@@ -112,14 +116,19 @@ for (const mirror of MIRRORS) {
       continue;
     }
     const current = await readFile(destFile);
-    const currentBody = stripBanner(current);
-    if (!currentBody || sha256(currentBody) !== hash) {
-      const currentHash = currentBody
-        ? sha256(currentBody).slice(0, 12)
-        : "sin-cabecera";
+    const mirror = readMirror(current);
+    const expectedHashLine = `SHA-256 del canónico: \`${hash}\``;
+    if (!mirror || !mirror.header.includes(expectedHashLine)) {
+      console.error(
+        `DERIVA: ${path.relative(ROOT, destFile)} tiene una cabecera inválida.`,
+      );
+      drifted += 1;
+      continue;
+    }
+    if (sha256(mirror.body) !== hash) {
       console.error(
         `DERIVA: ${path.relative(ROOT, destFile)} no coincide. ` +
-          `canónico=${hash.slice(0, 12)} espejo=${currentHash}`,
+          `canónico=${hash.slice(0, 12)} espejo=${sha256(mirror.body).slice(0, 12)}`,
       );
       drifted += 1;
     }

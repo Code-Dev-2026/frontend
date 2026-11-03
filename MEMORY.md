@@ -36,7 +36,7 @@
 - El contrato backend↔frontend es canónico en `backend/docs/contrato-backend-frontend.md` y se consume como espejo en `docs/backend-ref/` (ADR 0008).
 - `docs/harness/frontend-bootstrap/` es una copia obsoleta del arnés; no es fuente de verdad.
 - El contrato solo se edita en backend; aquí es espejo de solo lectura y `--check` falla si se desvía.
-- El check `contract-review` lee la política del commit base: un PR no puede relajar sus propias reglas.
+- El check `contract-review` lee la política del commit base: un PR no puede relajar sus propias reglas, y la política se incluye a sí misma en `paths`.
 - `pull_request_target` ejecuta el workflow de la rama por defecto: el PR que lo introduce no se autovalida.
 - `.turbo` puede conservar caché de la ruta antigua; usar `pnpm exec turbo run <task> --force`.
 - El SRS pide dependencias que aún no están instaladas (VisionCamera, op-sqlite, screen-capture, etc.): no se asumen; requieren spec y aprobación.
