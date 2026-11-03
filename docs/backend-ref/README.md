@@ -15,7 +15,9 @@ backend y se vuelve a copiar con `node scripts/sync-backend-ref.mjs`.
 | Contrato backend↔frontend | `backend/docs/contrato-backend-frontend.md` | `contrato-backend-frontend.md` | **espejo activo** (ADR 0008) |
 
 Los SHA-256 vigentes están en la cabecera de cada espejo y los imprime
-`node scripts/sync-backend-ref.mjs --check`.
+`node scripts/sync-backend-ref.mjs --check`. La verificación compara el **contenido** del espejo con
+el canónico, no el commit del banner: un commit del backend que no toque el documento no obliga a
+regenerar los espejos.
 
 ### Contrato backend↔frontend
 

@@ -31,6 +31,7 @@
 ## Trampas conocidas
 
 - El espejo `docs/backend-ref/` no se edita a mano: se regenera con `node scripts/sync-backend-ref.mjs`.
+- `--check` compara el contenido, no el commit del banner: un commit ajeno del backend no obliga a regenerar.
 - `docs/backend-ref/` está en `.prettierignore` y fuera de `lint-staged`: si Prettier lo reformatea, `--check` reporta deriva falsa.
 - El contrato backend↔frontend es canónico en `backend/docs/contrato-backend-frontend.md` y se consume como espejo en `docs/backend-ref/` (ADR 0008).
 - `docs/harness/frontend-bootstrap/` es una copia obsoleta del arnés; no es fuente de verdad.
