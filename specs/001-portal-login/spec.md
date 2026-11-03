@@ -1,5 +1,5 @@
 ---
-state: borrador
+state: en-revision
 app: portal
 requirements: [RF-13, RNF-01, RNF-02, RNF-04, HU-13]
 adr: [0007]
@@ -92,48 +92,69 @@ Fuentes normativas: SRS §2.4 (RF-13), §3 (RNF-01, RNF-02, RNF-04), §5 (caso d
   objetivos táctiles de 48 px en un portal de uso institucional en exteriores (RNF-04).
 - **Datos de prueba ficticios.** Ningún ejemplo, semilla o prueba usa datos personales reales.
 
-## Contrato requerido del backend
+## Contrato del backend (ratificado)
 
-> `[SUPUESTO] BLOQUEANTE` — Hoy **no existe ningún endpoint de autenticación**: `packages/contracts/openapi.json`
-> solo declara `/health`, `docs/backend-ref/contrato-backend-frontend.md` no menciona autenticación y el repo
-> backend no tiene código de API (`backend/src` no existe). Por tanto esta spec describe
-> **capacidades**, no rutas.
->
-> El mecanismo de sesión y la matriz de roles ya están decididos en el **ADR 0007** (cookie
-> `HttpOnly` emitida por el backend y cinco roles institucionales). La propuesta concreta de rutas,
-> verbos y esquemas está en `docs/propuestas/contrato-auth.md`.
->
-> Lo que sigue bloqueado: el backend debe **ratificar** la propuesta y publicarla en
-> `packages/contracts/openapi.json` y en `docs/backend-ref/contrato-backend-frontend.md`. Hasta entonces está
-> prohibido implementar rutas o esquemas inventados en el código.
+El contrato de autenticación está **ratificado y publicado** (2026-11-03). Esta spec ya no describe
+capacidades supuestas: rutas, verbos, esquemas y códigos salen del OpenAPI y del contrato canónico.
+El registro reproducible está en `specs/001-portal-login/evidence/contrato-ratificado.md`.
 
-| Capacidad requerida             | Qué necesita el portal                                                                                                                                                    | Qué NO puede asumir el cliente                                               | Estado                  |
-| :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------- | :---------------------- |
-| Autenticar credenciales         | Verificar identificador + contraseña; responder si la autenticación se completó, si requiere segundo factor o si falló, con un resultado indistinguible entre causas.     | Rutas, verbo, nombres de campo, códigos de estado ni forma del error.        | `[SUPUESTO] BLOQUEANTE` |
-| Verificar segundo factor (TOTP) | Recibir el código de 6 dígitos, confirmarlo y habilitar la sesión; informar código inválido o expirado y el bloqueo por intentos.                                         | Longitud, ventana de validez, política de reintentos ni formato del desafío. | `[SUPUESTO] BLOQUEANTE` |
-| Renovar sesión                  | Obtener una sesión vigente sin volver a pedir credenciales mientras el usuario trabaja; fallar de forma limpia al expirar.                                                | Duración, rotación, transporte ni si la renovación es silenciosa.            | `[SUPUESTO] BLOQUEANTE` |
-| Cerrar sesión                   | Invalidar la sesión en el servidor y permitir al portal confirmar que ya no es válida.                                                                                    | Si es idempotente ni qué responde ante una sesión ya cerrada.                | `[SUPUESTO] BLOQUEANTE` |
-| Obtener identidad y roles       | Entregar un identificador opaco de usuario, su nombre para mostrar y la lista de roles del catálogo (`V002`) con los permisos efectivos mínimos para el guardia de rutas. | Forma del payload, si los permisos vienen resueltos (CASL) o crudos.         | `[SUPUESTO] BLOQUEANTE` |
+- **Canónico:** `Code-Dev-2026/backend` → `docs/contrato-backend-frontend.md` @ `25804df` (integrado
+  en `f224b94`, PR #39), sección **Autenticación del portal**.
+- **Espejo de solo lectura:** `docs/backend-ref/contrato-backend-frontend.md`, SHA-256
+  `a38ba3b5fc3387db18b70d8ca2e0f3edd3acc6cc7b9d987f28f7282e39863bd7`, verificado byte a byte contra
+  el canónico.
+- **Esquema máquina:** `packages/contracts/openapi.json` — `openapi: 3.0.3`, `info.version: 0.2.0`,
+  `servers: [{ "url": "/api/v1" }]`. Publicado en frontend `main` = `df90d55` (PR #17 gobernanza del
+  contrato, PR #18 OpenAPI de auth).
+- **Mecanismo de sesión:** `docs/adr/0007-sesion-y-superficie-por-rol.md`. La propuesta histórica
+  `docs/propuestas/contrato-auth.md` ya fue publicada; **no** es la fuente vigente.
+
+### Cookies de sesión
+
+| Cookie              | Atributos                                              | Contenido                    | Vigencia              |
+| :------------------ | :----------------------------------------------------- | :--------------------------- | :-------------------- |
+| `__Host-cs_session` | `HttpOnly; Secure; SameSite=Strict; Path=/`            | JWT de acceso                | corta (p. ej. 15 min) |
+| `__Host-cs_refresh` | `HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth` | token de renovación rotativo | sesión de trabajo     |
+| `__Host-cs_mfa`     | `HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth` | desafío de segundo factor    | 5 min                 |
+
+`securitySchemes.cookieAuth` declara `apiKey` sobre la cookie `__Host-cs_session`. El portal envía
+las peticiones con `credentials: 'include'` y **nunca lee ni escribe** el token (RNF-01, ADR 0007).
+
+### Capacidades y su contrato
+
+| Capacidad requerida             | Qué necesita el portal                                                                                                                                                    | Respuestas del contrato                                                                                                                                                           | Ruta y esquema (OpenAPI)                                                                                          |
+| :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- |
+| Autenticar credenciales         | Verificar identificador + contraseña; responder si la autenticación se completó, si requiere segundo factor o si falló, con un resultado indistinguible entre causas.     | `200 {status:"authenticated"}` con sesión + renovación, `200 {status:"mfa_required"}` con desafío, `401 auth_failed`, `403 role_not_allowed`, `429 rate_limited` (+`Retry-After`) | `POST /api/v1/auth/login` → `LoginRequest` / `LoginResult` (`oneOf` `AuthenticatedResult` \| `MfaRequiredResult`) |
+| Verificar segundo factor (TOTP) | Recibir el código de 6 dígitos, confirmarlo y habilitar la sesión; informar código inválido o expirado y el bloqueo por intentos.                                         | `200` con sesión + renovación y sin desafío, `401 auth_failed`, `429 rate_limited` (+`Retry-After`)                                                                               | `POST /api/v1/auth/mfa/verify` → `MfaVerifyRequest` / `AuthenticatedResult`                                       |
+| Renovar sesión                  | Obtener una sesión vigente sin volver a pedir credenciales mientras el usuario trabaja; fallar de forma limpia al expirar.                                                | `204` rota ambas cookies, `401 auth_failed` revoca la familia y borra las cookies                                                                                                 | `POST /api/v1/auth/refresh` (sin cuerpo) → `204` / `401` con `ErrorResponse`                                      |
+| Cerrar sesión                   | Invalidar la sesión en el servidor y permitir al portal confirmar que ya no es válida.                                                                                    | `204` idempotente: también responde `204` si la sesión ya no existía                                                                                                              | `POST /api/v1/auth/logout` (sin cuerpo) → `204`                                                                   |
+| Obtener identidad y roles       | Entregar un identificador opaco de usuario, su nombre para mostrar y la lista de roles del catálogo (`V002`) con los permisos efectivos mínimos para el guardia de rutas. | `200 {id, display_name, roles[]}`, `401 auth_failed`                                                                                                                              | `GET /api/v1/auth/me` → `MeResponse`                                                                              |
 
 Notas de contrato:
 
-- El **mecanismo de sesión** está decidido en el ADR 0007: el backend emite una cookie `HttpOnly` +
-  `Secure` + `SameSite=Strict` y el portal nunca ve el token. Esto **exige que el backend la fije,
-  rote y revoque**; el frontend no puede fabricar ni firmar esa cookie. Si el backend no puede
-  emitirla, se aplica la alternativa 1 del ADR antes de escribir código.
-- Toda respuesta debe validarse contra el contrato (Zod) antes de renderizar; un error no muestra
-  datos crudos (`docs/architecture.md`).
-- Los roles citados son solo los ocho del catálogo semilla; el portal solo admite los cinco del
-  ADR 0007 y no debe inventar roles ni aceptar cadenas arbitrarias provenientes del cliente.
+- El **mecanismo de sesión** está ratificado en el ADR 0007 y en el contrato: el backend fija, rota y
+  revoca cookies `HttpOnly` + `Secure` + `SameSite=Strict`; el portal nunca ve el token y no puede
+  fabricar ni firmar esas cookies. Si el backend dejara de emitirlas, se aplica la alternativa 1 del
+  ADR mediante un ADR que lo reemplace.
+- Toda respuesta y todo error se validan contra el contrato (Zod) antes de renderizar; un error no
+  muestra datos crudos (`docs/architecture.md`).
+- `MeResponse.roles` está restringido por enum a los **cinco roles del portal**; un rol desconocido se
+  ignora y no concede acceso, y `MONITORA`, `CONDUCTOR` y `ACUDIENTE` reciben `403 role_not_allowed`
+  aunque sus credenciales sean válidas.
+- El `429` incluye `Retry-After` (segundos): el portal respeta la espera y no reintenta en bucle.
+- `display_name` es el mínimo para la cabecera; el contrato excluye documento, teléfono y correo.
+- CSRF: `SameSite=Strict` más verificación de `Origin` en el backend. El contrato exige doble envío
+  de token si el backend no puede validar `Origin` (ver supuestos del `plan.md`).
 
 ## Riesgos y supuestos
 
-- `[SUPUESTO]` **El contrato de autenticación aún no está ratificado.** Hay propuesta
-  (`docs/propuestas/contrato-auth.md`) y decisión de mecanismo (ADR 0007), pero el backend todavía
-  no la publicó en `packages/contracts/openapi.json` ni en `docs/backend-ref/contrato-backend-frontend.md`.
-  Riesgo: implementar una ruta inventada que el backend nunca exponga. Decisión requerida: que los
-  dueños de backend y frontend ratifiquen la propuesta y la publiquen en el contrato.
-  **Bloqueante para implementar.**
+- `[RESUELTO — 2026-11-03]` **El contrato de autenticación ya está ratificado y publicado.** PR #17
+  (gobernanza del contrato) y PR #18 (OpenAPI de auth, `info.version: 0.2.0`) en frontend; PR #39 en
+  backend (`main` = `f224b94`) publica la sección "Autenticación del portal" en el canónico y el
+  espejo queda sincronizado (`a38ba3b5…`, banner `@ 25804df`). Evidencia:
+  `specs/001-portal-login/evidence/contrato-ratificado.md`. Riesgo residual: cualquier cambio
+  posterior del contrato obliga a re-sincronizar espejo y OpenAPI **antes** de tocar el portal; las
+  rutas y esquemas que no estén en `packages/contracts/openapi.json` siguen prohibidos.
 - `[DECIDIDO — ADR 0007]` **Transporte de sesión: cookie `HttpOnly`/`Secure`/`SameSite=Strict`
   emitida por el backend.** Riesgo residual: si el backend se niega a emitirla, el portal no tiene
   forma segura de sostener sesión sin violar RNF-01 y se aplica la alternativa 1 del ADR.
@@ -159,6 +180,10 @@ Notas de contrato:
   procedimiento de recuperación (fuera del alcance de esta spec).
 - `[SUPUESTO]` **Idioma y tono de los mensajes.** Se asume español institucional; requiere visto
   bueno del responsable.
+- `[SUPUESTO]` **Protección CSRF del lado del backend.** El contrato acepta `SameSite=Strict` +
+  verificación de `Origin` y, si el backend no puede validar `Origin`, exige doble envío de token.
+  Decisión requerida antes de implementar: confirmar con backend cuál de las dos aplica; el portal no
+  añade un token CSRF que el backend no espere.
 
 ## Criterios de aceptación
 
@@ -172,10 +197,10 @@ Notas de contrato:
       `COORDINADORA_CONVIVENCIA` y sin completar el TOTP, no se emite sesión utilizable y cualquier
       intento de navegar a una ruta protegida redirige al acceso; la prueba falla si se renderiza
       contenido de la consola.
-- [ ] **Denegación esperada — escalamiento no autorizado:** una sesión con rol `MONITORA`,
-      `CONDUCTOR` o `ACUDIENTE` que intente abrir la ruta de consola/administración recibe
-      denegación (página de acceso denegado o redirección) y no se renderiza navegación de flota
-      global (HU-13, HU-19).
+- [ ] **Denegación esperada — escalamiento no autorizado:** `MONITORA`, `CONDUCTOR` y `ACUDIENTE`
+      reciben `403 role_not_allowed` al autenticarse y no obtienen sesión de portal; además, si una
+      respuesta de `GET /auth/me` trae un rol fuera del enum de los cinco, la validación Zod la
+      rechaza y el guardia niega el acceso en lugar de concederlo por defecto (HU-13, HU-19).
 - [ ] **Denegación esperada — persistencia de credenciales:** tras un login exitoso, `localStorage`
       y `sessionStorage` no contienen tokens ni datos personales, `document.cookie` no expone la
       credencial de sesión y la URL no transporta tokens; la prueba inspecciona ambos storages, las
