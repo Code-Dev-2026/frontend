@@ -1,5 +1,5 @@
 > ESPEJO DE SOLO LECTURA — no editar aquí.
-> Fuente: `Code-Dev-2026/backend` → `docs/supuestos-y-propuestas.md` @ `916e71b` (árbol de trabajo con cambios sin commit)
+> Fuente: `Code-Dev-2026/backend` → `docs/supuestos-y-propuestas.md` @ `444ad22`
 > SHA-256 del canónico: `b145fa9414c6915aaba1c336f9bb3a2494a34957554f4686f9078c5dca23e1ac`
 > Se actualiza en el mismo PR que cambie el documento canónico.
 
