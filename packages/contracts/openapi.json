@@ -1,0 +1,305 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Camino Seguro API",
+    "version": "0.2.0",
+    "description": "Contrato del portal institucional. La sesión viaja en cookies HttpOnly; el cliente no lee ni escribe el token (ADR 0007, SRS A.2)."
+  },
+  "servers": [{ "url": "/api/v1" }],
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Autenticación, segundo factor y sesión del portal."
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health endpoint",
+        "responses": {
+          "200": {
+            "description": "Service is healthy"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Autenticar credenciales",
+        "description": "El 401 es idéntico para cuenta inexistente, contraseña incorrecta y usuario inactivo. Solo los cinco roles del portal obtienen sesión.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada o segundo factor requerido.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Sesión y renovación, o cookie de desafío cuando se exige MFA.",
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResult" }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas o usuario inactivo.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "El rol no usa el portal.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "429": {
+            "description": "Demasiados intentos.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos antes de reintentar.",
+                "schema": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/mfa/verify": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Verificar segundo factor (TOTP)",
+        "description": "Consume la cookie de desafío y emite la sesión. Un código inválido conserva el desafío hasta su expiración o el bloqueo por intentos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MfaVerifyRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada; la cookie de desafío se borra.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Sesión y renovación; borra el desafío.",
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthenticatedResult" }
+              }
+            }
+          },
+          "401": {
+            "description": "Código inválido, expirado o desafío ausente.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "429": {
+            "description": "Demasiados intentos.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos antes de reintentar.",
+                "schema": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Identidad y roles de la sesión",
+        "description": "La usa el guardia de rutas. Devuelve el mínimo dato para la cabecera: sin documento, teléfono ni correo.",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Sesión válida.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MeResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Sin sesión válida.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Renovar la sesión",
+        "description": "Rota ambas cookies. Un fallo revoca la familia de tokens y borra las cookies.",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Cookies rotadas.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Nueva sesión y nueva renovación.",
+                "schema": { "type": "string" }
+              }
+            }
+          },
+          "401": {
+            "description": "Renovación inválida; la familia se revoca y las cookies se borran.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Cookies de sesión y renovación borradas.",
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Cerrar la sesión",
+        "description": "Idempotente: también responde 204 si la sesión ya no existía.",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Familia revocada y cookies borradas.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Cookies de sesión y renovación borradas.",
+                "schema": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-cs_session",
+        "description": "Cookie HttpOnly emitida por el backend. El cliente la envía con credentials: 'include' y nunca la lee."
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 1 }
+        }
+      },
+      "LoginResult": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/AuthenticatedResult" },
+          { "$ref": "#/components/schemas/MfaRequiredResult" }
+        ]
+      },
+      "AuthenticatedResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "enum": ["authenticated"] }
+        }
+      },
+      "MfaRequiredResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "enum": ["mfa_required"] }
+        }
+      },
+      "MfaVerifyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[0-9]{6}$" }
+        }
+      },
+      "MeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "display_name", "roles"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "display_name": { "type": "string", "minLength": 1 },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "COORDINADORA_CONVIVENCIA",
+                "RECTORIA",
+                "GERENCIA_TRANSPORTE",
+                "JEFE_OPERACIONES",
+                "ADMINISTRADOR_CARTERA"
+              ]
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": ["auth_failed", "role_not_allowed", "rate_limited"]
+          },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

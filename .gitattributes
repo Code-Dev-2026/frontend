@@ -1,0 +1,9 @@
+# El espejo del backend debe seguir siendo byte-idéntico al canónico.
+# Sin `-text`, core.autocrlf=true convertiría LF a CRLF en el checkout y
+# `node scripts/sync-backend-ref.mjs --check` reportaría deriva falsa.
+docs/backend-ref/** -text
+
+# Copia histórica del arnés anterior: se conserva tal cual.
+docs/harness/frontend-bootstrap/** -text
+
+*.sh text eol=lf
