@@ -2,7 +2,7 @@ export const STUDENT_STATES = [
   'EN_CASA',
   'A_BORDO_VEHICULO',
   'EN_COLEGIO',
-  'RETORNO_SEDE_POR_FALLA_ENTREGA'
+  'RETORNO_SEDE_POR_FALLA_ENTREGA',
 ] as const;
 
 export type StudentState = (typeof STUDENT_STATES)[number];
@@ -11,10 +11,13 @@ export const VALID_TRANSITIONS: Record<StudentState, StudentState[]> = {
   EN_CASA: ['A_BORDO_VEHICULO'],
   A_BORDO_VEHICULO: ['EN_COLEGIO', 'RETORNO_SEDE_POR_FALLA_ENTREGA'],
   EN_COLEGIO: ['RETORNO_SEDE_POR_FALLA_ENTREGA'],
-  RETORNO_SEDE_POR_FALLA_ENTREGA: ['EN_CASA']
+  RETORNO_SEDE_POR_FALLA_ENTREGA: ['EN_CASA'],
 };
 
-export const canTransitionTo = (from: StudentState, to: StudentState): boolean => {
+export const canTransitionTo = (
+  from: StudentState,
+  to: StudentState,
+): boolean => {
   return VALID_TRANSITIONS[from]?.includes(to) ?? false;
 };
 
@@ -42,6 +45,15 @@ export const createUuidV7 = (): string => {
   return `${timestampHex.slice(0, 8)}-${timestampHex.slice(8)}-${randomHex.slice(0, 4)}-${randomHex.slice(4, 8)}-${randomHex.slice(8)}`;
 };
 
-export const STUDENT_ROLES = ['COORDINADORA_CONVIVENCIA', 'RECTORIA', 'GERENCIA_TRANSPORTE', 'JEFE_OPERACIONES', 'ADMINISTRADOR_CARTERA', 'MONITORA', 'CONDUCTOR', 'ACUDIENTE'] as const;
+export const STUDENT_ROLES = [
+  'COORDINADORA_CONVIVENCIA',
+  'RECTORIA',
+  'GERENCIA_TRANSPORTE',
+  'JEFE_OPERACIONES',
+  'ADMINISTRADOR_CARTERA',
+  'MONITORA',
+  'CONDUCTOR',
+  'ACUDIENTE',
+] as const;
 
 export type StudentRole = (typeof STUDENT_ROLES)[number];

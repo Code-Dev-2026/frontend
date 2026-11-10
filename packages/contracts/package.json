@@ -9,10 +9,11 @@
     "generate": "node ./scripts/generate.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "echo 'contracts lint placeholder'"
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@camino/config": "workspace:*",
+    "eslint": "^9.16.0",
     "typescript": "^5.7.2"
   }
 }

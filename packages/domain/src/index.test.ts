@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { assertMaxAuthorizedAdults, canTransitionTo, shouldShowCustodyMap, STUDENT_STATES, createUuidV7 } from './index';
+import {
+  assertMaxAuthorizedAdults,
+  canTransitionTo,
+  shouldShowCustodyMap,
+  STUDENT_STATES,
+  createUuidV7,
+} from './index';
 
 describe('domain state machine', () => {
   it('allows valid transitions', () => {
@@ -23,6 +29,8 @@ describe('domain state machine', () => {
 
   it('keeps the canonical state list and valid v7 uuid generation', () => {
     expect(STUDENT_STATES).toHaveLength(4);
-    expect(createUuidV7()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    expect(createUuidV7()).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    );
   });
 });

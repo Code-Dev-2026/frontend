@@ -1,3 +1,6 @@
+# Normaliza los finales de línea a LF en todos los checkouts.
+* text=auto eol=lf
+
 # El espejo del backend debe seguir siendo byte-idéntico al canónico.
 # Sin `-text`, core.autocrlf=true convertiría LF a CRLF en el checkout y
 # `node scripts/sync-backend-ref.mjs --check` reportaría deriva falsa.

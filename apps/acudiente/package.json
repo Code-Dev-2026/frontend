@@ -7,6 +7,7 @@
     "start": "npx expo start --dev-client",
     "android": "npx expo run:android",
     "ios": "npx expo run:ios",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -20,7 +21,9 @@
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
+    "@camino/config": "workspace:*",
     "@types/react": "^18.3.12",
+    "eslint": "^9.16.0",
     "typescript": "^5.7.2"
   }
 }
