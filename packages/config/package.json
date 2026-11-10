@@ -5,6 +5,19 @@
   "type": "module",
   "exports": {
     "./tsconfig.base.json": "./tsconfig.base.json",
-    "./eslint.config.mjs": "./eslint.config.mjs"
+    "./eslint.config.mjs": "./eslint.config.mjs",
+    "./prettier.config.mjs": "./prettier.config.mjs"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.39.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^14.0.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0"
   }
 }

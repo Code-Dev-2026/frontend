@@ -9,6 +9,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   extra: {
     apiUrl: process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000/api/v1',
-    socketUrl: process.env.EXPO_PUBLIC_SOCKET_URL ?? 'http://localhost:3001'
-  }
+    socketUrl: process.env.EXPO_PUBLIC_SOCKET_URL ?? 'http://localhost:3001',
+  },
 });

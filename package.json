@@ -18,6 +18,9 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown",
+    "lint:fix": "turbo run lint -- --fix",
     "invariants": "node scripts/check-invariants.mjs",
     "specs:check": "node scripts/check-invariants.mjs --specs-only",
     "verify": "node scripts/verify.mjs",
@@ -26,12 +29,11 @@
     "contracts:generate": "pnpm --filter @camino/contracts generate"
   },
   "devDependencies": {
+    "@camino/config": "workspace:*",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
-    "@eslint/js": "^9.39.0",
     "@types/node": "^22.10.2",
     "eslint": "^9.16.0",
-    "eslint-config-next": "^15.1.0",
     "husky": "^9.0.0",
     "lint-staged": "^15.0.0",
     "prettier": "^3.3.0",

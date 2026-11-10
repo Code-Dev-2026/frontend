@@ -63,24 +63,31 @@ frontend/
 ## Qué contiene cada nivel
 
 ### `apps/portal`
+
 Aplicación web para administración operativa: rutas, matrículas, expedientes, reportes y coordinación.
 
 ### `apps/acudiente`
+
 Aplicación móvil para acudientes: seguimiento del recorrido, notificaciones y estado del menor.
 
 ### `apps/monitora`
+
 Aplicación móvil para monitoras: asistencia, QR, custodia, entregas, alertas y trabajo offline.
 
 ### `packages/contracts`
+
 Contratos con el backend: DTOs, tipos, eventos y modelos compartidos.
 
 ### `packages/domain`
+
 Lógica de negocio: estados, validaciones, reglas de capacidad, restricciones y denegaciones.
 
 ### `packages/ui`
+
 Primitivas visuales reutilizables para todas las apps.
 
 ### `packages/config`
+
 Configuración base de TypeScript, linting y tooling compartido.
 
 ## Stack base
@@ -106,7 +113,28 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm format
+pnpm format:check
+pnpm verify
 ```
+
+## Calidad, hooks y CI/CD
+
+- **ESLint**: configuración plana compartida en `packages/config/eslint.config.mjs`.
+  Cada workspace la extiende con su propio `eslint.config.mjs`; el portal añade las
+  reglas de Next.js.
+- **Prettier**: configuración compartida en `packages/config/prettier.config.mjs`.
+  `pnpm format` normaliza el repositorio y `pnpm format:check` valida sin escribir.
+- **TypeScript**: `strict: true` y `noUncheckedIndexedAccess` en
+  `packages/config/tsconfig.base.json`.
+- **Husky + lint-staged**: `.husky/pre-commit` ejecuta ESLint y Prettier sobre los
+  archivos en stage. `.husky/commit-msg` valida Conventional Commits con
+  Commitlint.
+- **GitHub Actions**: `.github/workflows/ci.yml` instala con
+  `pnpm install --frozen-lockfile`, ejecuta formato, lint, typecheck, pruebas y
+  build, y restaura la caché de Turborepo (`.turbo`) entre ejecuciones.
+- **Verificación local completa**: `pnpm verify` ejecuta el mismo pipeline más los
+  invariantes de arquitectura y la comprobación del espejo del backend.
 
 ## Convención de arquitectura
 
@@ -137,32 +165,10 @@ Este README representa la base técnica del repositorio y no un producto final c
 
 La dirección de dependencias es: `apps/* -> packages/*`. Nunca al revés.
 
-## Stack base
-
-- Node 20 LTS
-- pnpm 10
-- Turborepo
-- TypeScript
-- Next.js para portal
-- Expo + React Native para apps móviles
-- arquitectura por paquetes compartidos
-
 ## Requisitos
 
 - Node 20
 - pnpm 10
-
-## Comandos básicos
-
-```bash
-pnpm install --frozen-lockfile
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm dev
-
-```
 
 ## Convenciones de trabajo
 
@@ -171,7 +177,3 @@ pnpm dev
 - Los contratos se comparten desde `packages/contracts`.
 - La UI no debe depender directamente de transporte ni infraestructura concreta.
 - La base del proyecto debe mantenerse pequeña, clara y alineada con el SRS.
-
-## Estado actual
-
-Este README describe la base técnica del repositorio y no la implementación final del producto. La intención es mantener una estructura limpia y alineada con el stack del SRS: monorepo, apps por rol y paquetes compartidos.
