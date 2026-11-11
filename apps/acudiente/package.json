@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@camino/contracts": "workspace:*",
     "@maplibre/maplibre-react-native": "^10.0.0",
     "expo": "~52.0.0",
     "expo-dev-client": "~5.0.0",

@@ -76,7 +76,41 @@ Aplicación móvil para monitoras: asistencia, QR, custodia, entregas, alertas y
 
 ### `packages/contracts`
 
-Contratos con el backend: DTOs, tipos, eventos y modelos compartidos.
+Contratos con el backend: clientes HTTP generados con Orval desde el snapshot
+real de Swagger en `packages/contracts/openapi.json`, modelos compartidos,
+errores de dominio y mocks MSW separados por módulo. Para generarlos desde el
+snapshot versionado:
+
+```bash
+pnpm contracts:generate
+```
+
+Para sincronizar el snapshot desde Swagger de NestJS y regenerar clientes,
+inicia el backend y ejecuta:
+
+```powershell
+$env:BACKEND_OPENAPI_URL = "http://localhost:3000/api/v1/docs-json"
+pnpm contracts:sync-openapi
+Remove-Item Env:BACKEND_OPENAPI_URL
+```
+
+La CI regenera solo desde el snapshot para que el build sea determinista. El
+Swagger actual expone 23 operaciones, pero omite esquemas de varios cuerpos y
+respuestas; esos valores no se inventan en el cliente y deben documentarse en
+el backend para obtener tipos más precisos.
+
+El login del backend devuelve los tokens en el cuerpo JSON, mientras que el
+cliente compartido envía cookies con `credentials: include` y no persiste
+tokens. Alinear el contrato de autenticación con el backend antes de conectar
+el flujo de inicio de sesión; el cliente no almacena ni registra credenciales.
+
+No edites `packages/contracts/src/generated` a mano. CI regenera los clientes y
+falla si el resultado no coincide con lo versionado; además ejecuta el
+typecheck de las tres apps.
+
+El portal, la app de acudientes y la de monitoras importan solo sus módulos
+desde `@camino/contracts/<modulo>`. La página `/health` del portal consulta el
+endpoint institucional real como ejemplo de consumo generado.
 
 ### `packages/domain`
 

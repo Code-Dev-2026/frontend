@@ -4,16 +4,140 @@
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "react-native": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./auth": {
+      "types": "./src/generated/endpoints/auth/auth.ts",
+      "react-native": "./src/generated/endpoints/auth/auth.ts",
+      "import": "./src/generated/endpoints/auth/auth.ts",
+      "default": "./dist/generated/endpoints/auth/auth.js"
+    },
+    "./students": {
+      "types": "./src/generated/endpoints/students/students.ts",
+      "react-native": "./src/generated/endpoints/students/students.ts",
+      "import": "./src/generated/endpoints/students/students.ts",
+      "default": "./dist/generated/endpoints/students/students.js"
+    },
+    "./schools": {
+      "types": "./src/generated/endpoints/schools/schools.ts",
+      "react-native": "./src/generated/endpoints/schools/schools.ts",
+      "import": "./src/generated/endpoints/schools/schools.ts",
+      "default": "./dist/generated/endpoints/schools/schools.js"
+    },
+    "./transport-companies": {
+      "types": "./src/generated/endpoints/transport-companies/transport-companies.ts",
+      "react-native": "./src/generated/endpoints/transport-companies/transport-companies.ts",
+      "import": "./src/generated/endpoints/transport-companies/transport-companies.ts",
+      "default": "./dist/generated/endpoints/transport-companies/transport-companies.js"
+    },
+    "./routes": {
+      "types": "./src/generated/endpoints/routes/routes.ts",
+      "react-native": "./src/generated/endpoints/routes/routes.ts",
+      "import": "./src/generated/endpoints/routes/routes.ts",
+      "default": "./dist/generated/endpoints/routes/routes.js"
+    },
+    "./trips": {
+      "types": "./src/generated/endpoints/trips/trips.ts",
+      "react-native": "./src/generated/endpoints/trips/trips.ts",
+      "import": "./src/generated/endpoints/trips/trips.ts",
+      "default": "./dist/generated/endpoints/trips/trips.js"
+    },
+    "./custody": {
+      "types": "./src/generated/endpoints/custody/custody.ts",
+      "react-native": "./src/generated/endpoints/custody/custody.ts",
+      "import": "./src/generated/endpoints/custody/custody.ts",
+      "default": "./dist/generated/endpoints/custody/custody.js"
+    },
+    "./attendance": {
+      "types": "./src/generated/endpoints/attendance/attendance.ts",
+      "react-native": "./src/generated/endpoints/attendance/attendance.ts",
+      "import": "./src/generated/endpoints/attendance/attendance.ts",
+      "default": "./dist/generated/endpoints/attendance/attendance.js"
+    },
+    "./passengers": {
+      "types": "./src/generated/endpoints/passengers/passengers.ts",
+      "react-native": "./src/generated/endpoints/passengers/passengers.ts",
+      "import": "./src/generated/endpoints/passengers/passengers.ts",
+      "default": "./dist/generated/endpoints/passengers/passengers.js"
+    },
+    "./telemetry": {
+      "types": "./src/generated/endpoints/telemetry/telemetry.ts",
+      "react-native": "./src/generated/endpoints/telemetry/telemetry.ts",
+      "import": "./src/generated/endpoints/telemetry/telemetry.ts",
+      "default": "./dist/generated/endpoints/telemetry/telemetry.js"
+    },
+    "./tracking": {
+      "types": "./src/generated/endpoints/tracking/tracking.ts",
+      "react-native": "./src/generated/endpoints/tracking/tracking.ts",
+      "import": "./src/generated/endpoints/tracking/tracking.ts",
+      "default": "./dist/generated/endpoints/tracking/tracking.js"
+    },
+    "./notifications": {
+      "types": "./src/generated/endpoints/notifications/notifications.ts",
+      "react-native": "./src/generated/endpoints/notifications/notifications.ts",
+      "import": "./src/generated/endpoints/notifications/notifications.ts",
+      "default": "./dist/generated/endpoints/notifications/notifications.js"
+    },
+    "./offline": {
+      "types": "./src/generated/endpoints/offline/offline.ts",
+      "react-native": "./src/generated/endpoints/offline/offline.ts",
+      "import": "./src/generated/endpoints/offline/offline.ts",
+      "default": "./dist/generated/endpoints/offline/offline.js"
+    },
+    "./audit": {
+      "types": "./src/generated/endpoints/audit/audit.ts",
+      "react-native": "./src/generated/endpoints/audit/audit.ts",
+      "import": "./src/generated/endpoints/audit/audit.ts",
+      "default": "./dist/generated/endpoints/audit/audit.js"
+    },
+    "./billing-isolation": {
+      "types": "./src/generated/endpoints/billing-isolation/billing-isolation.ts",
+      "react-native": "./src/generated/endpoints/billing-isolation/billing-isolation.ts",
+      "import": "./src/generated/endpoints/billing-isolation/billing-isolation.ts",
+      "default": "./dist/generated/endpoints/billing-isolation/billing-isolation.js"
+    },
+    "./http": {
+      "types": "./src/http/index.ts",
+      "react-native": "./src/http/index.ts",
+      "import": "./src/http/index.ts",
+      "default": "./dist/http/index.js"
+    },
+    "./mocks": {
+      "types": "./src/generated/mocks/index.ts",
+      "react-native": "./src/generated/mocks/index.ts",
+      "import": "./src/generated/mocks/index.ts",
+      "default": "./dist/generated/mocks/index.js"
+    },
+    "./mocks/*": {
+      "types": "./src/generated/endpoints/*/*.msw.ts",
+      "react-native": "./src/generated/endpoints/*/*.msw.ts",
+      "import": "./src/generated/endpoints/*/*.msw.ts",
+      "default": "./dist/generated/endpoints/*/*.msw.js"
+    }
+  },
   "scripts": {
-    "generate": "node ./scripts/generate.js",
+    "generate": "node ./scripts/generate.mjs",
+    "sync-openapi": "node ./scripts/generate.mjs --sync-openapi",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@camino/config": "workspace:*",
     "eslint": "^9.16.0",
-    "typescript": "^5.7.2"
+    "orval": "7.12.2",
+    "typescript": "^5.7.2",
+    "vitest": "3.2.7"
+  },
+  "dependencies": {
+    "@faker-js/faker": "9.9.0",
+    "msw": "2.7.0"
   }
 }

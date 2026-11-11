@@ -26,7 +26,8 @@
     "verify": "node scripts/verify.mjs",
     "sync:backend-ref": "node scripts/sync-backend-ref.mjs",
     "sync:backend-ref:check": "node scripts/sync-backend-ref.mjs --check",
-    "contracts:generate": "pnpm --filter @camino/contracts generate"
+    "contracts:generate": "node packages/contracts/scripts/generate.mjs",
+    "contracts:sync-openapi": "node packages/contracts/scripts/generate.mjs --sync-openapi"
   },
   "devDependencies": {
     "@camino/config": "workspace:*",
