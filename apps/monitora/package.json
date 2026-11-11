@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@camino/contracts": "workspace:*",
     "expo": "~52.0.0",
     "expo-dev-client": "~5.0.0",
     "expo-status-bar": "~2.0.0",

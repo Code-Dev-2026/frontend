@@ -1,1 +1,3 @@
-export { default } from '@camino/config/eslint.config.mjs';
+import sharedConfig from '@camino/config/eslint.config.mjs';
+
+export default [...sharedConfig, { ignores: ['src/generated/**'] }];

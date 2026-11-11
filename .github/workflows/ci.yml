@@ -51,6 +51,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate OpenAPI clients and MSW mocks
+        run: pnpm contracts:generate
+
+      - name: Check generated contracts are committed
+        run: git diff --exit-code -- packages/contracts/src/generated
+      - name: Check generated files are not untracked
+        run: |
+          if [ -n "$(git ls-files --others --exclude-standard -- packages/contracts/src/generated)" ]; then
+            echo "Generated OpenAPI files are missing from version control."
+            exit 1
+          fi
+
       - name: Check formatting
         run: pnpm format:check
 
