@@ -4,61 +4,102 @@ Base del monorepo frontend para la plataforma Camino Seguro. El repositorio se o
 
 ## Estructura del repositorio
 
+<!-- estructura:inicio -->
+
 ```text
 frontend/
+├─ .github/
+│  └─ workflows/
+│     └─ ci.yml
+├─ .husky/
+│  ├─ commit-msg
+│  └─ pre-commit
 ├─ apps/
-│  ├─ portal/
-│  │  ├─ app/
-│  │  ├─ src/
-│  │  ├─ package.json
-│  │  ├─ next.config.mjs
-│  │  ├─ tsconfig.json
-│  │  └─ tailwind.config.ts
-│  │
 │  ├─ acudiente/
 │  │  ├─ app/
+│  │  ├─ assets/
 │  │  ├─ src/
-│  │  ├─ package.json
 │  │  ├─ app.config.ts
-│  │  ├─ app.json
+│  │  ├─ App.tsx
+│  │  ├─ eslint.config.mjs
+│  │  ├─ package.json
 │  │  └─ tsconfig.json
-│  │
-│  └─ monitora/
+│  ├─ monitora/
+│  │  ├─ app/
+│  │  ├─ assets/
+│  │  ├─ src/
+│  │  ├─ app.config.ts
+│  │  ├─ App.tsx
+│  │  ├─ eslint.config.mjs
+│  │  ├─ package.json
+│  │  └─ tsconfig.json
+│  └─ portal/
 │     ├─ app/
 │     ├─ src/
+│     ├─ eslint.config.mjs
+│     ├─ next-env.d.ts
+│     ├─ next.config.mjs
 │     ├─ package.json
-│     ├─ app.config.ts
-│     ├─ app.json
+│     ├─ postcss.config.js
+│     ├─ tailwind.config.ts
 │     └─ tsconfig.json
-│
+├─ docs/
+│  └─ srs.md
 ├─ packages/
 │  ├─ config/
-│  │  └─ package.json
-│  │
+│  │  ├─ eslint/
+│  │  ├─ prettier/
+│  │  ├─ typescript/
+│  │  ├─ eslint.config.mjs
+│  │  ├─ package.json
+│  │  ├─ prettier.config.mjs
+│  │  └─ tsconfig.base.json
 │  ├─ contracts/
+│  │  ├─ scripts/
 │  │  ├─ src/
-│  │  └─ package.json
-│  │
+│  │  ├─ test/
+│  │  ├─ eslint.config.mjs
+│  │  ├─ openapi.json
+│  │  ├─ orval.config.ts
+│  │  ├─ package.json
+│  │  └─ tsconfig.json
 │  ├─ domain/
 │  │  ├─ src/
-│  │  └─ package.json
-│  │
+│  │  ├─ eslint.config.mjs
+│  │  ├─ package.json
+│  │  ├─ tsconfig.json
+│  │  └─ vitest.config.ts
 │  └─ ui/
 │     ├─ src/
-│     └─ package.json
-│
+│     ├─ eslint.config.mjs
+│     ├─ package.json
+│     └─ tsconfig.json
+├─ scripts/
+│  ├─ check-invariants.mjs
+│  ├─ sync-backend-ref.mjs
+│  ├─ sync-readme-structure.mjs
+│  └─ verify.mjs
 ├─ .editorconfig
 ├─ .env.example
 ├─ .gitattributes
 ├─ .gitignore
 ├─ .nvmrc
+├─ .prettierignore
+├─ commitlint.config.js
+├─ eslint.config.mjs
+├─ lint-staged.config.mjs
 ├─ package.json
-├─ pnpm-workspace.yaml
 ├─ pnpm-lock.yaml
-├─ turbo.json
+├─ pnpm-workspace.yaml
+├─ prettier.config.mjs
 ├─ README.md
-└─ .git
+└─ turbo.json
 ```
+
+<!-- estructura:fin -->
+
+> Este árbol se genera automáticamente desde el índice de Git. No edites el
+> bloque a mano: ejecuta `pnpm readme:sync` (o `pnpm readme:check` para validar).
 
 ## Qué contiene cada nivel
 
@@ -149,6 +190,8 @@ pnpm test
 pnpm build
 pnpm format
 pnpm format:check
+pnpm readme:sync
+pnpm readme:check
 pnpm verify
 ```
 
@@ -164,6 +207,11 @@ pnpm verify
 - **Husky + lint-staged**: `.husky/pre-commit` ejecuta ESLint y Prettier sobre los
   archivos en stage. `.husky/commit-msg` valida Conventional Commits con
   Commitlint.
+- **Estructura del README**: `scripts/sync-readme-structure.mjs` reconstruye el
+  árbol del repositorio entre los marcadores `<!-- estructura:inicio -->` y
+  `<!-- estructura:fin -->`. `pnpm readme:sync` lo actualiza y
+  `pnpm readme:check` (en CI y en el hook `pre-commit`) falla si quedó
+  desactualizado.
 - **GitHub Actions**: `.github/workflows/ci.yml` instala con
   `pnpm install --frozen-lockfile`, ejecuta formato, lint, typecheck, pruebas y
   build, y restaura la caché de Turborepo (`.turbo`) entre ejecuciones.

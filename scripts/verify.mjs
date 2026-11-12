@@ -47,6 +47,11 @@ steps.push(['lint', PNPM, ['lint']]);
 steps.push(['typecheck', PNPM, ['typecheck']]);
 steps.push(['test', PNPM, ['test']]);
 if (!SKIP_BUILD) steps.push(['build', PNPM, ['build']]);
+steps.push([
+  'estructura README',
+  process.execPath,
+  ['scripts/sync-readme-structure.mjs', '--check'],
+]);
 steps.push(['invariantes', process.execPath, ['scripts/check-invariants.mjs']]);
 steps.push([
   'espejo backend',
