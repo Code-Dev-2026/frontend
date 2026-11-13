@@ -290,6 +290,12 @@ la guía completa está en [`docs/design/README.md`](docs/design/README.md).
 Para exportar un frame con un token personal de Figma (solo lectura):
 
 ```powershell
+# Opción 1: archivo local ignorado por Git
+Set-Content -NoNewline .figma-token "figd_..."
+pnpm figma:export "<url-de-figma-con-node-id>" <app>/<pantalla>
+Remove-Item .figma-token
+
+# Opción 2: variable de entorno
 $env:FIGMA_TOKEN = "figd_..."
 pnpm figma:export "<url-de-figma-con-node-id>" <app>/<pantalla>
 Remove-Item Env:FIGMA_TOKEN

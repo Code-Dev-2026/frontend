@@ -81,7 +81,19 @@ No se admiten placeholders presentados como definitivos.
 
 1. En Figma: **Settings → Security → Personal access tokens → Generate new
    token**, con permiso de lectura del archivo.
-2. En la terminal, sin escribir el token en ningún archivo:
+2. Da el token al script sin pegarlo en el código ni en el chat. Hay dos
+   formas:
+
+   **Archivo local (recomendado).** Crea `.figma-token` en la raíz del repo con
+   el token como única línea (el archivo está en `.gitignore`):
+
+   ```powershell
+   Set-Content -NoNewline .figma-token "figd_..."
+   pnpm figma:export "https://www.figma.com/design/ig1NPLOHpjHSCWL36bHW8z/Untitled?node-id=7-2" monitora/login
+   Remove-Item .figma-token
+   ```
+
+   **Variable de entorno (CI o uso puntual).**
 
    ```powershell
    $env:FIGMA_TOKEN = "figd_..."
@@ -119,8 +131,10 @@ Si `figma-node.json` queda muy pesado, resume los valores relevantes en
 ## 5. Seguridad del token
 
 - El token **nunca** se escribe en el código, en `.env.example`, en un commit,
-  en un issue ni en el chat. Solo se lee de la variable `FIGMA_TOKEN`.
-- El script no guarda el token en disco.
+  en un issue ni en el chat. El script lo lee de `FIGMA_TOKEN` o del archivo
+  local `.figma-token`.
+- `.figma-token` está en `.gitignore`: no se versiona. Bórralo al terminar.
+- El script no escribe el token en los archivos exportados.
 - Revoca el token en Figma cuando termines.
 
 ## 6. Qué aporta el usuario y qué escribe el agente

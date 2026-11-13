@@ -7,9 +7,10 @@
  *   pnpm figma:export "https://www.figma.com/design/<fileKey>/...?node-id=7-2" monitora/login
  *
  * Requiere un token personal de Figma con permiso de lectura del archivo.
- * El token solo se lee de FIGMA_TOKEN y nunca se escribe en disco.
+ * El token se lee de FIGMA_TOKEN o, si no existe, del archivo local
+ * .figma-token (ignorado por Git). Nunca se escribe en los archivos exportados.
  */
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -25,7 +26,7 @@ function usage() {
       'Ejemplo:',
       '  pnpm figma:export "https://www.figma.com/design/abc123/Untitled?node-id=7-2" monitora/login',
       '',
-      'Requiere la variable de entorno FIGMA_TOKEN con un token personal de Figma.',
+      'Requiere un token personal de Figma en FIGMA_TOKEN o en el archivo local .figma-token.',
     ].join('\n'),
   );
 }
@@ -125,8 +126,24 @@ async function downloadImage(token, fileKey, nodeId, format, outDir) {
   );
 }
 
+async function resolveToken() {
+  const fromEnv = process.env.FIGMA_TOKEN?.trim();
+  if (fromEnv) return fromEnv;
+
+  try {
+    const fromFile = (
+      await readFile(path.join(ROOT, '.figma-token'), 'utf8')
+    ).trim();
+    if (fromFile) return fromFile;
+  } catch {
+    // No hay archivo local .figma-token.
+  }
+
+  return null;
+}
+
 async function main() {
-  const token = process.env.FIGMA_TOKEN?.trim();
+  const token = await resolveToken();
   const [urlArg, outputArg] = process.argv.slice(2);
 
   if (!urlArg || !outputArg) {
@@ -135,7 +152,7 @@ async function main() {
   }
   if (!token) {
     console.error(
-      'Falta FIGMA_TOKEN. Genera un token personal con lectura de archivos en Figma → Settings → Security.',
+      'Falta el token de Figma. Define FIGMA_TOKEN o crea el archivo local .figma-token con el token (solo lectura).',
     );
     process.exit(1);
   }
