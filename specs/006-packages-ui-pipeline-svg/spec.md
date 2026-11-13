@@ -22,7 +22,7 @@ apps.
   TypeScript en ambas apps.
 - Configurar SVGO para conservar `viewBox` e IDs de recursos y validar
   incompatibilidades antes de usar los SVG.
-- Documentar el flujo de Figma en `docs/figma-svg.md`.
+- Documentar el flujo de Figma en `docs/design/README.md` §9.
 
 ## Requisito relacionado
 

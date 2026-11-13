@@ -6,7 +6,7 @@
 - [x] Añadir declaraciones TypeScript para imports SVG en ambas apps.
 - [x] Configurar SVGO para preservar viewBox e IDs protegidos.
 - [x] Crear `svg:check`, pruebas de logos, iconos, ilustraciones y detección de SVG incompatibles.
-- [x] Documentar exportación y validación en `docs/figma-svg.md`.
+- [x] Documentar exportación y validación en `docs/design/README.md` §9.
 - [x] Typecheck y bundle Expo en ambas apps con imports de los cuatro logos.
 - [x] Ejecutar `pnpm verify`.
 - [ ] Confirmar visualmente los cuatro logos en ambos emuladores Android; `adb` no está disponible en este entorno.

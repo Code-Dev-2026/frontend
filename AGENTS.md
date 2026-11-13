@@ -1,9 +1,9 @@
 # AGENTS.md — reglas compartidas del frontend
 
-Lee esta guía antes de trabajar en el monorepo. Las instrucciones específicas
-complementan estas reglas: `apps/AGENTS.md` para las apps móviles y
-`apps/portal/AGENTS.md` para el portal. Si una issue contradice estas reglas y
-no hay una excepción documentada, detente y pregunta.
+Lee esta guía antes de trabajar en el monorepo. Aplican a todo el repositorio;
+[`apps/AGENTS.md`](./apps/AGENTS.md) añade reglas móviles y
+[`apps/portal/AGENTS.md`](./apps/portal/AGENTS.md) reglas web. Si una issue
+contradice estas reglas y no hay una excepción documentada, detente y pregunta.
 
 ## Repositorio y arquitectura
 
@@ -49,14 +49,41 @@ tasks.md
 `spec.md` es obligatorio y lleva frontmatter con `state`, `app` y al menos un
 ID de requisito del SRS. `plan.md` y `tasks.md` son obligatorios cuando el
 estado no es `borrador`; en `tasks.md`, marca las tareas completadas con
-`- [x]`. Los IDs deben existir en `docs/backend-ref/srs.md` y el número de la
-carpeta debe corresponder al de la issue (por ejemplo, `FE-09` →
+`- [x]`. Los IDs deben existir en [`docs/srs.md`](./docs/srs.md) y el número de
+la carpeta debe corresponder al de la issue (por ejemplo, `FE-09` →
 `009-monitora-ruta-activa`).
 
 No generes ningún otro archivo, subcarpeta, captura, salida de comando ni
 carpeta `evidence/` dentro de una spec. Registra las verificaciones en
 `tasks.md` o en la descripción del PR. El CI valida tanto los nombres permitidos
 como el contenido de las specs.
+
+## Decisiones abiertas: no las resuelvas por tu cuenta
+
+Si tu tarea depende de alguna, avisa y espera instrucciones:
+
+- **Autenticación:** el backend devuelve los tokens en el cuerpo JSON, pero el
+  cliente compartido usa cookies (`credentials: include`) y no guarda tokens.
+  Falta alinear el contrato de login, expiración y refresh/logout.
+- **Eventos en tiempo real:** `packages/contracts/src/realtime-events.ts` está
+  vacío (`SocketEventName = never`); el backend aún no define el contrato de
+  Socket.IO.
+- **Estados del estudiante:** `packages/domain` usa `EN_CASA`,
+  `A_BORDO_VEHICULO`, `EN_COLEGIO` y `RETORNO_SEDE_POR_FALLA_ENTREGA`; el SRS
+  (sección 4) describe más estados.
+- **Textos oficiales** de capacidad agotada y de cupos ocasionales (el catálogo
+  actual difiere del SRS).
+
+## Documentación
+
+- Un tema tiene un solo documento canónico y el resto enlaza; no dupliques
+  procedimientos entre README y guías.
+- README solo en la raíz. No crees README por carpeta, app o paquete; la
+  documentación de proceso va en `docs/` o en la issue.
+- El flujo de Figma (exportación, assets y qué hacer si falta algo) vive en
+  [`docs/design/README.md`](./docs/design/README.md).
+- No crees documentación para lo que ya expresan el código, los tipos, las
+  pruebas o el CI.
 
 ## Entrega y validación
 
