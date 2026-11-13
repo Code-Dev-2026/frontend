@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Exporta un frame de Figma a docs/design/<app>/<pantalla>/.
+ * Exporta un frame de Figma a docs/design/<app-o-base>/<pantalla>/.
  *
  * Uso:
  *   $env:FIGMA_TOKEN="figd_..."
- *   pnpm figma:export "https://www.figma.com/design/<fileKey>/...?node-id=7-2" monitora/login
+ *   pnpm figma:export "https://www.figma.com/design/<fileKey>/...?node-id=7-2" base/login
  *
  * Requiere un token personal de Figma con permiso de lectura del archivo.
  * El token se lee de FIGMA_TOKEN o, si no existe, del archivo local
@@ -16,15 +16,15 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const APPS = new Set(['monitora', 'acudiente', 'portal']);
+const APPS = new Set(['base', 'monitora', 'acudiente', 'portal']);
 
 function usage() {
   console.error(
     [
-      'Uso: pnpm figma:export "<url-de-figma>" <app>/<pantalla>',
+      'Uso: pnpm figma:export "<url-de-figma>" <app-o-base>/<pantalla>',
       '',
       'Ejemplo:',
-      '  pnpm figma:export "https://www.figma.com/design/abc123/Untitled?node-id=7-2" monitora/login',
+      '  pnpm figma:export "https://www.figma.com/design/abc123/Untitled?node-id=7-2" base/login',
       '',
       'Requiere un token personal de Figma en FIGMA_TOKEN o en el archivo local .figma-token.',
     ].join('\n'),
@@ -68,12 +68,14 @@ function parseFigmaUrl(value) {
 function parseOutputDir(value) {
   const parts = value.replace(/\\/g, '/').split('/').filter(Boolean);
   if (parts.length !== 2) {
-    throw new Error('Indica el destino como <app>/<pantalla>.');
+    throw new Error('Indica el destino como <app-o-base>/<pantalla>.');
   }
 
   const [app, screen] = parts;
   if (!APPS.has(app)) {
-    throw new Error(`App inválida: ${app}. Usa monitora, acudiente o portal.`);
+    throw new Error(
+      `App inválida: ${app}. Usa base, monitora, acudiente o portal.`,
+    );
   }
   if (!/^[a-z0-9-]+$/.test(screen)) {
     throw new Error(
