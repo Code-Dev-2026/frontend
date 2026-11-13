@@ -1,6 +1,7 @@
 # Camino Seguro — Frontend
 
-Base del monorepo frontend para la plataforma Camino Seguro. El repositorio se organiza por roles de usuario y por paquetes compartidos de dominio y contratos.
+Monorepo frontend de la plataforma Camino Seguro: una app por rol y paquetes
+compartidos de dominio, contratos y UI.
 
 ## Estructura del repositorio
 
@@ -54,7 +55,6 @@ frontend/
 ├─ docs/
 │  ├─ design/
 │  │  └─ README.md
-│  ├─ figma-svg.md
 │  └─ srs.md
 ├─ packages/
 │  ├─ config/
@@ -129,38 +129,79 @@ frontend/
 
 <!-- estructura:fin -->
 
-> Este árbol se genera automáticamente desde el índice de Git. No edites el
-> bloque a mano: ejecuta `pnpm readme:sync` (o `pnpm readme:check` para validar).
+> Este árbol se genera desde el índice de Git. No edites el bloque a mano:
+> ejecuta `pnpm readme:sync` (o `pnpm readme:check` para validar).
 
-## Qué contiene cada nivel
+## Apps y paquetes
 
-### `apps/portal`
+- `apps/portal`: portal web (Next.js) para coordinación, rutas, matrículas y
+  gestión operativa.
+- `apps/acudiente`: app móvil (Expo) del acudiente para seguimiento y
+  comunicación.
+- `apps/monitora`: app móvil (Expo) de la monitora para abordaje, custodia y
+  entregas.
+- `packages/contracts`: clientes HTTP generados con Orval, modelos, `ApiError` y
+  mocks MSW. Ver [`packages/contracts/README.md`](./packages/contracts/README.md).
+- `packages/domain`: reglas de negocio puras, estados y validaciones.
+- `packages/ui`: primitivas visuales reutilizables (React Native), sin lógica de
+  negocio.
+- `packages/config`: configuración compartida de TypeScript, ESLint y Prettier.
 
-Aplicación web para administración operativa: rutas, matrículas, expedientes, reportes y coordinación.
+La dirección de dependencias es `apps/* → packages/*`. Nunca al revés.
 
-### `apps/acudiente`
+## Stack base
 
-Aplicación móvil para acudientes: seguimiento del recorrido, notificaciones y estado del menor.
+- Node 20 (`.nvmrc`) y pnpm 10 (`.npmrc`).
+- Turborepo y TypeScript estricto.
+- Next.js 15 para el portal.
+- Expo 52 + React Native 0.76.3 para las apps móviles; se usa **development
+  build**, no Expo Go.
 
-### `apps/monitora`
+## Configuración inicial
 
-Aplicación móvil para monitoras: asistencia, QR, custodia, entregas, alertas y trabajo offline.
+```bash
+pnpm install --frozen-lockfile
+```
 
-### `packages/contracts`
+## Comandos
 
-Contratos con el backend: clientes HTTP generados con Orval desde el snapshot
-real de Swagger en `packages/contracts/openapi.json`, modelos compartidos,
-errores de dominio y mocks MSW separados por módulo. Para generarlos desde el
-snapshot versionado. La guía de uso del cliente, `X-Idempotency-Key` y los
-eventos provisionales está en
-[`packages/contracts/README.md`](./packages/contracts/README.md).
+```bash
+pnpm dev            # portal + Metro de ambas apps
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm format         # escribe
+pnpm format:check   # valida
+pnpm invariants
+pnpm verify         # pipeline completo
+pnpm readme:sync    # regenera el árbol de este README
+pnpm readme:check   # valida que el árbol esté sincronizado
+```
+
+## Levantar las apps
+
+```bash
+pnpm --filter portal dev       # http://localhost:3000
+pnpm --filter monitora dev     # Metro en http://localhost:8082
+pnpm --filter acudiente dev    # Metro en http://localhost:8083
+pnpm --filter monitora android
+pnpm --filter acudiente android
+```
+
+Los puertos de Metro son fijos para que ambas apps convivan sin chocar con el
+`8081` por defecto de Expo. Para emulador, `adb reverse`, la URL `10.0.2.2` y la
+compilación nativa, ver [`apps/AGENTS.md`](./apps/AGENTS.md) §5.
+
+## Contratos con el backend
+
+Los clientes se generan desde el snapshot versionado:
 
 ```bash
 pnpm contracts:generate
 ```
 
-Para sincronizar el snapshot desde Swagger de NestJS y regenerar clientes,
-inicia el backend y ejecuta:
+Para sincronizar el snapshot desde el Swagger del backend:
 
 ```powershell
 $env:BACKEND_OPENAPI_URL = "http://localhost:3000/api/v1/docs-json"
@@ -168,231 +209,38 @@ pnpm contracts:sync-openapi
 Remove-Item Env:BACKEND_OPENAPI_URL
 ```
 
-La CI regenera solo desde el snapshot para que el build sea determinista. El
-Swagger actual expone 23 operaciones, pero omite esquemas de varios cuerpos y
-respuestas; esos valores no se inventan en el cliente y deben documentarse en
-el backend para obtener tipos más precisos.
+No edites `packages/contracts/src/generated` a mano: la CI regenera y falla si
+hay diferencias. El login del backend devuelve los tokens en el cuerpo JSON,
+pero el cliente compartido usa cookies y no persiste tokens; ese contrato sigue
+pendiente de alinear (ver “Decisiones abiertas” en [`AGENTS.md`](./AGENTS.md)).
 
-El login del backend devuelve los tokens en el cuerpo JSON, mientras que el
-cliente compartido envía cookies con `credentials: include` y no persiste
-tokens. Alinear el contrato de autenticación con el backend antes de conectar
-el flujo de inicio de sesión; el cliente no almacena ni registra credenciales.
+## Diseño (Figma)
 
-No edites `packages/contracts/src/generated` a mano. CI regenera los clientes y
-falla si el resultado no coincide con lo versionado; además ejecuta el
-typecheck de las tres apps.
+Cada pantalla se construye desde un frame de Figma. El flujo completo —cómo leer
+el enlace, exportar el frame, qué assets aporta el usuario y los criterios de
+SVG— está en [`docs/design/README.md`](./docs/design/README.md). La referencia
+de cada pantalla vive en `docs/design/<app>/<pantalla>/`.
 
-El portal, la app de acudientes y la de monitoras importan solo sus módulos
-desde `@camino/contracts/<modulo>`. La página `/health` del portal consulta el
-endpoint institucional real como ejemplo de consumo generado.
+## Calidad y CI
 
-### `packages/domain`
-
-Lógica de negocio: estados, validaciones, reglas de capacidad, restricciones y denegaciones.
-
-### `packages/ui`
-
-Primitivas visuales reutilizables para todas las apps.
-
-### `packages/config`
-
-Configuración base de TypeScript, linting y tooling compartido.
-
-## Stack base
-
-- Node 20 LTS
-- pnpm 10
-- Turborepo
-- TypeScript
-- Next.js para la app web
-- Expo + React Native para apps móviles
-
-## Configuración inicial
-
-```bash
-cd frontend
-pnpm install --frozen-lockfile
-```
-
-## Levantar las apps móviles
-
-`apps/monitora` y `apps/acudiente` usan Expo con **development build** (no Expo
-Go): la cámara, MapLibre y las notificaciones requieren módulos nativos.
-
-```bash
-# 1. Dependencias del monorepo (linker aislado de pnpm, ver .npmrc)
-pnpm install --frozen-lockfile
-
-# 2. Portal web en http://localhost:3000
-pnpm --filter portal dev
-
-# 3. Metro de cada app en modo development build
-pnpm --filter monitora dev    # http://localhost:8082
-pnpm --filter acudiente dev   # http://localhost:8083
-
-# 4. Compilar, instalar y abrir en el emulador Android
-pnpm --filter monitora android
-pnpm --filter acudiente android
-```
-
-`pnpm dev` (tarea `dev` de Turbo) levanta el portal y el Metro de las dos apps a
-la vez. Los scripts fijan el puerto `8082` para monitora y `8083` para acudiente
-para que ambos Metro convivan sin chocar entre sí ni con el `8081` que usa otro
-proyecto Expo por defecto; el portal usa `3000`. Para diagnosticar el entorno de
-una app: `pnpm --filter monitora doctor`.
-
-### Abrir las apps en el emulador
-
-Con el emulador encendido y los Metro corriendo, presiona `a` en la terminal de
-cada Metro o abre la URL del development build. Si el emulador no alcanza
-`10.0.2.2` (por ejemplo, por el firewall de Windows), redirige los puertos con
-`adb reverse` y usa `localhost`:
-
-```powershell
-$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb reverse tcp:8082 tcp:8082
-& $adb reverse tcp:8083 tcp:8083
-& $adb shell am start -a android.intent.action.VIEW -d "monitora://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8082" -p com.caminoseguro.monitora
-& $adb shell am start -a android.intent.action.VIEW -d "acudiente://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8083" -p com.caminoseguro.acudiente
-```
-
-Si cambias de puerto, actualiza también los `adb reverse` y las URLs del dev
-client.
-
-### URL del backend en el emulador
-
-El emulador Android ve la máquina anfitriona en `10.0.2.2`, no en `localhost`.
-Por defecto ambas apps usan `http://10.0.2.2:3000/api/v1` y
-`http://10.0.2.2:3001`; sobrescribe con `EXPO_PUBLIC_API_URL` y
-`EXPO_PUBLIC_SOCKET_URL` (ver `.env.example`) para el simulador de iOS, un
-dispositivo físico o un backend desplegado.
-
-### Metro y el monorepo
-
-Cada app tiene su `metro.config.js`, que vigila la raíz del monorepo, resuelve
-`node_modules` desde la app y desde la raíz, y activa los `exports` de
-`package.json` para que `@camino/contracts/<modulo>` se importe por subrutas. No
-dupliques esa configuración ni importes paquetes por ruta relativa.
-
-Metro no vigila `android/` ni `ios/`: son carpetas nativas que genera
-`expo prebuild` y sus archivos intermedios cambian mientras Gradle compila. En
-Windows, vigilarlas bloquea el renombrado de workspaces de Gradle
-(`AccessDeniedException`).
-
-### Nota de compilación nativa (Android)
-
-React Native `0.76.3` (la versión que fija esta entrega; no se actualiza) hace
-que Gradle resuelva Kotlin `1.9.24`, mientras el template de Expo SDK 52 pide
-`1.9.25` para el compilador de Compose. Si `expo run:android` falla con
-`Compose Compiler requires Kotlin version 1.9.25`, compila indicando la versión
-que sí está en el classpath:
-
-```bash
-cd apps/monitora   # o apps/acudiente
-./android/gradlew -p android app:assembleDebug -Pandroid.kotlinVersion=1.9.24
-adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-Actualizar React Native a `0.76.9` (lo que sugiere `expo-doctor`) queda fuera
-del alcance de FE-03.
-
-## Referencias de diseño (Figma)
-
-Cada pantalla se construye a partir de un frame de Figma. La referencia de cada
-pantalla vive en `docs/design/<app>/<pantalla>/` (frame, SVG, textos y tokens);
-la guía completa está en [`docs/design/README.md`](docs/design/README.md).
-
-Para exportar un frame con un token personal de Figma (solo lectura):
-
-```powershell
-# Opción 1: archivo local ignorado por Git
-Set-Content -NoNewline .figma-token "figd_..."
-pnpm figma:export "<url-de-figma-con-node-id>" <app>/<pantalla>
-Remove-Item .figma-token
-
-# Opción 2: variable de entorno
-$env:FIGMA_TOKEN = "figd_..."
-pnpm figma:export "<url-de-figma-con-node-id>" <app>/<pantalla>
-Remove-Item Env:FIGMA_TOKEN
-```
-
-El token nunca se escribe en el repositorio.
-
-## Comandos básicos
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm format
-pnpm format:check
-pnpm readme:sync
-pnpm readme:check
-pnpm verify
-```
-
-## Calidad, hooks y CI/CD
-
-- **ESLint**: configuración plana compartida en `packages/config/eslint.config.mjs`.
-  Cada workspace la extiende con su propio `eslint.config.mjs`; el portal añade las
-  reglas de Next.js.
-- **Prettier**: configuración compartida en `packages/config/prettier.config.mjs`.
-  `pnpm format` normaliza el repositorio y `pnpm format:check` valida sin escribir.
-- **TypeScript**: `strict: true` y `noUncheckedIndexedAccess` en
-  `packages/config/tsconfig.base.json`.
-- **Husky + lint-staged**: `.husky/pre-commit` ejecuta ESLint y Prettier sobre los
-  archivos en stage. `.husky/commit-msg` valida Conventional Commits con
-  Commitlint.
-- **Estructura del README**: `scripts/sync-readme-structure.mjs` reconstruye el
-  árbol del repositorio entre los marcadores `<!-- estructura:inicio -->` y
-  `<!-- estructura:fin -->`. `pnpm readme:sync` lo actualiza y
-  `pnpm readme:check` (en CI y en el hook `pre-commit`) falla si quedó
-  desactualizado.
-- **GitHub Actions**: `.github/workflows/ci.yml` instala con
-  `pnpm install --frozen-lockfile`, ejecuta formato, lint, typecheck, pruebas y
-  build, y restaura la caché de Turborepo (`.turbo`) entre ejecuciones.
-- **Verificación local completa**: `pnpm verify` ejecuta el mismo pipeline más los
-  invariantes de arquitectura y la comprobación del espejo del backend.
-
-## Convención de arquitectura
-
-- Cada app está orientada a un rol o usuario concreto.
-- Los paquetes compartidos resuelven dominio, contratos y UI.
-- La lógica de negocio vive en `packages/domain` y no en la capa visual.
-- La UI no debe depender de transporte ni infraestructura concreta.
-
-## Cómo contribuir
-
-1. Crear o trabajar dentro de la app correcta según el rol.
-2. Mantener la lógica de negocio en `packages/domain`.
-3. Usar `packages/contracts` para cualquier cambio de API o evento.
-4. Reutilizar `packages/ui` en lugar de duplicar componentes.
-5. Ejecutar lint, typecheck y tests antes de cerrar cambios.
-
-## Estado actual
-
-Este README representa la base técnica del repositorio y no un producto final cerrado. La intención es mantener una estructura clara y escalable para el frontend de Camino Seguro.
-
-- `apps/portal`: portal web para coordinación, rutas, matrículas y gestión operativa.
-- `apps/acudiente`: app móvil del acudiente para seguimiento y comunicación.
-- `apps/monitora`: app móvil de la monitora para abordaje, custodia y entregas.
-- `packages/contracts`: tipos, DTOs y eventos compartidos entre apps y backend.
-- `packages/domain`: reglas de negocio, estados, transiciones y validaciones puras.
-- `packages/ui`: componentes reutilizables sin lógica de negocio.
-- `packages/config`: configuración centralizada de lint, TypeScript y tooling del monorepo.
-
-La dirección de dependencias es: `apps/* -> packages/*`. Nunca al revés.
-
-## Requisitos
-
-- Node 20
-- pnpm 10
+- ESLint y Prettier compartidos desde `packages/config`.
+- Husky + lint-staged en `pre-commit`; Commitlint (Conventional Commits) en
+  `commit-msg`.
+- CI (`.github/workflows/ci.yml`): formato, árbol del README, generación de
+  contratos, lint, typecheck, test, build e invariantes de arquitectura.
+- `pnpm verify` ejecuta el mismo pipeline en local, más la comprobación del SRS.
 
 ## Convenciones de trabajo
 
-- El frontend consume la API del backend; no la implementa.
-- La lógica de negocio se centraliza en `packages/domain`.
-- Los contratos se comparten desde `packages/contracts`.
-- La UI no debe depender directamente de transporte ni infraestructura concreta.
-- La base del proyecto debe mantenerse pequeña, clara y alineada con el SRS.
+- La lógica de negocio vive en `packages/domain`; no se reimplementa en las apps.
+- Los contratos HTTP y los mocks salen solo de `packages/contracts` (`@camino/*`).
+- La UI no depende de transporte ni infraestructura concreta.
+- Mantén el repositorio pequeño y alineado con el SRS.
+
+## Documentación
+
+Las guías de trabajo por alcance son [`AGENTS.md`](./AGENTS.md) (raíz),
+[`apps/AGENTS.md`](./apps/AGENTS.md) (móvil) y
+[`apps/portal/AGENTS.md`](./apps/portal/AGENTS.md) (web). Regla: un tema tiene un
+solo documento canónico y el resto enlaza; no se crean README por carpeta, app o
+paquete.

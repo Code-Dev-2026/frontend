@@ -69,7 +69,13 @@ function gitLsFiles() {
     encoding: 'utf8',
   });
   if (result.error || result.status !== 0) return null;
-  return result.stdout.split('\0').filter(Boolean).map(normalize);
+  // Ignora entradas del índice cuyo archivo ya no está en disco: así el árbol
+  // refleja también eliminaciones que todavía no se han preparado con git add.
+  return result.stdout
+    .split('\0')
+    .filter(Boolean)
+    .map(normalize)
+    .filter((file) => existsSync(path.join(ROOT, file)));
 }
 
 async function walkFiles() {

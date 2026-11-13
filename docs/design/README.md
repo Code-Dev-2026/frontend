@@ -6,10 +6,9 @@ el archivo original (es privado y no es accesible desde el repositorio ni desde
 CI).
 
 Regla de oro: si un dato visual (color, tamaño, texto, icono, logo) no está en
-esta carpeta, **no se inventa**. El agente se detiene y pide el asset. Ver
-`apps/AGENTS.md` §4.1 (móvil) y `apps/portal/AGENTS.md` §5.1 (web).
-Para exportar y validar SVG destinados a React Native, consulta también
-`docs/figma-svg.md`.
+esta carpeta, **no se inventa**. El agente se detiene y pide el asset; el
+procedimiento completo está en la §8 de este documento.
+Los criterios de SVG para React Native están en la §9.
 
 ## 1. Cómo leer una URL de Figma
 
@@ -146,7 +145,79 @@ Si `figma-node.json` queda muy pesado, resume los valores relevantes en
 - **Escribe el agente:** los componentes de React Native / React, usando los
   tokens y SVG. No se aportan componentes de React desde Figma.
 
-## 7. Referencias
+## 8. Si falta un asset, un dato o una decisión
 
-- Reglas móviles: `apps/AGENTS.md` §4 y §4.1.
-- Reglas web: `apps/portal/AGENTS.md` §5 y §5.1.
+Antes de escribir código de una pantalla, verifica que existan los archivos del
+bloque **"Assets listos"** de la issue (frame, SVG, `textos.md`, tokens).
+
+**Falta algo que define cómo se ve o qué dice la pantalla** (un frame, un SVG de
+logo o icono, los textos, los tokens, un estado como error o vacío):
+
+1. **Detente.** No escribas código de esa pantalla ni "aproximes" el diseño con
+   colores, tamaños o textos inventados.
+2. Responde con una lista de lo que falta: ruta esperada de cada archivo y para
+   qué se necesita.
+3. **Espera** a que la persona lo agregue. Si la sesión es interactiva, pregunta
+   y quédate esperando la respuesta.
+4. Si trabajas **sin nadie presente** (segundo plano, tarea programada o CI) y no
+   puedes preguntar: no avances con esa pantalla. Entrega solo lo que no depende
+   del asset, deja la lista de pendientes en el PR y termina.
+
+**Falta solo un detalle menor** (un espaciado intermedio, un color de un estado
+secundario que el diseño no especifica): usa el token más cercano ya definido, no
+agregues valores nuevos y anótalo en el PR bajo "Decisiones tomadas".
+
+**Falta un dato o una decisión de backend:** avisa y espera; no la resuelvas por
+tu cuenta (ver "Decisiones abiertas" en `AGENTS.md`).
+
+**Nunca:**
+
+- Pegar un placeholder (cuadro gris, logo genérico, texto "Lorem ipsum") y
+  presentarlo como terminado. Si usas uno para poder compilar, márcalo con
+  `// PROVISIONAL: falta <archivo>` y decláralo en el PR.
+- Redibujar un SVG de Figma a mano ni usar un icono de librería en su lugar sin
+  que la issue lo permita.
+- Afirmar que la pantalla "se ve igual al diseño" si no tenías el frame para
+  compararla.
+
+## 9. Criterios de SVG para React Native
+
+Los logos, iconos e ilustraciones se guardan una sola vez en
+`packages/ui/src/svg/` y se importan como componentes:
+
+```tsx
+import Logo from '@camino/ui/svg/logo-texto.svg';
+
+<Logo width={160} height={174} />;
+```
+
+### Preparar el archivo en Figma
+
+- Exporta cada logo, icono o ilustración individualmente en SVG; no exportes una
+  pantalla completa como un único componente.
+- Convierte textos y trazos a contornos antes de exportar.
+- Usa nombres en kebab-case y un `viewBox` explícito.
+- No incrustes imágenes rasterizadas ni uses filtros SVG.
+- Conserva los colores originales. Usa `currentColor` solo para elementos que
+  deban cambiar de color según el tema.
+
+### Optimización y validación
+
+SVGO usa `packages/ui/svgo.config.js`, que conserva `viewBox` y los IDs de
+gradientes, máscaras y clip-paths. No reemplaces ni cambies esos IDs a mano.
+Después de agregar o modificar un SVG, ejecuta:
+
+```bash
+pnpm --filter @camino/ui svg:check
+pnpm --filter @camino/ui test
+```
+
+El chequeo detecta filtros, imágenes incrustadas, textos o fuentes sin convertir
+a contornos, y comprueba que SVGO conserve el `viewBox`, los IDs protegidos y
+las referencias.
+
+## 10. Referencias
+
+- Reglas compartidas: `AGENTS.md`.
+- Reglas móviles: `apps/AGENTS.md` §4 y §5.
+- Reglas web: `apps/portal/AGENTS.md` §5.

@@ -39,8 +39,43 @@ const SKIP_DIRS = new Set([
   '.git',
   '.expo',
   '.expo-shared',
+  'android',
+  'ios',
 ]);
 const SKIP_FILE = /(\.test\.|\.spec\.|__tests__)/;
+
+// Documentación: solo estos README están permitidos. El resto de la
+// documentación vive en AGENTS.md y docs/.
+const ALLOWED_README = new Set([
+  'README.md',
+  'docs/design/README.md',
+  'packages/contracts/README.md',
+]);
+const DOC_GUIDES = [
+  'README.md',
+  'AGENTS.md',
+  'apps/AGENTS.md',
+  'apps/portal/AGENTS.md',
+  'docs/design/README.md',
+  'packages/contracts/README.md',
+];
+const DOC_PATH_PREFIXES = [
+  '.github/',
+  'apps/',
+  'packages/',
+  'docs/',
+  'scripts/',
+  'specs/',
+];
+const DOC_ROOT_FILES = new Set([
+  'README.md',
+  'AGENTS.md',
+  '.nvmrc',
+  '.npmrc',
+  'package.json',
+]);
+// Ignora ejemplos, globs y plantillas: `apps/*`, `packages/...`, `<app>`.
+const DOC_SKIP_PATTERN = /[<>*{}|]|\.\.\./;
 
 const RULES = [
   {
@@ -137,6 +172,48 @@ async function scanSources() {
           }
         }
       });
+    });
+  }
+}
+
+async function checkDocs() {
+  await walk(ROOT, async (file) => {
+    if (path.basename(file) !== 'README.md') return;
+    const relative = rel(file);
+    if (ALLOWED_README.has(relative)) return;
+    errors.push({
+      kind: 'docs',
+      file: relative,
+      message:
+        'README no permitido: usa README.md (raíz), docs/design/README.md o packages/contracts/README.md.',
+    });
+  });
+
+  for (const guide of DOC_GUIDES) {
+    const file = path.join(ROOT, guide);
+    if (!existsSync(file)) continue;
+    const lines = (await readFile(file, 'utf8')).split(/\r?\n/);
+    lines.forEach((line, index) => {
+      for (const match of line.matchAll(/`([^`\n]+)`/g)) {
+        const raw = match[1].trim();
+        const candidate = raw.startsWith('./') ? raw.slice(2) : raw;
+        if (!candidate || DOC_SKIP_PATTERN.test(candidate)) continue;
+        const isRootFile =
+          !candidate.includes('/') && DOC_ROOT_FILES.has(candidate);
+        const hasPrefix = DOC_PATH_PREFIXES.some((prefix) =>
+          candidate.startsWith(prefix),
+        );
+        if (!isRootFile && !hasPrefix) continue;
+        if (candidate.includes(' ') || candidate.includes('#')) continue;
+        if (!existsSync(path.join(ROOT, candidate))) {
+          errors.push({
+            kind: 'docs',
+            file: guide,
+            line: index + 1,
+            message: `La ruta \`${raw}\` no existe.`,
+          });
+        }
+      }
     });
   }
 }
@@ -331,5 +408,6 @@ function printResults() {
 
 if (!SOURCE_ONLY) await checkSpecs();
 if (!SPECS_ONLY) await scanSources();
+await checkDocs();
 printResults();
 process.exit(errors.length === 0 ? 0 : 1);
