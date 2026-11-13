@@ -32,6 +32,7 @@ pnpm --filter acudiente android
 
 > Disponible una vez completada la issue FE-06. Antes de eso, no agregues SVG ni `react-native-svg` por tu cuenta.
 
+- Antes de tocar una pantalla, lee `docs/design/README.md`: explica cómo interpretar el enlace de Figma (`fileKey` y `node-id`) y cómo exportar el frame a `docs/design/<app>/<pantalla>/` con `pnpm figma:export` (requiere `FIGMA_TOKEN`) o a mano. Si el archivo es privado y no hay token, pide al usuario la exportación (PNG + SVG + textos + tokens); no interpretes el enlace sin esos datos.
 - Los logos e interfaces se diseñan en Figma y llegan como `.svg`. El componente resultante debe verse **idéntico** al diseño (medidas, colores, trazos, degradados).
 - Los SVG viven en `packages/ui/src/svg/` con nombres en kebab-case (`logo-texto.svg`, `icon-qr-scan.svg`) y se importan como componentes. No dejes copias en las apps.
 - Nunca conviertas a PNG un logo o ilustración que exista como SVG.
@@ -39,7 +40,7 @@ pnpm --filter acudiente android
 - Ejecuta `pnpm --filter @camino/ui svg:check` y corrige filtros, imágenes incrustadas y texto sin convertir a contornos.
 - Colores, tipografías, radios y espaciados salen de los tokens de `packages/ui`, no de valores escritos en la pantalla.
 - Elementos táctiles de **48 px mínimo** y alto contraste para exteriores (RNF-04).
-- Las referencias de diseño de cada pantalla están en `docs/design/<app>/<pantalla>/` (captura del frame + SVG + textos). Si no existen, aplica la sección 7.1: **detente y pide el asset; no inventes el diseño.**
+- Las referencias de diseño de cada pantalla están en `docs/design/<app>/<pantalla>/` (captura del frame + SVG + textos). Si no existen, aplica la sección 4.1: **detente y pide el asset; no inventes el diseño.**
 
 ## 4.1 Cuando falta un asset, un dato o una decisión
 

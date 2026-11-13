@@ -63,6 +63,7 @@ Hay dos zonas de código (`app/` y `src/`). **Problema conocido:** `tailwind.con
 - Los **SVG** (logos, iconos, ilustraciones) se usan como archivos en `public/` o como componentes React mediante SVGR (`@svgr/webpack` en `next.config.mjs`), **sin** `react-native-svg`. Nombres en kebab-case. No rasterices SVG.
 - Los componentes se construyen con shadcn/ui y se ajustan al diseño; no copies estilos "aproximados".
 - Referencias de diseño de cada pantalla: `docs/design/portal/<pantalla>/` (frame + SVG + textos). Si faltan, aplica la sección 5.1.
+- Antes de tocar una pantalla, lee `docs/design/README.md`: explica cómo interpretar el enlace de Figma (`fileKey` y `node-id`) y cómo exportar el frame a `docs/design/portal/<pantalla>/` con `pnpm figma:export` (requiere `FIGMA_TOKEN`) o a mano. Si el archivo es privado y no hay token, pide la exportación (PNG + SVG + textos + tokens).
 
 ## 5.1 Cuando falta un asset, un dato o una decisión
 

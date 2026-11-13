@@ -52,6 +52,8 @@ frontend/
 │  │  └─ tsconfig.json
 │  └─ AGENTS.md
 ├─ docs/
+│  ├─ design/
+│  │  └─ README.md
 │  └─ srs.md
 ├─ packages/
 │  ├─ config/
@@ -84,6 +86,7 @@ frontend/
 │     └─ tsconfig.json
 ├─ scripts/
 │  ├─ check-invariants.mjs
+│  ├─ figma-export.mjs
 │  ├─ sync-backend-ref.mjs
 │  ├─ sync-readme-structure.mjs
 │  └─ verify.mjs
@@ -277,6 +280,22 @@ adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 
 Actualizar React Native a `0.76.9` (lo que sugiere `expo-doctor`) queda fuera
 del alcance de FE-03.
+
+## Referencias de diseño (Figma)
+
+Cada pantalla se construye a partir de un frame de Figma. La referencia de cada
+pantalla vive en `docs/design/<app>/<pantalla>/` (frame, SVG, textos y tokens);
+la guía completa está en [`docs/design/README.md`](docs/design/README.md).
+
+Para exportar un frame con un token personal de Figma (solo lectura):
+
+```powershell
+$env:FIGMA_TOKEN = "figd_..."
+pnpm figma:export "<url-de-figma-con-node-id>" <app>/<pantalla>
+Remove-Item Env:FIGMA_TOKEN
+```
+
+El token nunca se escribe en el repositorio.
 
 ## Comandos básicos
 
