@@ -87,6 +87,7 @@ const SPEC_APPS = new Set([
   'packages',
   'transversal',
 ]);
+const SPEC_FILES = new Set(['spec.md', 'plan.md', 'tasks.md']);
 const REQ_ID = /^(?:RF|RNF|RN|HU)-\d{2}$/;
 
 const errors = [];
@@ -179,14 +180,14 @@ function stripQuotes(value) {
 }
 
 async function loadSrsIds() {
-  const mirror = path.join(ROOT, 'docs', 'backend-ref', 'srs.md');
-  if (!existsSync(mirror)) {
+  const srsFile = path.join(ROOT, 'docs', 'srs.md');
+  if (!existsSync(srsFile)) {
     warnings.push(
-      'No existe docs/backend-ref/srs.md: no se pueden validar los IDs de las specs.',
+      'No existe docs/srs.md: no se pueden validar los IDs de las specs.',
     );
     return null;
   }
-  const text = await readFile(mirror, 'utf8');
+  const text = await readFile(srsFile, 'utf8');
   const ids = new Set();
   for (const match of text.matchAll(/\b(?:RF|RNF|RN|HU)-\d{2}\b/g))
     ids.add(match[0]);
@@ -212,6 +213,15 @@ async function checkSpecs() {
     }
     checkedSpecs += 1;
     const dir = path.join(specsDir, entry.name);
+    const specEntries = await readdir(dir, { withFileTypes: true });
+    for (const specEntry of specEntries) {
+      if (specEntry.isFile() && SPEC_FILES.has(specEntry.name)) continue;
+      errors.push({
+        kind: 'spec',
+        file: `specs/${entry.name}/${specEntry.name}`,
+        message: 'Solo se permiten spec.md, plan.md y tasks.md en la carpeta.',
+      });
+    }
     const specFile = path.join(dir, 'spec.md');
     if (!existsSync(specFile)) {
       errors.push({
@@ -293,19 +303,6 @@ async function checkSpecs() {
             message: 'No hay tareas marcadas como completadas.',
           });
         }
-      }
-    }
-    if (meta.state === 'verificada') {
-      const evidenceDir = path.join(dir, 'evidence');
-      const evidenceOk =
-        existsSync(evidenceDir) &&
-        (await readdir(evidenceDir)).some((name) => name !== 'README.md');
-      if (!evidenceOk) {
-        errors.push({
-          kind: 'spec',
-          file: `specs/${entry.name}`,
-          message: 'state=verificada sin evidencia.',
-        });
       }
     }
   }
