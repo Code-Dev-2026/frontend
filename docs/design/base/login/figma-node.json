@@ -1,8 +1,7 @@
 {
   "name": "Untitled",
-  "lastModified": "2026-11-13T12:59:49Z",
-  "thumbnailUrl": "https://s3-alpha.figma.com/thumbnails/cf6ecde3-57d6-4f7c-87b7-9ea59e6233dc?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQ4GOSFWCY65GOSXI%2F20261112%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261112T000000Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=bf07a945d65d724f4ddcb23a67b24cc8af061a4cafc89958b9225dd35b4dfe5f",
-  "version": "2421333808478520121",
+  "lastModified": "2026-11-13T22:27:57Z",
+  "version": "2421484140386626882",
   "role": "owner",
   "editorType": "figma",
   "linkAccess": "view",
@@ -1195,13 +1194,13 @@
                 "children": [
                   {
                     "id": "15:7867",
-                    "name": "Correo electrónico o teléfono",
+                    "name": "Correo electrónico",
                     "type": "FRAME",
                     "scrollBehavior": "SCROLLS",
                     "children": [
                       {
                         "id": "15:7868",
-                        "name": "Correo electrónico o teléfono",
+                        "name": "Correo electrónico",
                         "type": "TEXT",
                         "scrollBehavior": "SCROLLS",
                         "blendMode": "PASS_THROUGH",
@@ -1229,7 +1228,7 @@
                         "absoluteRenderBounds": {
                           "x": 25.67755699157715,
                           "y": 223.99632263183594,
-                          "width": 166.2411346435547,
+                          "width": 105.38565826416016,
                           "height": 9.515625
                         },
                         "constraints": {
@@ -1240,7 +1239,7 @@
                         "layoutGrow": 0,
                         "layoutSizingHorizontal": "FILL",
                         "layoutSizingVertical": "HUG",
-                        "characters": "Correo electrónico o teléfono",
+                        "characters": "Correo electrónico ",
                         "characterStyleOverrides": [],
                         "styleOverrideTable": {},
                         "lineTypes": [
@@ -1273,13 +1272,13 @@
                       },
                       {
                         "id": "15:7869",
-                        "name": "Campo · Correo electrónico o teléfono",
+                        "name": "Campo · Correo electrónico ",
                         "type": "FRAME",
                         "scrollBehavior": "SCROLLS",
                         "children": [
                           {
                             "id": "15:7870",
-                            "name": "Ingresa tu correo o teléfono",
+                            "name": "Ingresa tu correo ",
                             "type": "TEXT",
                             "scrollBehavior": "SCROLLS",
                             "blendMode": "PASS_THROUGH",
@@ -1306,9 +1305,9 @@
                             },
                             "absoluteRenderBounds": {
                               "x": 41.1448860168457,
-                              "y": 260.6866760253906,
-                              "width": 168.29368591308594,
-                              "height": 13
+                              "y": 261.42529296875,
+                              "width": 102.84934997558594,
+                              "height": 12.261383056640625
                             },
                             "constraints": {
                               "vertical": "TOP",
@@ -1318,7 +1317,7 @@
                             "layoutGrow": 1,
                             "layoutSizingHorizontal": "FILL",
                             "layoutSizingVertical": "HUG",
-                            "characters": "Ingresa tu correo o teléfono",
+                            "characters": "Ingresa tu correo ",
                             "characterStyleOverrides": [],
                             "styleOverrideTable": {},
                             "lineTypes": [
@@ -2062,25 +2061,7 @@
                     "layoutSizingHorizontal": "FIXED",
                     "layoutSizingVertical": "FIXED",
                     "effects": [],
-                    "transitionNodeID": "15:8220",
-                    "transitionDuration": 300,
-                    "transitionEasing": "EASE_OUT",
-                    "interactions": [
-                      {
-                        "trigger": {
-                          "type": "ON_CLICK"
-                        },
-                        "actions": [
-                          {
-                            "type": "NODE",
-                            "destinationId": null,
-                            "navigation": "NAVIGATE",
-                            "transition": null,
-                            "resetScrollPosition": true
-                          }
-                        ]
-                      }
-                    ],
+                    "interactions": [],
                     "complexStrokeProperties": {
                       "strokeType": "BASIC"
                     }
@@ -2283,57 +2264,6 @@
                     }
                   },
                   {
-                    "id": "15:7883",
-                    "name": "Acceso con Google, Facebook o Apple",
-                    "type": "FRAME",
-                    "scrollBehavior": "SCROLLS",
-                    "children": [],
-                    "blendMode": "PASS_THROUGH",
-                    "clipsContent": true,
-                    "background": [],
-                    "fills": [],
-                    "strokes": [],
-                    "strokeWeight": 1,
-                    "strokeAlign": "INSIDE",
-                    "backgroundColor": {
-                      "r": 0,
-                      "g": 0,
-                      "b": 0,
-                      "a": 0
-                    },
-                    "layoutMode": "HORIZONTAL",
-                    "primaryAxisSizingMode": "FIXED",
-                    "primaryAxisAlignItems": "CENTER",
-                    "strokesIncludedInLayout": true,
-                    "itemSpacing": 16,
-                    "layoutWrap": "NO_WRAP",
-                    "absoluteBoundingBox": {
-                      "x": 25,
-                      "y": 512.3798828125,
-                      "width": 340,
-                      "height": 44
-                    },
-                    "absoluteRenderBounds": {
-                      "x": 25,
-                      "y": 512.3798828125,
-                      "width": 340,
-                      "height": 44
-                    },
-                    "constraints": {
-                      "vertical": "TOP",
-                      "horizontal": "LEFT"
-                    },
-                    "layoutAlign": "STRETCH",
-                    "layoutGrow": 0,
-                    "layoutSizingHorizontal": "FILL",
-                    "layoutSizingVertical": "HUG",
-                    "effects": [],
-                    "interactions": [],
-                    "complexStrokeProperties": {
-                      "strokeType": "BASIC"
-                    }
-                  },
-                  {
                     "id": "15:7891",
                     "name": "Crear cuenta nueva",
                     "type": "FRAME",
@@ -2362,13 +2292,13 @@
                         "strokeAlign": "OUTSIDE",
                         "absoluteBoundingBox": {
                           "x": 26,
-                          "y": 586.3798828125,
+                          "y": 526.3798828125,
                           "width": 338,
                           "height": 20
                         },
                         "absoluteRenderBounds": {
                           "x": 129.60804748535156,
-                          "y": 591.058837890625,
+                          "y": 531.058837890625,
                           "width": 130.6446990966797,
                           "height": 10.47515869140625
                         },
@@ -2469,13 +2399,13 @@
                     "layoutWrap": "NO_WRAP",
                     "absoluteBoundingBox": {
                       "x": 25,
-                      "y": 572.3798828125,
+                      "y": 512.3798828125,
                       "width": 340,
                       "height": 48
                     },
                     "absoluteRenderBounds": {
                       "x": 25,
-                      "y": 572.3798828125,
+                      "y": 512.3798828125,
                       "width": 340,
                       "height": 47.999969482421875
                     },
@@ -2488,25 +2418,7 @@
                     "layoutSizingHorizontal": "FILL",
                     "layoutSizingVertical": "FIXED",
                     "effects": [],
-                    "transitionNodeID": "15:8070",
-                    "transitionDuration": 300,
-                    "transitionEasing": "EASE_OUT",
-                    "interactions": [
-                      {
-                        "trigger": {
-                          "type": "ON_CLICK"
-                        },
-                        "actions": [
-                          {
-                            "type": "NODE",
-                            "destinationId": null,
-                            "navigation": "NAVIGATE",
-                            "transition": null,
-                            "resetScrollPosition": true
-                          }
-                        ]
-                      }
-                    ],
+                    "interactions": [],
                     "complexStrokeProperties": {
                       "strokeType": "BASIC"
                     }
@@ -2534,13 +2446,13 @@
                   "x": 25,
                   "y": 495.3798522949219,
                   "width": 340,
-                  "height": 125
+                  "height": 65
                 },
                 "absoluteRenderBounds": {
                   "x": 25,
                   "y": 495.3798522949219,
                   "width": 340,
-                  "height": 125.00003051757812
+                  "height": 65.00003051757812
                 },
                 "constraints": {
                   "vertical": "TOP",
@@ -2579,13 +2491,13 @@
               "x": 25,
               "y": 32,
               "width": 340,
-              "height": 588.3798828125
+              "height": 528.3798828125
             },
             "absoluteRenderBounds": {
               "x": 25,
               "y": 32,
               "width": 340,
-              "height": 588.3798828125
+              "height": 528.3798828125
             },
             "constraints": {
               "vertical": "TOP",

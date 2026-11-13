@@ -7,6 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'monitora',
   version: '0.1.0',
   orientation: 'portrait',
+  plugins: [...(config.plugins ?? []), 'expo-font'],
   android: {
     package: 'com.caminoseguro.monitora',
   },

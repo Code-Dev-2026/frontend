@@ -111,6 +111,17 @@ No se admiten placeholders presentados como definitivos.
 3. El script crea `docs/design/<app-o-base>/<pantalla>/` con
    `figma-node.json`, `figma-styles.json`, `frame.png` y `frame.svg`.
 
+Para los estados de una misma pantalla, exporta el frame principal sin sufijo y
+cada estado adicional con `--suffix <estado>`. Así se generan archivos como
+`figma-node-error.json`, `frame-error.png` y `frame-error.svg` sin sobrescribir
+el frame principal:
+
+```powershell
+pnpm figma:export "<url-del-frame-vacío>" base/login
+pnpm figma:export "<url-del-frame-cargando>" base/login --suffix cargando
+pnpm figma:export "<url-del-frame-error>" base/login --suffix error
+```
+
 Después completa a mano `textos.md`, `tokens.json`, `medidas.md` y
 `estados.md`, y exporta cada SVG por separado si el frame los incluye.
 
@@ -149,6 +160,14 @@ Si `figma-node.json` queda muy pesado, resume los valores relevantes en
   `FIGMA_TOKEN` para generarlos).
 - **Escribe el agente:** los componentes de React Native / React, usando los
   tokens y SVG. No se aportan componentes de React desde Figma.
+
+## 7. Interfaces móviles compartidas
+
+Cuando una interfaz se construya para `apps/acudiente` y `apps/monitora`,
+implementa su presentación una sola vez en `packages/ui` y expórtala desde
+`packages/ui/src/index.ts`. Las apps la consumen desde `@camino/ui` y conservan
+solo sus acciones, datos y navegación propios. El componente compartido no debe
+conocer roles, llamar a la red ni duplicarse dentro de cada app.
 
 ## 8. Si falta un asset, un dato o una decisión
 
