@@ -1,19 +1,22 @@
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { ApiProvider } from './src/lib/api/provider';
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
-      <View style={styles.card}>
-        <Text style={styles.eyebrow}>Acudiente</Text>
-        <Text style={styles.title}>Camino Seguro</Text>
-        <Text style={styles.body}>
-          Mapa y alertas para seguimiento del menor cuando se encuentre a bordo
-          del vehículo.
-        </Text>
-      </View>
-    </SafeAreaView>
+    <ApiProvider>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={styles.card}>
+          <Text style={styles.eyebrow}>Acudiente</Text>
+          <Text style={styles.title}>Camino Seguro</Text>
+          <Text style={styles.body}>
+            Mapa y alertas para seguimiento del menor cuando se encuentre a
+            bordo del vehículo.
+          </Text>
+        </View>
+      </SafeAreaView>
+    </ApiProvider>
   );
 }
 

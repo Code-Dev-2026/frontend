@@ -73,6 +73,7 @@ frontend/
 │  │  ├─ openapi.json
 │  │  ├─ orval.config.ts
 │  │  ├─ package.json
+│  │  ├─ README.md
 │  │  └─ tsconfig.json
 │  ├─ domain/
 │  │  ├─ src/
@@ -96,6 +97,10 @@ frontend/
 │  └─ verify.mjs
 ├─ specs/
 │  ├─ 003-transversal-habilitar-expo/
+│  │  ├─ plan.md
+│  │  ├─ spec.md
+│  │  └─ tasks.md
+│  ├─ 004-packages-contracts-react-native/
 │  │  ├─ plan.md
 │  │  ├─ spec.md
 │  │  └─ tasks.md
@@ -146,7 +151,9 @@ Aplicación móvil para monitoras: asistencia, QR, custodia, entregas, alertas y
 Contratos con el backend: clientes HTTP generados con Orval desde el snapshot
 real de Swagger en `packages/contracts/openapi.json`, modelos compartidos,
 errores de dominio y mocks MSW separados por módulo. Para generarlos desde el
-snapshot versionado:
+snapshot versionado. La guía de uso del cliente, `X-Idempotency-Key` y los
+eventos provisionales está en
+[`packages/contracts/README.md`](./packages/contracts/README.md).
 
 ```bash
 pnpm contracts:generate

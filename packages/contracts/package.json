@@ -108,6 +108,18 @@
       "import": "./src/http/index.ts",
       "default": "./dist/http/index.js"
     },
+    "./realtime-events": {
+      "types": "./src/realtime-events.ts",
+      "react-native": "./src/realtime-events.ts",
+      "import": "./src/realtime-events.ts",
+      "default": "./dist/realtime-events.js"
+    },
+    "./realtime-simulator": {
+      "types": "./src/realtime-simulator.ts",
+      "react-native": "./src/realtime-simulator.ts",
+      "import": "./src/realtime-simulator.ts",
+      "default": "./dist/realtime-simulator.js"
+    },
     "./mocks": {
       "types": "./src/generated/mocks/index.ts",
       "react-native": "./src/generated/mocks/index.ts",

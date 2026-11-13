@@ -30,7 +30,7 @@ describe('domain state machine', () => {
   it('keeps the canonical state list and valid v7 uuid generation', () => {
     expect(STUDENT_STATES).toHaveLength(4);
     expect(createUuidV7()).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
     );
   });
 });
