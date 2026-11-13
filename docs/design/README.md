@@ -42,9 +42,13 @@ automáticamente (`7-2` → `7:2`).
 
 ```text
 docs/design/
+  base/             # diseño compartido por varias apps
   <app>/            # monitora | acudiente | portal
     <pantalla>/     # minúsculas, números y guiones (login, ruta-activa...)
 ```
+
+Usa `base/` cuando el diseño sea compartido por más de una app, como el login
+móvil. Para pantallas propias de un rol, usa la carpeta de esa app.
 
 Cada pantalla debe contener, como mínimo:
 
@@ -102,16 +106,28 @@ No se admiten placeholders presentados como definitivos.
    Remove-Item Env:FIGMA_TOKEN
    ```
 
-   El segundo argumento es `<app>/<pantalla>`.
+   El segundo argumento es `<app-o-base>/<pantalla>`.
 
-3. El script crea `docs/design/<app>/<pantalla>/` con `figma-node.json`,
-   `figma-styles.json`, `frame.png` y `frame.svg`.
+3. El script crea `docs/design/<app-o-base>/<pantalla>/` con
+   `figma-node.json`, `figma-styles.json`, `frame.png` y `frame.svg`.
+
+Para los estados de una misma pantalla, exporta el frame principal sin sufijo y
+cada estado adicional con `--suffix <estado>`. Así se generan archivos como
+`figma-node-error.json`, `frame-error.png` y `frame-error.svg` sin sobrescribir
+el frame principal:
+
+```powershell
+pnpm figma:export "<url-del-frame-vacío>" base/login
+pnpm figma:export "<url-del-frame-cargando>" base/login --suffix cargando
+pnpm figma:export "<url-del-frame-error>" base/login --suffix error
+```
 
 Después completa a mano `textos.md`, `tokens.json`, `medidas.md` y
 `estados.md`, y exporta cada SVG por separado si el frame los incluye.
 
-Si el login tiene **un frame por app**, ejecuta el comando una vez por cada
-`node-id` (por ejemplo `monitora/login` y `acudiente/login`).
+Si el login es compartido, usa `base/login`. Si cada app tiene un diseño
+distinto, ejecuta el comando una vez por cada `node-id` y destino, por ejemplo
+`monitora/login` y `acudiente/login`.
 
 Si `figma-node.json` queda muy pesado, resume los valores relevantes en
 `tokens.json` y `medidas.md` y conserva el JSON solo en local.
@@ -127,7 +143,7 @@ Si `figma-node.json` queda muy pesado, resume los valores relevantes en
    - tipografías, tamaños y pesos → `tokens.json`,
    - espaciados y tamaños → `medidas.md`,
    - todos los textos → `textos.md`.
-5. Copia los archivos a `docs/design/<app>/<pantalla>/`.
+5. Copia los archivos a `docs/design/<app-o-base>/<pantalla>/`.
 
 ## 5. Seguridad del token
 
@@ -144,6 +160,14 @@ Si `figma-node.json` queda muy pesado, resume los valores relevantes en
   `FIGMA_TOKEN` para generarlos).
 - **Escribe el agente:** los componentes de React Native / React, usando los
   tokens y SVG. No se aportan componentes de React desde Figma.
+
+## 7. Interfaces móviles compartidas
+
+Cuando una interfaz se construya para `apps/acudiente` y `apps/monitora`,
+implementa su presentación una sola vez en `packages/ui` y expórtala desde
+`packages/ui/src/index.ts`. Las apps la consumen desde `@camino/ui` y conservan
+solo sus acciones, datos y navegación propios. El componente compartido no debe
+conocer roles, llamar a la red ni duplicarse dentro de cada app.
 
 ## 8. Si falta un asset, un dato o una decisión
 

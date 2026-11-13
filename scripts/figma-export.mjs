@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Exporta un frame de Figma a docs/design/<app>/<pantalla>/.
+ * Exporta un frame de Figma a docs/design/<app-o-base>/<pantalla>/.
  *
  * Uso:
  *   $env:FIGMA_TOKEN="figd_..."
- *   pnpm figma:export "https://www.figma.com/design/<fileKey>/...?node-id=7-2" monitora/login
+ *   pnpm figma:export "https://www.figma.com/design/<fileKey>/...?node-id=7-2" base/login [--suffix cargando]
  *
  * Requiere un token personal de Figma con permiso de lectura del archivo.
  * El token se lee de FIGMA_TOKEN o, si no existe, del archivo local
@@ -16,15 +16,16 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const APPS = new Set(['monitora', 'acudiente', 'portal']);
+const APPS = new Set(['base', 'monitora', 'acudiente', 'portal']);
 
 function usage() {
   console.error(
     [
-      'Uso: pnpm figma:export "<url-de-figma>" <app>/<pantalla>',
+      'Uso: pnpm figma:export "<url-de-figma>" <app-o-base>/<pantalla> [--suffix <estado>]',
       '',
       'Ejemplo:',
-      '  pnpm figma:export "https://www.figma.com/design/abc123/Untitled?node-id=7-2" monitora/login',
+      '  pnpm figma:export "https://www.figma.com/design/abc123/Untitled?node-id=7-2" base/login',
+      '  pnpm figma:export "https://www.figma.com/design/abc123/Untitled?node-id=7-8" base/login --suffix error',
       '',
       'Requiere un token personal de Figma en FIGMA_TOKEN o en el archivo local .figma-token.',
     ].join('\n'),
@@ -68,12 +69,14 @@ function parseFigmaUrl(value) {
 function parseOutputDir(value) {
   const parts = value.replace(/\\/g, '/').split('/').filter(Boolean);
   if (parts.length !== 2) {
-    throw new Error('Indica el destino como <app>/<pantalla>.');
+    throw new Error('Indica el destino como <app-o-base>/<pantalla>.');
   }
 
   const [app, screen] = parts;
   if (!APPS.has(app)) {
-    throw new Error(`App inválida: ${app}. Usa monitora, acudiente o portal.`);
+    throw new Error(
+      `App inválida: ${app}. Usa base, monitora, acudiente o portal.`,
+    );
   }
   if (!/^[a-z0-9-]+$/.test(screen)) {
     throw new Error(
@@ -102,7 +105,7 @@ async function writeJson(file, value) {
   await writeFile(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-async function downloadImage(token, fileKey, nodeId, format, outDir) {
+async function downloadImage(token, fileKey, nodeId, format, outDir, suffix) {
   const scale = format === 'png' ? '&scale=2' : '';
   const response = await figmaGet(
     token,
@@ -121,7 +124,7 @@ async function downloadImage(token, fileKey, nodeId, format, outDir) {
     throw new Error(`No se pudo descargar la imagen ${format}.`);
   }
   await writeFile(
-    path.join(outDir, `frame.${format}`),
+    path.join(outDir, suffix ? `frame-${suffix}.${format}` : `frame.${format}`),
     Buffer.from(await asset.arrayBuffer()),
   );
 }
@@ -144,7 +147,22 @@ async function resolveToken() {
 
 async function main() {
   const token = await resolveToken();
-  const [urlArg, outputArg] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const suffixIndex = args.indexOf('--suffix');
+  let suffix = '';
+
+  if (suffixIndex !== -1) {
+    suffix = args[suffixIndex + 1] ?? '';
+    args.splice(suffixIndex, 2);
+    if (!/^[a-z0-9-]+$/.test(suffix)) {
+      console.error(
+        'El sufijo debe usar minúsculas, números y guiones (por ejemplo cargando).',
+      );
+      process.exit(1);
+    }
+  }
+
+  const [urlArg, outputArg] = args;
 
   if (!urlArg || !outputArg) {
     usage();
@@ -173,25 +191,33 @@ async function main() {
   if (!nodes.nodes?.[nodeId]) {
     throw new Error(`El nodo ${nodeId} no existe o no es accesible.`);
   }
-  await writeJson(path.join(outDir, 'figma-node.json'), nodes);
+  delete nodes.thumbnailUrl;
+  await writeJson(
+    path.join(outDir, suffix ? `figma-node-${suffix}.json` : 'figma-node.json'),
+    nodes,
+  );
 
-  try {
-    const stylesResponse = await figmaGet(token, `/files/${fileKey}/styles`);
-    await writeJson(
-      path.join(outDir, 'figma-styles.json'),
-      await stylesResponse.json(),
-    );
-  } catch (error) {
-    console.warn(`⚠ No se pudieron exportar los estilos: ${error.message}`);
+  if (!suffix) {
+    try {
+      const stylesResponse = await figmaGet(token, `/files/${fileKey}/styles`);
+      await writeJson(
+        path.join(outDir, 'figma-styles.json'),
+        await stylesResponse.json(),
+      );
+    } catch (error) {
+      console.warn(`⚠ No se pudieron exportar los estilos: ${error.message}`);
+    }
   }
 
-  await downloadImage(token, fileKey, nodeId, 'png', outDir);
-  await downloadImage(token, fileKey, nodeId, 'svg', outDir);
+  await downloadImage(token, fileKey, nodeId, 'png', outDir, suffix);
+  await downloadImage(token, fileKey, nodeId, 'svg', outDir, suffix);
 
-  console.log('✔ Frame exportado.');
-  console.log(
-    'Completa en la misma carpeta: textos.md, tokens.json, medidas.md, estados.md y los SVG individuales.',
-  );
+  console.log(suffix ? `✔ Frame exportado (${suffix}).` : '✔ Frame exportado.');
+  if (!suffix) {
+    console.log(
+      'Completa en la misma carpeta: textos.md, tokens.json, medidas.md, estados.md y los SVG individuales.',
+    );
+  }
 }
 
 main().catch((error) => {

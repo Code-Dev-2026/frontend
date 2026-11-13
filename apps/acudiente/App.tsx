@@ -1,55 +1,48 @@
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import { LoginScreen } from '@camino/ui';
+import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Alert } from 'react-native';
 import { ApiProvider } from './src/lib/api/provider';
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
+  if (fontError) throw fontError;
+  if (!fontsLoaded) return null;
+
   return (
-    <ApiProvider>
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="dark" />
-        <View style={styles.card}>
-          <Text style={styles.eyebrow}>Acudiente</Text>
-          <Text style={styles.title}>Camino Seguro</Text>
-          <Text style={styles.body}>
-            Mapa y alertas para seguimiento del menor cuando se encuentre a
-            bordo del vehículo.
-          </Text>
-        </View>
-      </SafeAreaView>
-    </ApiProvider>
+    <>
+      <StatusBar style="dark" />
+      <ApiProvider>
+        <LoginScreen
+          onCreateAccount={() =>
+            Alert.alert('Crear cuenta', 'El registro aún no está disponible.')
+          }
+          onForgotPassword={() =>
+            Alert.alert(
+              'Recuperar contraseña',
+              'La recuperación aún no está disponible.',
+            )
+          }
+          onSubmit={() =>
+            Alert.alert(
+              'Inicio de sesión',
+              'La autenticación aún no está conectada.',
+            )
+          }
+        />
+      </ApiProvider>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#f8fafc',
-    padding: 24,
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  eyebrow: {
-    color: '#64748b',
-    fontSize: 12,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    marginTop: 8,
-    color: '#0f172a',
-  },
-  body: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#334155',
-    lineHeight: 24,
-  },
-});
