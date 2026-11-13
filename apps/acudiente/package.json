@@ -2,8 +2,10 @@
   "name": "acudiente",
   "private": true,
   "version": "0.1.0",
+  "main": "index.js",
   "scripts": {
     "doctor": "npx expo-doctor",
+    "dev": "npx expo start --dev-client",
     "start": "npx expo start --dev-client",
     "android": "npx expo run:android",
     "ios": "npx expo run:ios",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@camino/config": "workspace:*",
     "@types/react": "^18.3.12",
+    "babel-preset-expo": "~12.0.0",
     "eslint": "^9.16.0",
     "typescript": "^5.7.2"
   }

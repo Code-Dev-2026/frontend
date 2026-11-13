@@ -21,7 +21,10 @@ frontend/
 │  │  ├─ src/
 │  │  ├─ app.config.ts
 │  │  ├─ App.tsx
+│  │  ├─ babel.config.js
 │  │  ├─ eslint.config.mjs
+│  │  ├─ index.js
+│  │  ├─ metro.config.js
 │  │  ├─ package.json
 │  │  └─ tsconfig.json
 │  ├─ monitora/
@@ -30,19 +33,24 @@ frontend/
 │  │  ├─ src/
 │  │  ├─ app.config.ts
 │  │  ├─ App.tsx
+│  │  ├─ babel.config.js
 │  │  ├─ eslint.config.mjs
+│  │  ├─ index.js
+│  │  ├─ metro.config.js
 │  │  ├─ package.json
 │  │  └─ tsconfig.json
-│  └─ portal/
-│     ├─ app/
-│     ├─ src/
-│     ├─ eslint.config.mjs
-│     ├─ next-env.d.ts
-│     ├─ next.config.mjs
-│     ├─ package.json
-│     ├─ postcss.config.js
-│     ├─ tailwind.config.ts
-│     └─ tsconfig.json
+│  ├─ portal/
+│  │  ├─ app/
+│  │  ├─ src/
+│  │  ├─ AGENTS.md
+│  │  ├─ eslint.config.mjs
+│  │  ├─ next-env.d.ts
+│  │  ├─ next.config.mjs
+│  │  ├─ package.json
+│  │  ├─ postcss.config.js
+│  │  ├─ tailwind.config.ts
+│  │  └─ tsconfig.json
+│  └─ AGENTS.md
 ├─ docs/
 │  └─ srs.md
 ├─ packages/
@@ -79,12 +87,19 @@ frontend/
 │  ├─ sync-backend-ref.mjs
 │  ├─ sync-readme-structure.mjs
 │  └─ verify.mjs
+├─ specs/
+│  └─ 003-transversal-habilitar-expo/
+│     ├─ plan.md
+│     ├─ spec.md
+│     └─ tasks.md
 ├─ .editorconfig
 ├─ .env.example
 ├─ .gitattributes
 ├─ .gitignore
+├─ .npmrc
 ├─ .nvmrc
 ├─ .prettierignore
+├─ AGENTS.md
 ├─ commitlint.config.js
 ├─ eslint.config.mjs
 ├─ lint-staged.config.mjs
@@ -180,6 +195,64 @@ Configuración base de TypeScript, linting y tooling compartido.
 cd frontend
 pnpm install --frozen-lockfile
 ```
+
+## Levantar las apps móviles
+
+`apps/monitora` y `apps/acudiente` usan Expo con **development build** (no Expo
+Go): la cámara, MapLibre y las notificaciones requieren módulos nativos.
+
+```bash
+# 1. Dependencias del monorepo (linker aislado de pnpm, ver .npmrc)
+pnpm install --frozen-lockfile
+
+# 2. Metro en modo development build
+pnpm --filter monitora dev
+pnpm --filter acudiente dev
+
+# 3. Compilar, instalar y abrir en el emulador Android
+pnpm --filter monitora android
+pnpm --filter acudiente android
+```
+
+`pnpm dev` (tarea `dev` de Turbo) levanta el portal y el Metro de las dos apps a
+la vez. Para diagnosticar el entorno de una app: `pnpm --filter monitora doctor`.
+
+### URL del backend en el emulador
+
+El emulador Android ve la máquina anfitriona en `10.0.2.2`, no en `localhost`.
+Por defecto ambas apps usan `http://10.0.2.2:3000/api/v1` y
+`http://10.0.2.2:3001`; sobrescribe con `EXPO_PUBLIC_API_URL` y
+`EXPO_PUBLIC_SOCKET_URL` (ver `.env.example`) para el simulador de iOS, un
+dispositivo físico o un backend desplegado.
+
+### Metro y el monorepo
+
+Cada app tiene su `metro.config.js`, que vigila la raíz del monorepo, resuelve
+`node_modules` desde la app y desde la raíz, y activa los `exports` de
+`package.json` para que `@camino/contracts/<modulo>` se importe por subrutas. No
+dupliques esa configuración ni importes paquetes por ruta relativa.
+
+Metro no vigila `android/` ni `ios/`: son carpetas nativas que genera
+`expo prebuild` y sus archivos intermedios cambian mientras Gradle compila. En
+Windows, vigilarlas bloquea el renombrado de workspaces de Gradle
+(`AccessDeniedException`).
+
+### Nota de compilación nativa (Android)
+
+React Native `0.76.3` (la versión que fija esta entrega; no se actualiza) hace
+que Gradle resuelva Kotlin `1.9.24`, mientras el template de Expo SDK 52 pide
+`1.9.25` para el compilador de Compose. Si `expo run:android` falla con
+`Compose Compiler requires Kotlin version 1.9.25`, compila indicando la versión
+que sí está en el classpath:
+
+```bash
+cd apps/monitora   # o apps/acudiente
+./android/gradlew -p android app:assembleDebug -Pandroid.kotlinVersion=1.9.24
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Actualizar React Native a `0.76.9` (lo que sugiere `expo-doctor`) queda fuera
+del alcance de FE-03.
 
 ## Comandos básicos
 
