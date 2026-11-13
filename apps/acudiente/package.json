@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@camino/ui": "workspace:*",
     "@camino/contracts": "workspace:*",
     "@maplibre/maplibre-react-native": "^10.0.0",
     "expo": "~52.0.0",
@@ -21,6 +22,7 @@
     "expo-status-bar": "~2.0.0",
     "react": "18.3.1",
     "react-native": "0.76.3",
+    "react-native-svg": "~15.8.0",
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
@@ -28,6 +30,7 @@
     "@types/react": "^18.3.12",
     "babel-preset-expo": "~12.0.0",
     "eslint": "^9.16.0",
+    "react-native-svg-transformer": "^1.5.1",
     "typescript": "^5.7.2"
   }
 }

@@ -8,6 +8,8 @@ CI).
 Regla de oro: si un dato visual (color, tamaño, texto, icono, logo) no está en
 esta carpeta, **no se inventa**. El agente se detiene y pide el asset. Ver
 `apps/AGENTS.md` §4.1 (móvil) y `apps/portal/AGENTS.md` §5.1 (web).
+Para exportar y validar SVG destinados a React Native, consulta también
+`docs/figma-svg.md`.
 
 ## 1. Cómo leer una URL de Figma
 
