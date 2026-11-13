@@ -10,6 +10,8 @@ ios
 .env
 .env.local
 .env.*.local
+# Token local de Figma para `pnpm figma:export` (nunca se versiona)
+.figma-token
 coverage
 build
 dist

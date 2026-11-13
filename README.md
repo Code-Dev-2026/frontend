@@ -52,6 +52,8 @@ frontend/
 │  │  └─ tsconfig.json
 │  └─ AGENTS.md
 ├─ docs/
+│  ├─ design/
+│  │  └─ README.md
 │  └─ srs.md
 ├─ packages/
 │  ├─ config/
@@ -84,6 +86,7 @@ frontend/
 │     └─ tsconfig.json
 ├─ scripts/
 │  ├─ check-invariants.mjs
+│  ├─ figma-export.mjs
 │  ├─ sync-backend-ref.mjs
 │  ├─ sync-readme-structure.mjs
 │  └─ verify.mjs
@@ -205,17 +208,41 @@ Go): la cámara, MapLibre y las notificaciones requieren módulos nativos.
 # 1. Dependencias del monorepo (linker aislado de pnpm, ver .npmrc)
 pnpm install --frozen-lockfile
 
-# 2. Metro en modo development build
-pnpm --filter monitora dev
-pnpm --filter acudiente dev
+# 2. Portal web en http://localhost:3000
+pnpm --filter portal dev
 
-# 3. Compilar, instalar y abrir en el emulador Android
+# 3. Metro de cada app en modo development build
+pnpm --filter monitora dev    # http://localhost:8082
+pnpm --filter acudiente dev   # http://localhost:8083
+
+# 4. Compilar, instalar y abrir en el emulador Android
 pnpm --filter monitora android
 pnpm --filter acudiente android
 ```
 
 `pnpm dev` (tarea `dev` de Turbo) levanta el portal y el Metro de las dos apps a
-la vez. Para diagnosticar el entorno de una app: `pnpm --filter monitora doctor`.
+la vez. Los scripts fijan el puerto `8082` para monitora y `8083` para acudiente
+para que ambos Metro convivan sin chocar entre sí ni con el `8081` que usa otro
+proyecto Expo por defecto; el portal usa `3000`. Para diagnosticar el entorno de
+una app: `pnpm --filter monitora doctor`.
+
+### Abrir las apps en el emulador
+
+Con el emulador encendido y los Metro corriendo, presiona `a` en la terminal de
+cada Metro o abre la URL del development build. Si el emulador no alcanza
+`10.0.2.2` (por ejemplo, por el firewall de Windows), redirige los puertos con
+`adb reverse` y usa `localhost`:
+
+```powershell
+$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
+& $adb reverse tcp:8082 tcp:8082
+& $adb reverse tcp:8083 tcp:8083
+& $adb shell am start -a android.intent.action.VIEW -d "monitora://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8082" -p com.caminoseguro.monitora
+& $adb shell am start -a android.intent.action.VIEW -d "acudiente://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8083" -p com.caminoseguro.acudiente
+```
+
+Si cambias de puerto, actualiza también los `adb reverse` y las URLs del dev
+client.
 
 ### URL del backend en el emulador
 
@@ -253,6 +280,28 @@ adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 
 Actualizar React Native a `0.76.9` (lo que sugiere `expo-doctor`) queda fuera
 del alcance de FE-03.
+
+## Referencias de diseño (Figma)
+
+Cada pantalla se construye a partir de un frame de Figma. La referencia de cada
+pantalla vive en `docs/design/<app>/<pantalla>/` (frame, SVG, textos y tokens);
+la guía completa está en [`docs/design/README.md`](docs/design/README.md).
+
+Para exportar un frame con un token personal de Figma (solo lectura):
+
+```powershell
+# Opción 1: archivo local ignorado por Git
+Set-Content -NoNewline .figma-token "figd_..."
+pnpm figma:export "<url-de-figma-con-node-id>" <app>/<pantalla>
+Remove-Item .figma-token
+
+# Opción 2: variable de entorno
+$env:FIGMA_TOKEN = "figd_..."
+pnpm figma:export "<url-de-figma-con-node-id>" <app>/<pantalla>
+Remove-Item Env:FIGMA_TOKEN
+```
+
+El token nunca se escribe en el repositorio.
 
 ## Comandos básicos
 

@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "doctor": "npx expo-doctor",
-    "dev": "npx expo start --dev-client",
-    "start": "npx expo start --dev-client",
-    "android": "npx expo run:android",
-    "ios": "npx expo run:ios",
+    "dev": "npx expo start --dev-client --port 8082",
+    "start": "npx expo start --dev-client --port 8082",
+    "android": "npx expo run:android --port 8082",
+    "ios": "npx expo run:ios --port 8082",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
