@@ -17,11 +17,11 @@ frontend/
 ├─ apps/
 │  ├─ acudiente/
 │  │  ├─ app/
-│  │  ├─ assets/
 │  │  ├─ src/
 │  │  ├─ app.config.ts
 │  │  ├─ App.tsx
 │  │  ├─ babel.config.js
+│  │  ├─ declarations.d.ts
 │  │  ├─ eslint.config.mjs
 │  │  ├─ index.js
 │  │  ├─ metro.config.js
@@ -29,11 +29,11 @@ frontend/
 │  │  └─ tsconfig.json
 │  ├─ monitora/
 │  │  ├─ app/
-│  │  ├─ assets/
 │  │  ├─ src/
 │  │  ├─ app.config.ts
 │  │  ├─ App.tsx
 │  │  ├─ babel.config.js
+│  │  ├─ declarations.d.ts
 │  │  ├─ eslint.config.mjs
 │  │  ├─ index.js
 │  │  ├─ metro.config.js
@@ -54,6 +54,7 @@ frontend/
 ├─ docs/
 │  ├─ design/
 │  │  └─ README.md
+│  ├─ figma-svg.md
 │  └─ srs.md
 ├─ packages/
 │  ├─ config/
@@ -80,9 +81,12 @@ frontend/
 │  │  ├─ tsconfig.json
 │  │  └─ vitest.config.ts
 │  └─ ui/
+│     ├─ scripts/
 │     ├─ src/
+│     ├─ test/
 │     ├─ eslint.config.mjs
 │     ├─ package.json
+│     ├─ svgo.config.js
 │     └─ tsconfig.json
 ├─ scripts/
 │  ├─ check-invariants.mjs
@@ -91,7 +95,11 @@ frontend/
 │  ├─ sync-readme-structure.mjs
 │  └─ verify.mjs
 ├─ specs/
-│  └─ 003-transversal-habilitar-expo/
+│  ├─ 003-transversal-habilitar-expo/
+│  │  ├─ plan.md
+│  │  ├─ spec.md
+│  │  └─ tasks.md
+│  └─ 006-packages-ui-pipeline-svg/
 │     ├─ plan.md
 │     ├─ spec.md
 │     └─ tasks.md

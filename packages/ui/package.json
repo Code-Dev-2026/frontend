@@ -5,14 +5,31 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "react-native": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./svg/*": "./src/svg/*"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node --test",
+    "svg:check": "node ./scripts/svg-check.mjs"
+  },
+  "peerDependencies": {
+    "react": "18.3.1",
+    "react-native": "0.76.3",
+    "react-native-svg": "~15.8.0"
   },
   "devDependencies": {
     "@camino/config": "workspace:*",
     "eslint": "^9.16.0",
+    "svgo": "^3.3.2",
     "typescript": "^5.7.2"
   }
 }
