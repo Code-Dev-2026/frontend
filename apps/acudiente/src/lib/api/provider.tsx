@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { configureMobileApiClient } from './index';
-import { startApiMocks } from './mock-setup';
 
 export type ApiMode = 'mock' | 'real';
 
@@ -14,9 +13,25 @@ export function ApiProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     configureMobileApiClient();
-    const stopApiMocks = mode === 'mock' ? startApiMocks() : undefined;
-    setReady(true);
-    return () => stopApiMocks?.();
+    let cancelled = false;
+    let stopApiMocks: (() => void) | undefined;
+
+    if (mode === 'mock') {
+      // Carga diferida: msw/native requiere APIs de navegador que Hermes no
+      // trae (BroadcastChannel) y no debe evaluarse en modo real.
+      void import('./mock-setup').then(({ startApiMocks }) => {
+        if (cancelled) return;
+        stopApiMocks = startApiMocks();
+        setReady(true);
+      });
+    } else {
+      setReady(true);
+    }
+
+    return () => {
+      cancelled = true;
+      stopApiMocks?.();
+    };
   }, [mode]);
 
   if (!ready) return null;
