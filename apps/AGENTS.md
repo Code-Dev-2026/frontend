@@ -61,6 +61,9 @@ pnpm --filter acudiente android
   incrustadas y texto sin convertir a contornos.
 - Colores, tipografías, radios y espaciados salen de los tokens de `packages/ui`,
   no de valores escritos en la pantalla.
+- Si una interfaz se construye para ambas apps, impleméntala una sola vez en
+  `@camino/ui`; las apps solo conectan sus datos, navegación y acciones. No
+  dupliques componentes visuales entre `apps/acudiente` y `apps/monitora`.
 - Elementos táctiles de **48 px mínimo** y alto contraste para exteriores
   (RNF-04).
 - Si falta un asset, un dato o una decisión: aplica

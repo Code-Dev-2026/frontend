@@ -54,6 +54,7 @@ frontend/
 │  └─ AGENTS.md
 ├─ docs/
 │  ├─ design/
+│  │  ├─ base/
 │  │  └─ README.md
 │  └─ srs.md
 ├─ packages/
