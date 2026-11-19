@@ -10,6 +10,8 @@ compartidos de dominio, contratos y UI.
 ```text
 frontend/
 ├─ .github/
+│  ├─ skills/
+│  │  └─ gitflow-workflow/
 │  └─ workflows/
 │     └─ ci.yml
 ├─ .husky/
