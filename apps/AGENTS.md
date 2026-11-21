@@ -131,7 +131,7 @@ Actualizar React Native queda fuera del alcance hasta que una issue lo pida.
 ## 6. Entrega específica de apps móviles
 
 - Para toda pantalla nueva, compara el frame de Figma con el emulador y describe
-  el resultado en el PR; no guardes capturas ni otros archivos en `specs/`.
+  el resultado en el PR.
 - Si **no pudiste correr el emulador**, dilo explícitamente en el PR y marca qué
   quedó sin verificar visualmente. No afirmes que "se ve igual" sin haberlo
   comprobado.

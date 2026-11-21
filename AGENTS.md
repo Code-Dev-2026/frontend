@@ -35,29 +35,6 @@ contradice estas reglas y no hay una excepción documentada, detente y pregunta.
 - Respeta las reglas de producto del SRS y los límites de autorización del
   backend. La interfaz no reemplaza la autorización del servidor.
 
-## Flujo de specs
-
-Cada spec de funcionalidad se ubica en `specs/NNN-<app>-<feature>/`. Dentro de
-esa carpeta solo se permiten estos archivos:
-
-```
-spec.md
-plan.md
-tasks.md
-```
-
-`spec.md` es obligatorio y lleva frontmatter con `state`, `app` y al menos un
-ID de requisito del SRS. `plan.md` y `tasks.md` son obligatorios cuando el
-estado no es `borrador`; en `tasks.md`, marca las tareas completadas con
-`- [x]`. Los IDs deben existir en [`docs/srs.md`](./docs/srs.md) y el número de
-la carpeta debe corresponder al de la issue (por ejemplo, `FE-09` →
-`009-monitora-ruta-activa`).
-
-No generes ningún otro archivo, subcarpeta, captura, salida de comando ni
-carpeta `evidence/` dentro de una spec. Registra las verificaciones en
-`tasks.md` o en la descripción del PR. El CI valida tanto los nombres permitidos
-como el contenido de las specs.
-
 ## Decisiones abiertas: no las resuelvas por tu cuenta
 
 Si tu tarea depende de alguna, avisa y espera instrucciones:

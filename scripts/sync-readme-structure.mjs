@@ -28,7 +28,7 @@ const depthIndex = ARGS.indexOf('--depth');
 const MAX_DEPTH =
   depthIndex >= 0 && ARGS[depthIndex + 1]
     ? Number.parseInt(ARGS[depthIndex + 1], 10)
-    : 3;
+    : 2;
 
 const MARKER_START = '<!-- estructura:inicio -->';
 const MARKER_END = '<!-- estructura:fin -->';
