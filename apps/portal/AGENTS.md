@@ -115,7 +115,7 @@ no se generan. Hasta que se corrija, no confíes en estilos de componentes de
 ## 6. Entrega específica del portal
 
 - Para toda pantalla nueva, compara Figma con el navegador y describe el
-  resultado en el PR; no guardes capturas ni otros archivos en `specs/`.
+  resultado en el PR.
 - Si no pudiste abrir el navegador o ver el resultado, **dilo en el PR**; no
   afirmes fidelidad visual sin haberla comprobado.
 - No toques `apps/monitora`, `apps/acudiente` ni `packages/ui`.

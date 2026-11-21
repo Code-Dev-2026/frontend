@@ -18,3 +18,7 @@ export type {
   LoginScreenProps,
 } from './components/login/LoginScreen';
 export { loginTokens } from './tokens/login';
+
+export { ForgotPasswordScreen } from './components/forgot-password/ForgotPasswordScreen';
+export type { ForgotPasswordScreenProps } from './components/forgot-password/ForgotPasswordScreen';
+export { forgotPasswordTokens } from './tokens/forgot-password';

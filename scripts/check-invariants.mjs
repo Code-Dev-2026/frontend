@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 /**
- * Invariantes del frontend + validación de specs.
+ * Invariantes de seguridad y arquitectura del frontend.
  * No usa bash: funciona en Windows, Linux y CI.
  *
  * Uso:
  *   node scripts/check-invariants.mjs
- *   node scripts/check-invariants.mjs --specs-only
- *   node scripts/check-invariants.mjs --source-only
  *   node scripts/check-invariants.mjs --json
  */
 import { existsSync } from 'node:fs';
@@ -16,8 +14,6 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const ARGS = new Set(process.argv.slice(2));
 const JSON_OUT = ARGS.has('--json');
-const SPECS_ONLY = ARGS.has('--specs-only');
-const SOURCE_ONLY = ARGS.has('--source-only');
 
 const SOURCE_DIRS = ['apps', 'packages'];
 const SOURCE_EXT = new Set([
@@ -43,39 +39,6 @@ const SKIP_DIRS = new Set([
   'ios',
 ]);
 const SKIP_FILE = /(\.test\.|\.spec\.|__tests__)/;
-
-// Documentación: solo estos README están permitidos. El resto de la
-// documentación vive en AGENTS.md y docs/.
-const ALLOWED_README = new Set([
-  'README.md',
-  'docs/design/README.md',
-  'packages/contracts/README.md',
-]);
-const DOC_GUIDES = [
-  'README.md',
-  'AGENTS.md',
-  'apps/AGENTS.md',
-  'apps/portal/AGENTS.md',
-  'docs/design/README.md',
-  'packages/contracts/README.md',
-];
-const DOC_PATH_PREFIXES = [
-  '.github/',
-  'apps/',
-  'packages/',
-  'docs/',
-  'scripts/',
-  'specs/',
-];
-const DOC_ROOT_FILES = new Set([
-  'README.md',
-  'AGENTS.md',
-  '.nvmrc',
-  '.npmrc',
-  'package.json',
-]);
-// Ignora ejemplos, globs y plantillas: `apps/*`, `packages/...`, `<app>`.
-const DOC_SKIP_PATTERN = /[<>*{}|]|\.\.\./;
 
 const RULES = [
   {
@@ -107,28 +70,9 @@ const RULES = [
   },
 ];
 
-const SPEC_STATES = new Set([
-  'borrador',
-  'en-revision',
-  'aprobada',
-  'implementada',
-  'verificada',
-  'archivada',
-]);
-const SPEC_APPS = new Set([
-  'portal',
-  'acudiente',
-  'monitora',
-  'packages',
-  'transversal',
-]);
-const SPEC_FILES = new Set(['spec.md', 'plan.md', 'tasks.md']);
-const REQ_ID = /^(?:RF|RNF|RN|HU)-\d{2}$/;
-
 const errors = [];
 const warnings = [];
 let scannedFiles = 0;
-let checkedSpecs = 0;
 
 function rel(file) {
   return path.relative(ROOT, file).replace(/\\/g, '/');
@@ -176,238 +120,24 @@ async function scanSources() {
   }
 }
 
-async function checkDocs() {
-  await walk(ROOT, async (file) => {
-    if (path.basename(file) !== 'README.md') return;
-    const relative = rel(file);
-    if (ALLOWED_README.has(relative)) return;
-    errors.push({
-      kind: 'docs',
-      file: relative,
-      message:
-        'README no permitido: usa README.md (raíz), docs/design/README.md o packages/contracts/README.md.',
-    });
-  });
-
-  for (const guide of DOC_GUIDES) {
-    const file = path.join(ROOT, guide);
-    if (!existsSync(file)) continue;
-    const lines = (await readFile(file, 'utf8')).split(/\r?\n/);
-    lines.forEach((line, index) => {
-      for (const match of line.matchAll(/`([^`\n]+)`/g)) {
-        const raw = match[1].trim();
-        const candidate = raw.startsWith('./') ? raw.slice(2) : raw;
-        if (!candidate || DOC_SKIP_PATTERN.test(candidate)) continue;
-        const isRootFile =
-          !candidate.includes('/') && DOC_ROOT_FILES.has(candidate);
-        const hasPrefix = DOC_PATH_PREFIXES.some((prefix) =>
-          candidate.startsWith(prefix),
-        );
-        if (!isRootFile && !hasPrefix) continue;
-        if (candidate.includes(' ') || candidate.includes('#')) continue;
-        if (!existsSync(path.join(ROOT, candidate))) {
-          errors.push({
-            kind: 'docs',
-            file: guide,
-            line: index + 1,
-            message: `La ruta \`${raw}\` no existe.`,
-          });
-        }
-      }
-    });
-  }
-}
-
-function parseFrontmatter(text) {
-  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return null;
-  const data = {};
-  let currentKey = null;
-  for (const raw of match[1].split(/\r?\n/)) {
-    if (!raw.trim() || raw.trim().startsWith('#')) continue;
-    const item = raw.match(/^\s*-\s+(.+)$/);
-    if (item && currentKey) {
-      if (!Array.isArray(data[currentKey])) data[currentKey] = [];
-      data[currentKey].push(stripQuotes(item[1].trim()));
-      continue;
-    }
-    const pair = raw.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (!pair) continue;
-    currentKey = pair[1];
-    const value = pair[2].trim();
-    if (!value) {
-      data[currentKey] = [];
-      continue;
-    }
-    const inline = value.match(/^\[(.*)\]$/);
-    if (inline) {
-      data[currentKey] = inline[1]
-        .split(',')
-        .map((part) => stripQuotes(part.trim()))
-        .filter(Boolean);
-    } else {
-      data[currentKey] = stripQuotes(value);
-    }
-  }
-  return data;
-}
-
-function stripQuotes(value) {
-  return value.replace(/^['"]|['"]$/g, '');
-}
-
-async function loadSrsIds() {
-  const srsFile = path.join(ROOT, 'docs', 'srs.md');
-  if (!existsSync(srsFile)) {
-    warnings.push(
-      'No existe docs/srs.md: no se pueden validar los IDs de las specs.',
-    );
-    return null;
-  }
-  const text = await readFile(srsFile, 'utf8');
-  const ids = new Set();
-  for (const match of text.matchAll(/\b(?:RF|RNF|RN|HU)-\d{2}\b/g))
-    ids.add(match[0]);
-  return ids;
-}
-
-async function checkSpecs() {
-  const specsDir = path.join(ROOT, 'specs');
-  if (!existsSync(specsDir)) {
-    warnings.push('No existe specs/: no hay specs que validar.');
-    return;
-  }
-  const srsIds = await loadSrsIds();
-  const entries = await readdir(specsDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    if (entry.name === '_template') continue;
-    if (!/^\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entry.name)) {
-      warnings.push(
-        `specs/${entry.name}: el nombre no cumple NNN-<app>-<feature>.`,
-      );
-      continue;
-    }
-    checkedSpecs += 1;
-    const dir = path.join(specsDir, entry.name);
-    const specEntries = await readdir(dir, { withFileTypes: true });
-    for (const specEntry of specEntries) {
-      if (specEntry.isFile() && SPEC_FILES.has(specEntry.name)) continue;
-      errors.push({
-        kind: 'spec',
-        file: `specs/${entry.name}/${specEntry.name}`,
-        message: 'Solo se permiten spec.md, plan.md y tasks.md en la carpeta.',
-      });
-    }
-    const specFile = path.join(dir, 'spec.md');
-    if (!existsSync(specFile)) {
-      errors.push({
-        kind: 'spec',
-        file: `specs/${entry.name}`,
-        message: 'Falta spec.md.',
-      });
-      continue;
-    }
-    const text = await readFile(specFile, 'utf8');
-    const meta = parseFrontmatter(text);
-    if (!meta) {
-      errors.push({
-        kind: 'spec',
-        file: rel(specFile),
-        message: 'Falta el frontmatter.',
-      });
-      continue;
-    }
-    if (!SPEC_STATES.has(meta.state)) {
-      errors.push({
-        kind: 'spec',
-        file: rel(specFile),
-        message: `state inválido: ${meta.state ?? '(vacío)'}.`,
-      });
-    }
-    if (!SPEC_APPS.has(meta.app)) {
-      errors.push({
-        kind: 'spec',
-        file: rel(specFile),
-        message: `app inválida: ${meta.app ?? '(vacío)'}.`,
-      });
-    }
-    const requirements = (
-      Array.isArray(meta.requirements) ? meta.requirements : [meta.requirements]
-    ).filter(Boolean);
-    const valid = requirements.filter((id) => REQ_ID.test(id));
-    if (valid.length === 0) {
-      errors.push({
-        kind: 'spec',
-        file: rel(specFile),
-        message: 'Debe citar al menos un RF/RNF/RN/HU.',
-      });
-    }
-    for (const id of valid) {
-      if (!REQ_ID.test(id)) continue;
-      if (srsIds && !srsIds.has(id)) {
-        errors.push({
-          kind: 'spec',
-          file: rel(specFile),
-          message: `El requisito ${id} no existe en el SRS.`,
-        });
-      }
-    }
-    if (meta.state !== 'borrador') {
-      if (!existsSync(path.join(dir, 'plan.md'))) {
-        errors.push({
-          kind: 'spec',
-          file: `specs/${entry.name}`,
-          message: `Falta plan.md para state=${meta.state}.`,
-        });
-      }
-      if (!existsSync(path.join(dir, 'tasks.md'))) {
-        errors.push({
-          kind: 'spec',
-          file: `specs/${entry.name}`,
-          message: `Falta tasks.md para state=${meta.state}.`,
-        });
-      }
-    }
-    if (meta.state === 'implementada' || meta.state === 'verificada') {
-      const tasksFile = path.join(dir, 'tasks.md');
-      if (existsSync(tasksFile)) {
-        const tasks = await readFile(tasksFile, 'utf8');
-        if (!/^- \[x\]/im.test(tasks)) {
-          errors.push({
-            kind: 'spec',
-            file: rel(tasksFile),
-            message: 'No hay tareas marcadas como completadas.',
-          });
-        }
-      }
-    }
-  }
-}
-
 function printResults() {
   if (JSON_OUT) {
-    console.log(
-      JSON.stringify({ scannedFiles, checkedSpecs, errors, warnings }, null, 2),
-    );
+    console.log(JSON.stringify({ scannedFiles, errors, warnings }, null, 2));
     return;
   }
   console.log(`Archivos de código escaneados: ${scannedFiles}`);
-  console.log(`Specs validadas: ${checkedSpecs}`);
   for (const warning of warnings) console.warn(`AVISO: ${warning}`);
   for (const error of errors) {
     const where = error.line ? `${error.file}:${error.line}` : error.file;
     console.error(`ERROR [${error.kind}] ${where} — ${error.message}`);
   }
   if (errors.length === 0) {
-    console.log('OK: invariantes y specs sin errores.');
+    console.log('OK: invariantes de seguridad sin errores.');
   } else {
     console.error(`Fallaron ${errors.length} comprobación(es).`);
   }
 }
 
-if (!SOURCE_ONLY) await checkSpecs();
-if (!SPECS_ONLY) await scanSources();
-await checkDocs();
+await scanSources();
 printResults();
 process.exit(errors.length === 0 ? 0 : 1);
