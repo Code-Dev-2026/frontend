@@ -1,10 +1,21 @@
-export const MIN_TOUCH_TARGET = 48;
+import { baseTokens } from './tokens/base';
+
+export const MIN_TOUCH_TARGET = baseTokens.sizes.touchMin;
 
 export const designTokens = {
-  alert: '#b42318',
-  success: '#027a48',
-  warning: '#f2c94c',
-  highContrast: '#0f172a',
+  // Claves legadas preservadas por retrocompatibilidad, mapeadas a tokens reales de Figma
+  alert: baseTokens.colors.criticalText,
+  success: baseTokens.colors.successText,
+  warning: baseTokens.colors.orange500,
+  highContrast: baseTokens.colors.textStrong,
+  // Escala completa del sistema de diseño (`cs/*`)
+  colors: baseTokens.colors,
+  typography: baseTokens.typography,
+  spacing: baseTokens.spacing,
+  radii: baseTokens.radii,
+  borderWidth: baseTokens.borderWidth,
+  sizes: baseTokens.sizes,
+  elevation: baseTokens.elevation,
 } as const;
 
 export const buttonSize = {
@@ -12,6 +23,50 @@ export const buttonSize = {
   minWidth: MIN_TOUCH_TARGET,
 } as const;
 
+export { baseTokens } from './tokens/base';
+export type {
+  BaseColorToken,
+  BaseTokens,
+  BaseTypographyToken,
+} from './tokens/base';
+
+// Componentes base reutilizables (FE-07)
+export { Badge } from './components/badge/Badge';
+export type { BadgeProps, BadgeVariant } from './components/badge/Badge';
+
+export { Banner } from './components/banner/Banner';
+export type { BannerProps, BannerVariant } from './components/banner/Banner';
+
+export { Button } from './components/button/Button';
+export type { ButtonProps, ButtonVariant } from './components/button/Button';
+
+export { Card } from './components/card/Card';
+export type { CardProps, CardState } from './components/card/Card';
+
+export { Dialog, Modal } from './components/dialog/Modal';
+export type {
+  DialogProps,
+  ModalAction,
+  ModalProps,
+  ModalTone,
+} from './components/dialog/Modal';
+
+export { EmptyState } from './components/empty-state/EmptyState';
+export type {
+  EmptyStateProps,
+  EmptyStateStatus,
+} from './components/empty-state/EmptyState';
+
+export { ICON_NAMES, Icon } from './components/icon/Icon';
+export type { IconName, IconProps } from './components/icon/Icon';
+
+export { Input } from './components/input/Input';
+export type { InputPlatform, InputProps } from './components/input/Input';
+
+export { UiCatalogScreen } from './components/catalog/UiCatalogScreen';
+export type { UiCatalogScreenProps } from './components/catalog/UiCatalogScreen';
+
+// Pantallas existentes y sus tokens por pantalla
 export { LoginScreen } from './components/login/LoginScreen';
 export type {
   LoginCredentials,
