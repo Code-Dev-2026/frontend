@@ -9,12 +9,13 @@ import { ForgotPasswordScreen, LoginScreen } from '@camino/ui';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { Alert } from 'react-native';
+import { AcudienteHomeContainer } from './app/screens/AcudienteHomeContainer';
 import { ApiProvider } from './src/lib/api/provider';
 
+type AcudienteScreen = 'login' | 'forgot-password' | 'home';
+
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<
-    'login' | 'forgot-password'
-  >('login');
+  const [currentScreen, setCurrentScreen] = useState<AcudienteScreen>('login');
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -35,14 +36,13 @@ export default function App() {
               Alert.alert('Crear cuenta', 'El registro aún no está disponible.')
             }
             onForgotPassword={() => setCurrentScreen('forgot-password')}
-            onSubmit={() =>
-              Alert.alert(
-                'Inicio de sesión',
-                'La autenticación aún no está conectada.',
-              )
-            }
+            onSubmit={() => {
+              // PROVISIONAL: navega a la pantalla de inicio mientras se define
+              // el contrato oficial de autenticación con el backend.
+              setCurrentScreen('home');
+            }}
           />
-        ) : (
+        ) : currentScreen === 'forgot-password' ? (
           <ForgotPasswordScreen
             onBackToLogin={() => setCurrentScreen('login')}
             onSubmit={(email) =>
@@ -51,6 +51,10 @@ export default function App() {
                 `Se enviará el enlace de recuperación a: ${email}`,
               )
             }
+          />
+        ) : (
+          <AcudienteHomeContainer
+            onBackToLogin={() => setCurrentScreen('login')}
           />
         )}
       </ApiProvider>

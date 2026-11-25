@@ -26,11 +26,16 @@ config.resolver = {
 };
 
 config.watchFolders = [...new Set([...config.watchFolders, monorepoRoot])];
+// Con `node-linker=isolated` en `.npmrc`, pnpm aloja dependencias transitivas
+// (como `@babel/runtime` que inyecta `babel-preset-expo`) en
+// `node_modules/.pnpm/node_modules`. Se añade al final para que prevalezcan
+// siempre las dependencias directas de la app (`react@18.3.1`, `expo`, etc.).
 config.resolver.nodeModulesPaths = [
   ...new Set([
     ...config.resolver.nodeModulesPaths,
     path.resolve(projectRoot, 'node_modules'),
     path.resolve(monorepoRoot, 'node_modules'),
+    path.resolve(monorepoRoot, 'node_modules', '.pnpm', 'node_modules'),
   ]),
 ];
 config.resolver.unstable_enablePackageExports = true;

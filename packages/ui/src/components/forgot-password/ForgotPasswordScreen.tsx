@@ -52,12 +52,7 @@ export function ForgotPasswordScreen({
           />
           <View style={styles.header}>
             <Text style={styles.title}>Recuperar contraseña</Text>
-            <View style={styles.subtitleContainer}>
-              <Text style={styles.subtitle}>Ingresa el correo</Text>
-              <Text style={styles.subtitle}>
-                Te enviaremos un enlace para restablecerla.
-              </Text>
-            </View>
+            <View style={styles.subtitleContainer}></View>
           </View>
         </View>
 
@@ -70,7 +65,7 @@ export function ForgotPasswordScreen({
               autoComplete="email"
               keyboardType="email-address"
               onChangeText={setEmail}
-              placeholder="nombre@correo.com"
+              placeholder="correo restablecer contraseña"
               placeholderTextColor={forgotPasswordTokens.colors.placeholder}
               returnKeyType="done"
               onSubmitEditing={handleSubmit}
@@ -130,7 +125,7 @@ export function ForgotPasswordScreen({
             onPress={onBackToLogin}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>Volver a iniciar sesión</Text>
+            <Text style={styles.backButtonText}>Volver</Text>
           </Pressable>
         </View>
       </View>

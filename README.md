@@ -84,9 +84,13 @@ pnpm --filter portal dev       # Portal web (http://localhost:3000)
 pnpm --filter acudiente dev    # App acudiente (Metro en :8083)
 pnpm --filter monitora dev     # App monitora (Metro en :8082)
 
-# Abrir en emulador de Android:
+# Abrir en emulador de Android (development build):
 pnpm --filter acudiente android
 pnpm --filter monitora android
+
+# Vista rápida de interfaces en Expo Go (emulador, sin módulos nativos como MapLibre/cámara; presiona "a" al iniciar):
+pnpm --filter acudiente exec expo start --go --port 8083
+pnpm --filter monitora exec expo start --go --port 8082
 ```
 
 ### 3. Comandos de calidad y verificación
