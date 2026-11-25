@@ -22,3 +22,16 @@ export { loginTokens } from './tokens/login';
 export { ForgotPasswordScreen } from './components/forgot-password/ForgotPasswordScreen';
 export type { ForgotPasswordScreenProps } from './components/forgot-password/ForgotPasswordScreen';
 export { forgotPasswordTokens } from './tokens/forgot-password';
+
+export { AcudienteHomeScreen } from './components/acudiente-home/AcudienteHomeScreen';
+export type {
+  AcudienteChildStatusVariant,
+  AcudienteChildSummary,
+  AcudienteHomeScreenProps,
+  AcudienteNavTab,
+} from './components/acudiente-home/AcudienteHomeScreen';
+export { acudienteHomeTokens } from './tokens/acudiente-home';
+
+export { AcudienteMapScreen } from './components/acudiente-map/AcudienteMapScreen';
+export type { AcudienteMapScreenProps } from './components/acudiente-map/AcudienteMapScreen';
+export { acudienteMapTokens } from './tokens/acudiente-map';
