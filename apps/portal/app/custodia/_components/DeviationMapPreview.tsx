@@ -43,7 +43,7 @@ function makeBusPin(code: string, isAlert: boolean): HTMLDivElement {
   img.width = 18;
   img.height = 18;
   img.src = isAlert
-    ? '/icons/triangle-alert.svg'
+    ? '/icons/triangle-alert-white.svg'
     : '/icons/bus-front-white.svg';
   circle.appendChild(img);
   ring.appendChild(circle);
