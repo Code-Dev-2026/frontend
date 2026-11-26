@@ -74,7 +74,7 @@ function createMarkerElement(
     img.height = 24;
     img.src =
       variant === 'bus-error'
-        ? '/icons/triangle-alert.svg'
+        ? '/icons/triangle-alert-white.svg'
         : '/icons/bus-front-white.svg';
     inner.appendChild(img);
     outer.appendChild(inner);
