@@ -58,12 +58,11 @@ export function Modal({
   const isBlocking = blocking ?? isCritical;
   const resolvedIcon =
     icon === undefined ? (isCritical ? 'triangle-alert' : 'info') : icon;
-  const foregroundColor = isCritical
-    ? baseTokens.colors.criticalText
-    : baseTokens.colors.textStrong;
-  const bodyColor = isCritical
-    ? baseTokens.colors.criticalText
-    : baseTokens.colors.textBody;
+  const foregroundColor = baseTokens.colors.textStrong;
+  const bodyColor = baseTokens.colors.textBody;
+  const iconColor = isCritical
+    ? baseTokens.colors.criticalSolid
+    : baseTokens.colors.link600;
 
   function handleDismiss() {
     if (!isBlocking) {
@@ -100,7 +99,7 @@ export function Modal({
             <Icon
               name={resolvedIcon}
               size={baseTokens.sizes.iconDefault}
-              color={foregroundColor}
+              color={iconColor}
             />
           ) : null}
 
@@ -179,8 +178,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   dialogCritical: {
-    backgroundColor: baseTokens.colors.criticalBg,
-    borderColor: baseTokens.colors.criticalText,
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderStrong,
   },
   title: {
     ...baseTokens.typography.screenTitle,

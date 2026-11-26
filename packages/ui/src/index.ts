@@ -4,7 +4,7 @@ export const MIN_TOUCH_TARGET = baseTokens.sizes.touchMin;
 
 export const designTokens = {
   // Claves legadas preservadas por retrocompatibilidad, mapeadas a tokens reales de Figma
-  alert: baseTokens.colors.criticalText,
+  alert: baseTokens.colors.criticalSolid,
   success: baseTokens.colors.successText,
   warning: baseTokens.colors.orange500,
   highContrast: baseTokens.colors.textStrong,

@@ -30,51 +30,59 @@ export type BadgeProps = {
 type BadgeStyleSpec = {
   backgroundColor: string;
   borderColor: string;
+  iconColor: string;
   textColor: string;
   defaultIcon: IconName;
 };
 
 const BADGE_SPECS: Record<BadgeVariant, BadgeStyleSpec> = {
   info: {
-    backgroundColor: baseTokens.colors.infoBg,
-    borderColor: baseTokens.colors.infoBg,
-    textColor: baseTokens.colors.navy900,
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderSoft,
+    iconColor: baseTokens.colors.textStrong,
+    textColor: baseTokens.colors.textStrong,
     defaultIcon: 'bus-front',
   },
   neutral: {
-    backgroundColor: baseTokens.colors.surfaceInput,
-    borderColor: baseTokens.colors.surfaceInput,
-    textColor: baseTokens.colors.textBody,
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderSoft,
+    iconColor: baseTokens.colors.textBody,
+    textColor: baseTokens.colors.textStrong,
     defaultIcon: 'house',
   },
   outlined: {
     backgroundColor: baseTokens.colors.surface,
     borderColor: baseTokens.colors.borderStrong,
-    textColor: baseTokens.colors.textBody,
+    iconColor: baseTokens.colors.textBody,
+    textColor: baseTokens.colors.textStrong,
     defaultIcon: 'user-round',
   },
   success: {
-    backgroundColor: baseTokens.colors.successBg,
-    borderColor: baseTokens.colors.successBorder,
-    textColor: baseTokens.colors.successText,
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderSoft,
+    iconColor: baseTokens.colors.successText,
+    textColor: baseTokens.colors.textStrong,
     defaultIcon: 'shield-check',
   },
   warning: {
-    backgroundColor: baseTokens.colors.warningBg,
-    borderColor: baseTokens.colors.warningBg,
-    textColor: baseTokens.colors.warningText,
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderSoft,
+    iconColor: baseTokens.colors.warningText,
+    textColor: baseTokens.colors.textStrong,
     defaultIcon: 'school',
   },
   critical: {
-    backgroundColor: baseTokens.colors.criticalBg,
-    borderColor: baseTokens.colors.criticalBorder,
-    textColor: baseTokens.colors.criticalText,
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderSoft,
+    iconColor: baseTokens.colors.criticalSolid,
+    textColor: baseTokens.colors.textStrong,
     defaultIcon: 'triangle-alert',
   },
   institutional: {
-    backgroundColor: baseTokens.colors.navy900,
-    borderColor: baseTokens.colors.navy900,
-    textColor: baseTokens.colors.surface,
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderSoft,
+    iconColor: baseTokens.colors.textStrong,
+    textColor: baseTokens.colors.textStrong,
     defaultIcon: 'school',
   },
 };
@@ -108,7 +116,7 @@ export function Badge({
         <Icon
           name={resolvedIcon}
           size={baseTokens.sizes.iconDefault}
-          color={spec.textColor}
+          color={spec.iconColor}
         />
       ) : null}
       <Text style={[styles.label, { color: spec.textColor }]}>{label}</Text>

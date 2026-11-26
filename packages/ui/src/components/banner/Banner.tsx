@@ -23,7 +23,9 @@ export type BannerProps = {
 type BannerStyleSpec = {
   backgroundColor: string;
   borderColor: string;
-  textColor: string;
+  iconColor: string;
+  titleColor: string;
+  messageColor: string;
   defaultIcon: IconName;
 };
 
@@ -31,25 +33,33 @@ const BANNER_SPECS: Record<BannerVariant, BannerStyleSpec> = {
   info: {
     backgroundColor: baseTokens.colors.infoBg,
     borderColor: baseTokens.colors.infoBorder,
-    textColor: baseTokens.colors.infoText,
+    iconColor: baseTokens.colors.link600,
+    titleColor: baseTokens.colors.textStrong,
+    messageColor: baseTokens.colors.textBody,
     defaultIcon: 'info',
   },
   success: {
     backgroundColor: baseTokens.colors.successBg,
     borderColor: baseTokens.colors.successBorder,
-    textColor: baseTokens.colors.successText,
+    iconColor: baseTokens.colors.successText,
+    titleColor: baseTokens.colors.textStrong,
+    messageColor: baseTokens.colors.textBody,
     defaultIcon: 'circle-check',
   },
   warning: {
     backgroundColor: baseTokens.colors.warningBg,
     borderColor: baseTokens.colors.warningBorder,
-    textColor: baseTokens.colors.warningText,
+    iconColor: baseTokens.colors.warningText,
+    titleColor: baseTokens.colors.textStrong,
+    messageColor: baseTokens.colors.textBody,
     defaultIcon: 'triangle-alert',
   },
   critical: {
     backgroundColor: baseTokens.colors.criticalBg,
     borderColor: baseTokens.colors.criticalBorder,
-    textColor: baseTokens.colors.criticalText,
+    iconColor: baseTokens.colors.criticalSolid,
+    titleColor: baseTokens.colors.textStrong,
+    messageColor: baseTokens.colors.textBody,
     defaultIcon: 'triangle-alert',
   },
 };
@@ -83,12 +93,12 @@ export function Banner({
         <Icon
           name={resolvedIcon}
           size={baseTokens.sizes.iconDefault}
-          color={spec.textColor}
+          color={spec.iconColor}
         />
       ) : null}
       <View style={styles.content}>
-        <Text style={[styles.title, { color: spec.textColor }]}>{title}</Text>
-        <Text style={[styles.message, { color: spec.textColor }]}>
+        <Text style={[styles.title, { color: spec.titleColor }]}>{title}</Text>
+        <Text style={[styles.message, { color: spec.messageColor }]}>
           {message}
         </Text>
       </View>

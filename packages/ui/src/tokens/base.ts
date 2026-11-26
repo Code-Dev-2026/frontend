@@ -5,49 +5,49 @@
 export const baseTokens = {
   colors: {
     // Marca (cs/navy-900, cs/cyan-500, cs/orange-500, cs/primary-500, cs/link-600)
-    navy900: '#023866',
-    cyan500: '#0abae2',
-    orange500: '#fca11f',
-    primary500: '#1877f2',
-    link600: '#1464cf',
+    navy900: '#1f2937',
+    cyan500: '#60a5fa',
+    orange500: '#f59e0b',
+    primary500: '#3b82f6',
+    link600: '#2563eb',
 
     // Acciones, foco y estados deshabilitados
-    actionPrimary: '#1464cf',
-    actionPrimaryPressed: '#023866',
-    actionSoftPressed: '#047857',
+    actionPrimary: '#2563eb',
+    actionPrimaryPressed: '#1f2937',
+    actionSoftPressed: '#16a34a',
     actionSoftPressedText: '#ffffff',
-    focusRing: '#1464cf',
-    disabledBg: '#e2e8f0',
-    disabledText: '#334155',
+    focusRing: '#2563eb',
+    disabledBg: '#f3f4f6',
+    disabledText: '#9ca3af',
 
     // Superficies y bordes
     surface: '#ffffff',
-    surfaceInput: '#f8fafc',
-    borderSoft: '#e2e8f0',
-    borderStrong: '#cbd5e1',
+    surfaceInput: '#ffffff',
+    borderSoft: '#e5e7eb',
+    borderStrong: '#d1d5db',
 
     // Tipografía
-    textStrong: '#0f172a',
-    textBody: '#334155',
-    textMuted: '#64748b',
+    textStrong: '#1f2937',
+    textBody: '#4b5563',
+    textMuted: '#6b7280',
 
-    // Estados semánticos
-    infoBg: '#e6f8fd',
-    infoBorder: '#0abae2',
-    infoText: '#023866',
-    successBg: '#ecfdf5',
-    successBorder: '#6ee7b7',
-    successText: '#047857',
-    warningBg: '#fff7ed',
-    warningBorder: '#fca11f',
-    warningText: '#9a3412',
-    criticalBg: '#fef2f2',
-    criticalBorder: '#fca5a5',
-    criticalText: '#b91c1c',
-    criticalSolid: '#dc2626',
+    // Estados semánticos (superficies blancas y rojo reservado a íconos de alerta)
+    infoBg: '#ffffff',
+    infoBorder: '#e5e7eb',
+    infoText: '#1f2937',
+    successBg: '#ffffff',
+    successBorder: '#e5e7eb',
+    successText: '#16a34a',
+    warningBg: '#ffffff',
+    warningBorder: '#e5e7eb',
+    warningText: '#d97706',
+    criticalBg: '#ffffff',
+    criticalBorder: '#e5e7eb',
+    criticalText: '#1f2937',
+    criticalSolid: '#e04f5f',
 
-    // Fondo translúcido para overlays / modales (navy-900 con opacidad)
-    backdrop: 'rgba(2, 56, 102, 0.48)',
+    // Fondo translúcido para overlays / modales
+    backdrop: 'rgba(31, 41, 55, 0.24)',
   },
   typography: {
     display: {
@@ -142,9 +142,9 @@ export const baseTokens = {
   },
   elevation: {
     overlay: {
-      shadowColor: '#023866',
+      shadowColor: '#1f2937',
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.12,
+      shadowOpacity: 0.1,
       shadowRadius: 24,
       elevation: 8,
     },

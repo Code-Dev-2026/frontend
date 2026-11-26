@@ -364,11 +364,11 @@ const styles = StyleSheet.create({
   },
   statusChipOnBoard: {
     backgroundColor: acudienteHomeTokens.colors.infoBackground,
-    borderColor: acudienteHomeTokens.colors.infoBackground,
+    borderColor: acudienteHomeTokens.colors.cardBorder,
   },
   statusChipAtHome: {
     backgroundColor: acudienteHomeTokens.colors.neutralChipBackground,
-    borderColor: acudienteHomeTokens.colors.neutralChipBackground,
+    borderColor: acudienteHomeTokens.colors.cardBorder,
   },
   statusChipText: {
     ...acudienteHomeTokens.typography.statusChip,

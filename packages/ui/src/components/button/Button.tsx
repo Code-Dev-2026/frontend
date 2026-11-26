@@ -65,24 +65,26 @@ const VARIANT_PALETTES: Record<CanonicalButtonVariant, VariantPalette> = {
     pressedTextColor: baseTokens.colors.surface,
   },
   soft: {
-    background: baseTokens.colors.successBg,
-    pressedBackground: baseTokens.colors.actionSoftPressed,
-    borderColor: baseTokens.colors.successBorder,
-    textColor: baseTokens.colors.successText,
-    pressedTextColor: baseTokens.colors.actionSoftPressedText,
-    disabledBorderColor: baseTokens.colors.successBorder,
+    background: baseTokens.colors.surface,
+    pressedBackground: baseTokens.colors.disabledBg,
+    borderColor: baseTokens.colors.borderSoft,
+    textColor: baseTokens.colors.textStrong,
+    pressedTextColor: baseTokens.colors.textStrong,
+    disabledBorderColor: baseTokens.colors.borderSoft,
   },
   tertiary: {
     background: baseTokens.colors.surface,
-    pressedBackground: baseTokens.colors.infoBg,
+    pressedBackground: baseTokens.colors.disabledBg,
     textColor: baseTokens.colors.link600,
     pressedTextColor: baseTokens.colors.link600,
   },
   destructive: {
-    background: baseTokens.colors.criticalSolid,
-    pressedBackground: baseTokens.colors.criticalText,
-    textColor: baseTokens.colors.surface,
-    pressedTextColor: baseTokens.colors.surface,
+    background: baseTokens.colors.surface,
+    pressedBackground: baseTokens.colors.disabledBg,
+    borderColor: baseTokens.colors.borderStrong,
+    textColor: baseTokens.colors.textStrong,
+    pressedTextColor: baseTokens.colors.textStrong,
+    disabledBorderColor: baseTokens.colors.borderSoft,
   },
 };
 
@@ -190,7 +192,11 @@ export function Button({
               <Icon
                 name="triangle-alert"
                 size={baseTokens.sizes.iconDefault}
-                color={foregroundColor}
+                color={
+                  canonical === 'primary'
+                    ? foregroundColor
+                    : baseTokens.colors.criticalSolid
+                }
               />
             ) : leadingIcon ? (
               <Icon
