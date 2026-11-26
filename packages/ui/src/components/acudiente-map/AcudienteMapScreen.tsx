@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   statusChip: {
     alignItems: 'center',
     backgroundColor: acudienteMapTokens.colors.infoBackground,
-    borderColor: acudienteMapTokens.colors.infoBackground,
+    borderColor: acudienteMapTokens.colors.borderSoft,
     borderRadius: acudienteMapTokens.spacing.chipRadius,
     borderWidth: 1,
     flexDirection: 'row',
