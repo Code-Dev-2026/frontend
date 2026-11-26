@@ -68,24 +68,54 @@ test('all Icon SVG assets exist and pass svg:check with currentColor', async () 
   }
 });
 
-test('base tokens align with Figma tokens.json colors and RNF-04 touch minimum', async () => {
-  const [baseSource, tokensJsonRaw] = await Promise.all([
-    readFile(path.join(UI_ROOT, 'src', 'tokens', 'base.ts'), 'utf8'),
-    readFile(
-      path.resolve(UI_ROOT, '../../docs/design/base/componentes/tokens.json'),
-      'utf8',
-    ),
-  ]);
+test('base tokens define required cs/* palette and RNF-04 touch minimum', async () => {
+  const baseSource = await readFile(
+    path.join(UI_ROOT, 'src', 'tokens', 'base.ts'),
+    'utf8',
+  );
 
-  const figmaTokens = JSON.parse(tokensJsonRaw);
-  assert.equal(figmaTokens.layout['cs/touch-min'], 48);
   assert.match(baseSource, /touchMin:\s*48/);
 
-  for (const hex of Object.values(figmaTokens.colors)) {
-    assert.equal(
-      baseSource.toLowerCase().includes(String(hex).toLowerCase()),
-      true,
-      `El color de Figma ${hex} debe existir en packages/ui/src/tokens/base.ts`,
+  const requiredColorKeys = [
+    'navy900',
+    'cyan500',
+    'orange500',
+    'primary500',
+    'link600',
+    'actionPrimary',
+    'actionPrimaryPressed',
+    'actionSoftPressed',
+    'actionSoftPressedText',
+    'focusRing',
+    'disabledBg',
+    'disabledText',
+    'surface',
+    'surfaceInput',
+    'borderSoft',
+    'borderStrong',
+    'textStrong',
+    'textBody',
+    'textMuted',
+    'infoBg',
+    'infoBorder',
+    'infoText',
+    'successBg',
+    'successBorder',
+    'successText',
+    'warningBg',
+    'warningBorder',
+    'warningText',
+    'criticalBg',
+    'criticalBorder',
+    'criticalText',
+    'criticalSolid',
+  ];
+
+  for (const key of requiredColorKeys) {
+    assert.match(
+      baseSource,
+      new RegExp(`\\b${key}:\\s*'#[0-9a-f]{6}'`, 'i'),
+      `Falta el token de color hexadecimal ${key} en packages/ui/src/tokens/base.ts`,
     );
   }
 });

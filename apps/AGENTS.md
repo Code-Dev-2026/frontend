@@ -47,8 +47,8 @@ pnpm --filter acudiente android
 ## 4. Diseño: Figma → SVG → React Native
 
 - Antes de tocar una pantalla, lee [`docs/design/README.md`](../docs/design/README.md):
-  explica cómo interpretar el enlace de Figma, cómo exportar el frame y qué hacer
-  si falta un asset. No interpretes un enlace sin los archivos exportados.
+  define el flujo para traducir pantallas de Figma a SVG, tokens y componentes
+  nativos.
 - Los logos e interfaces se diseñan en Figma y llegan como `.svg`. El componente
   resultante debe verse **idéntico** al diseño (medidas, colores, trazos,
   degradados).
@@ -66,10 +66,9 @@ pnpm --filter acudiente android
   dupliques componentes visuales entre `apps/acudiente` y `apps/monitora`.
 - Elementos táctiles de **48 px mínimo** y alto contraste para exteriores
   (RNF-04).
-- Si falta un asset, un dato o una decisión: aplica
-  [`docs/design/README.md`](../docs/design/README.md) §8. **No inventes ni
-  aproximes el diseño.** Un placeholder para compilar se marca con
-  `// PROVISIONAL: falta <archivo>` y se declara en el PR.
+- Si falta un asset, un dato o una decisión, **no inventes ni aproximes el
+  diseño**: enumera lo que falta y espera indicaciones. Un placeholder para
+  compilar se marca con `// PROVISIONAL: falta <archivo>` y se declara en el PR.
 
 ## 5. Entorno móvil (Android)
 
