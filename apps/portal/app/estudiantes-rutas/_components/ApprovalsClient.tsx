@@ -163,7 +163,7 @@ export function ApprovalsClient() {
       id: 'comunicacion',
       label: 'Comunicación',
       icon: '/icons/bell.svg',
-      href: null,
+      href: '/comunicacion' as const,
       active: false,
     },
     {
