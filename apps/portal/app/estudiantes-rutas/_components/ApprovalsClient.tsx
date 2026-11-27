@@ -390,6 +390,12 @@ export function ApprovalsClient() {
               >
                 Carga masiva CSV/Excel →
               </Link>
+              <Link
+                className="inline-flex h-[45px] items-center justify-center rounded-cs-button border border-cs-borderSoft bg-cs-surface px-4 text-[14px] font-semibold text-cs-navy transition-colors hover:border-cs-primary"
+                href="/estudiantes-rutas/rutas"
+              >
+                Diseñador de rutas →
+              </Link>
             </div>
           </div>
 
