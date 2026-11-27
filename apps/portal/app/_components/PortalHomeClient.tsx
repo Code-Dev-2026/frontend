@@ -11,7 +11,7 @@ interface ModuleCardItem {
   icon: string;
   statusLabel: string;
   isActive: boolean;
-  href: '/custodia' | '/telemetria' | null;
+  href: '/estudiantes-rutas' | '/custodia' | '/telemetria' | null;
 }
 
 const MODULE_CARDS: ReadonlyArray<ModuleCardItem> = [
@@ -21,9 +21,9 @@ const MODULE_CARDS: ReadonlyArray<ModuleCardItem> = [
     description:
       'Gestión de paraderos, aprobaciones y asignación de rutas escolares.',
     icon: '/icons/route.svg',
-    statusLabel: 'Pendiente de fusión',
-    isActive: false,
-    href: null,
+    statusLabel: 'Activo',
+    isActive: true,
+    href: '/estudiantes-rutas',
   },
   {
     id: 'custodia',
@@ -119,7 +119,7 @@ export function PortalHomeClient() {
       id: 'rutas',
       label: 'Estudiantes y rutas',
       icon: '/icons/route.svg',
-      href: null,
+      href: '/estudiantes-rutas' as const,
       active: false,
     },
     {
