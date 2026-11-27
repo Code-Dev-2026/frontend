@@ -35,6 +35,7 @@ export type AcudienteHomeScreenProps = {
   avatarInitials: string;
   childrenCards: readonly AcudienteChildSummary[];
   activeTab?: AcudienteNavTab;
+  hideBottomNav?: boolean;
   onBack?: () => void;
   onPressAvatar?: () => void;
   onPressChildAction?: (childId: string) => void;
@@ -54,6 +55,7 @@ export function AcudienteHomeScreen({
   avatarInitials,
   childrenCards,
   activeTab = 'inicio',
+  hideBottomNav = false,
   onBack,
   onPressAvatar,
   onPressChildAction,
@@ -213,11 +215,13 @@ export function AcudienteHomeScreen({
         </InteractivePressable>
       </View>
 
-      <BottomNavBar
-        activeId={activeTab}
-        items={NAV_ITEMS}
-        onSelect={onSelectTab}
-      />
+      {!hideBottomNav ? (
+        <BottomNavBar
+          activeId={activeTab}
+          items={NAV_ITEMS}
+          onSelect={onSelectTab}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

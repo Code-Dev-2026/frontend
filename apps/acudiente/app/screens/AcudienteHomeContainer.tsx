@@ -1,14 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { shouldShowCustodyMap, type StudentState } from '@camino/domain';
 import {
   AcudienteHomeScreen,
   AcudienteMapScreen,
+  BottomNavBar,
+  BrandLoadingOverlay,
   SwipeBackView,
-  useScreenLoading,
+  baseTokens,
   type AcudienteChildSummary,
   type AcudienteNavTab,
+  type BottomNavItem,
 } from '@camino/ui';
-import { Alert } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
+
+const ACUDIENTE_NAV_ITEMS: ReadonlyArray<BottomNavItem<AcudienteNavTab>> = [
+  { id: 'inicio', label: 'Inicio', icon: 'house' },
+  { id: 'mapa', label: 'Mapa', icon: 'map-pin' },
+  { id: 'avisos', label: 'Avisos', icon: 'bell' },
+  { id: 'perfil', label: 'Perfil', icon: 'user-round' },
+];
+
+const TAB_TRANSITION_MS = 420;
 
 type GuardianStudentRecord = {
   id: string;
@@ -61,10 +73,33 @@ export type AcudienteHomeContainerProps = {
 export function AcudienteHomeContainer({
   onBackToLogin,
 }: AcudienteHomeContainerProps) {
-  const { transitionScreen } = useScreenLoading();
   const [activeTab, setActiveTab] = useState<AcudienteNavTab>('inicio');
   const [selectedMapStudentId, setSelectedMapStudentId] =
     useState<string>('student-lucia');
+  const [isTabLoading, setIsTabLoading] = useState(false);
+  const [tabLoadingLabel, setTabLoadingLabel] = useState<string | undefined>(
+    undefined,
+  );
+  const tabTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    return () => {
+      if (tabTimerRef.current) clearTimeout(tabTimerRef.current);
+    };
+  }, []);
+
+  const switchTab = (nextTab: AcudienteNavTab, label?: string) => {
+    if (tabTimerRef.current) clearTimeout(tabTimerRef.current);
+    // Mantiene fija la barra inferior (estilo Spotify) y recarga solo el contenido superior.
+    setActiveTab(nextTab);
+    setTabLoadingLabel(label);
+    setIsTabLoading(true);
+    tabTimerRef.current = setTimeout(() => {
+      setIsTabLoading(false);
+    }, TAB_TRANSITION_MS);
+  };
 
   const childrenCards: AcudienteChildSummary[] = PROVISIONAL_STUDENTS.map(
     (student) => {
@@ -93,13 +128,8 @@ export function AcudienteHomeContainer({
     if (!student) return;
 
     if (shouldShowCustodyMap(student.state)) {
-      transitionScreen(
-        () => {
-          setSelectedMapStudentId(student.id);
-          setActiveTab('mapa');
-        },
-        { label: 'Cargando mapa…' },
-      );
+      setSelectedMapStudentId(student.id);
+      switchTab('mapa', 'Cargando mapa…');
       return;
     }
 
@@ -119,16 +149,14 @@ export function AcudienteHomeContainer({
         return;
       }
       if (activeTab !== 'mapa') {
-        transitionScreen(() => setActiveTab('mapa'), {
-          label: 'Cargando mapa…',
-        });
+        switchTab('mapa', 'Cargando mapa…');
       }
       return;
     }
 
     if (tab === 'inicio') {
       if (activeTab !== 'inicio') {
-        transitionScreen(() => setActiveTab('inicio'));
+        switchTab('inicio');
       }
       return;
     }
@@ -139,58 +167,89 @@ export function AcudienteHomeContainer({
     );
   };
 
-  if (activeTab === 'mapa' && onBoardStudent) {
-    return (
-      <SwipeBackView
-        enabled
-        onBack={() => transitionScreen(() => setActiveTab('inicio'))}
-      >
-        <AcudienteMapScreen
-          activeTab="mapa"
-          busSummary={onBoardStudent.busSummary ?? onBoardStudent.routeSummary}
-          custodyStatusLabel={onBoardStudent.statusLabel}
-          etaSubtitle={`${onBoardStudent.name} · Llegada estimada a tu parada`}
-          etaValue={onBoardStudent.etaValue ?? '—'}
-          lastUpdatedLabel={
-            onBoardStudent.mapLastUpdatedLabel ?? onBoardStudent.lastUpdateLabel
-          }
-          onPressAlerts={() => handleSelectTab('avisos')}
-          onPressCoverageNotice={() =>
-            Alert.alert(
-              'Zona sin cobertura',
-              'Se notificará si el vehículo ingresa a una zona con señal intermitente.',
-            )
-          }
-          onSelectTab={handleSelectTab}
-          stopSummary={
-            onBoardStudent.stopSummary ?? onBoardStudent.scheduleSummary
-          }
-        />
-      </SwipeBackView>
-    );
-  }
-
   return (
-    <AcudienteHomeScreen
-      activeTab={activeTab}
-      avatarInitials={PROVISIONAL_AVATAR_INITIALS}
-      childrenCards={childrenCards}
-      onBack={onBackToLogin}
-      onPressAvatar={() => handleSelectTab('perfil')}
-      onPressChildAction={handleChildAction}
-      onReportAbsence={() =>
-        Alert.alert(
-          'Reportar inasistencia',
-          'El flujo de reporte de inasistencia aún no está conectado.',
-        )
-      }
-      onRequestOccasionalPassenger={() =>
-        Alert.alert(
-          'Solicitar pasajero ocasional',
-          'La solicitud de pasajero ocasional aún no está conectada.',
-        )
-      }
-      onSelectTab={handleSelectTab}
-    />
+    <View style={styles.shell}>
+      <View style={styles.contentArea}>
+        {activeTab === 'mapa' && onBoardStudent ? (
+          <SwipeBackView enabled onBack={() => switchTab('inicio')}>
+            <AcudienteMapScreen
+              activeTab="mapa"
+              busSummary={
+                onBoardStudent.busSummary ?? onBoardStudent.routeSummary
+              }
+              custodyStatusLabel={onBoardStudent.statusLabel}
+              etaSubtitle={`${onBoardStudent.name} · Llegada estimada a tu parada`}
+              etaValue={onBoardStudent.etaValue ?? '—'}
+              hideBottomNav
+              lastUpdatedLabel={
+                onBoardStudent.mapLastUpdatedLabel ??
+                onBoardStudent.lastUpdateLabel
+              }
+              onPressAlerts={() => handleSelectTab('avisos')}
+              onPressCoverageNotice={() =>
+                Alert.alert(
+                  'Zona sin cobertura',
+                  'Se notificará si el vehículo ingresa a una zona con señal intermitente.',
+                )
+              }
+              onSelectTab={handleSelectTab}
+              stopSummary={
+                onBoardStudent.stopSummary ?? onBoardStudent.scheduleSummary
+              }
+            />
+          </SwipeBackView>
+        ) : (
+          <AcudienteHomeScreen
+            activeTab={activeTab}
+            avatarInitials={PROVISIONAL_AVATAR_INITIALS}
+            childrenCards={childrenCards}
+            hideBottomNav
+            onBack={onBackToLogin}
+            onPressAvatar={() => handleSelectTab('perfil')}
+            onPressChildAction={handleChildAction}
+            onReportAbsence={() =>
+              Alert.alert(
+                'Reportar inasistencia',
+                'El flujo de reporte de inasistencia aún no está conectado.',
+              )
+            }
+            onRequestOccasionalPassenger={() =>
+              Alert.alert(
+                'Solicitar pasajero ocasional',
+                'La solicitud de pasajero ocasional aún no está conectada.',
+              )
+            }
+            onSelectTab={handleSelectTab}
+          />
+        )}
+
+        <BrandLoadingOverlay
+          backdrop="solid"
+          label={tabLoadingLabel}
+          size={52}
+          testID="acudiente-tab-loader"
+          visible={isTabLoading}
+        />
+      </View>
+
+      <BottomNavBar
+        activeId={activeTab}
+        items={ACUDIENTE_NAV_ITEMS}
+        onSelect={handleSelectTab}
+        testID="acudiente-bottom-nav"
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  shell: {
+    backgroundColor: baseTokens.colors.surface,
+    flex: 1,
+  },
+  contentArea: {
+    flex: 1,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+});
