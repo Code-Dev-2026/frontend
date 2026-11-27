@@ -12,7 +12,12 @@ interface ModuleCardItem {
   statusLabel: string;
   isActive: boolean;
   href:
-    '/estudiantes-rutas' | '/custodia' | '/telemetria' | '/comunicacion' | null;
+    | '/estudiantes-rutas'
+    | '/custodia'
+    | '/telemetria'
+    | '/comunicacion'
+    | '/reportes'
+    | null;
 }
 
 const MODULE_CARDS: ReadonlyArray<ModuleCardItem> = [
@@ -52,6 +57,15 @@ const MODULE_CARDS: ReadonlyArray<ModuleCardItem> = [
     statusLabel: 'Activo',
     isActive: true,
     href: '/comunicacion',
+  },
+  {
+    id: 'reportes',
+    title: 'Reportes y auditoría',
+    description: 'Consulta de recorridos, desvíos e incidentes certificados.',
+    icon: '/icons/eye.svg',
+    statusLabel: 'Activo',
+    isActive: true,
+    href: '/reportes',
   },
   {
     id: 'cartera',
@@ -142,6 +156,13 @@ export function PortalHomeClient() {
       label: 'Comunicación',
       icon: '/icons/bell.svg',
       href: '/comunicacion' as const,
+      active: false,
+    },
+    {
+      id: 'reportes',
+      label: 'Reportes',
+      icon: '/icons/eye.svg',
+      href: '/reportes' as const,
       active: false,
     },
     {

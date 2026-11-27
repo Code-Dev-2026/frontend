@@ -469,6 +469,13 @@ export function RestrictionsClient({
       active: false,
     },
     {
+      id: 'reportes',
+      label: 'Reportes',
+      icon: '/icons/eye.svg',
+      href: '/reportes' as const,
+      active: false,
+    },
+    {
       id: 'cartera',
       label: 'Cartera',
       icon: '/icons/users.svg',
