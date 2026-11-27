@@ -214,7 +214,7 @@ export function DeviationMapPreview({
         <div className="absolute bottom-0 left-[68%] top-0 w-2.5 bg-cs-borderSoft/80" />
       </div>
       <div
-        aria-label="Mapa de resalte de desvío reportado por backend"
+        aria-label="Mapa de seguimiento del desvío en ruta"
         className="h-full w-full"
         ref={containerRef}
       />
