@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
-    elevation: 16,
     justifyContent: 'center',
     zIndex: 100,
   },

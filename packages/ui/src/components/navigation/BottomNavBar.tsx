@@ -1,12 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Easing,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { baseTokens } from '../../tokens/base';
 import { AnimatedNavIcon, type NavIconName } from './AnimatedNavIcon';
 
@@ -37,40 +30,22 @@ function BottomNavTabButton<T extends string>({
   testID,
 }: BottomNavTabButtonProps<T>) {
   const [pressed, setPressed] = useState(false);
-  const pillOpacity = useRef(new Animated.Value(isActive ? 1 : 0)).current;
-
-  useEffect(() => {
-    Animated.timing(pillOpacity, {
-      toValue: isActive || pressed ? 1 : 0,
-      duration: isActive || pressed ? 180 : 160,
-      easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-      isInteraction: false,
-    }).start();
-  }, [isActive, pillOpacity, pressed]);
 
   return (
     <Pressable
       accessibilityRole="tab"
       accessibilityState={{ selected: isActive }}
+      android_ripple={null}
       onPress={onPress}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       style={styles.navItem}
       testID={testID}
     >
-      <Animated.View
-        pointerEvents="none"
-        style={[styles.activePill, { opacity: pillOpacity }]}
-      />
       <AnimatedNavIcon
         active={isActive}
         activeColor={baseTokens.colors.navy900}
-        cutoutColor={
-          isActive || pressed
-            ? baseTokens.colors.infoBg
-            : baseTokens.colors.surface
-        }
+        cutoutColor={baseTokens.colors.surface}
         inactiveColor={baseTokens.colors.textMuted}
         name={item.icon}
         pressed={pressed}
@@ -78,10 +53,7 @@ function BottomNavTabButton<T extends string>({
       />
       <Text
         numberOfLines={1}
-        style={[
-          styles.navItemLabel,
-          (isActive || pressed) && styles.navItemLabelActive,
-        ]}
+        style={[styles.navItemLabel, isActive && styles.navItemLabelActive]}
       >
         {item.label}
       </Text>
@@ -124,20 +96,14 @@ const styles = StyleSheet.create({
   },
   navItem: {
     alignItems: 'center',
-    borderRadius: 10,
+    backgroundColor: 'transparent',
     flex: 1,
     gap: 3,
     height: 52,
     justifyContent: 'center',
     minHeight: baseTokens.sizes.touchMin,
-    overflow: 'hidden',
     paddingHorizontal: 4,
     paddingVertical: 6,
-  },
-  activePill: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: baseTokens.colors.infoBg,
-    borderRadius: 10,
   },
   navItemLabel: {
     ...baseTokens.typography.caption,

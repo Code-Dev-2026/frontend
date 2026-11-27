@@ -26,6 +26,7 @@ export type AcudienteMapScreenProps = {
   primaryActionLabel?: string;
   coverageActionLabel?: string;
   activeTab?: AcudienteNavTab;
+  hideBottomNav?: boolean;
   onPressAlerts?: () => void;
   onPressCoverageNotice?: () => void;
   onSelectTab?: (tab: AcudienteNavTab) => void;
@@ -49,6 +50,7 @@ export function AcudienteMapScreen({
   primaryActionLabel = 'Ver avisos',
   coverageActionLabel = 'Próxima zona sin cobertura',
   activeTab = 'mapa',
+  hideBottomNav = false,
   onPressAlerts,
   onPressCoverageNotice,
   onSelectTab,
@@ -200,11 +202,13 @@ export function AcudienteMapScreen({
         </InteractivePressable>
       </View>
 
-      <BottomNavBar
-        activeId={activeTab}
-        items={NAV_ITEMS}
-        onSelect={onSelectTab}
-      />
+      {!hideBottomNav ? (
+        <BottomNavBar
+          activeId={activeTab}
+          items={NAV_ITEMS}
+          onSelect={onSelectTab}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

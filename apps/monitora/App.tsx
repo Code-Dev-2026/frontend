@@ -9,10 +9,7 @@ import {
 } from '@expo-google-fonts/inter';
 import {
   BrandLoader,
-  Button,
-  Card,
   ForgotPasswordScreen,
-  Icon,
   InteractivePressable,
   LoginScreen,
   MfaVerificationScreen,
@@ -27,7 +24,8 @@ import {
 } from '@camino/ui';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import { MonitoraShellContainer } from './app/screens/MonitoraShellContainer';
 import { ApiErrorMessage } from './src/components/ApiErrorMessage';
 import {
   createProvisionalAuthGateway,
@@ -43,7 +41,7 @@ type MonitoraScreen =
   | 'forgot-password'
   | 'mfa'
   | 'role-blocked'
-  | 'home-placeholder'
+  | 'shell'
   | 'ui-catalog';
 
 const INITIAL_SCREEN: MonitoraScreen =
@@ -60,6 +58,9 @@ function MonitoraAppContent() {
 
   const [currentScreen, setCurrentScreen] =
     useState<MonitoraScreen>(INITIAL_SCREEN);
+  const [authenticatedEmail, setAuthenticatedEmail] = useState<
+    string | undefined
+  >(undefined);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginValidationError, setLoginValidationError] = useState<
     string | null
@@ -123,6 +124,7 @@ function MonitoraAppContent() {
             setCurrentScreen('role-blocked');
             return;
           }
+          setAuthenticatedEmail(validation.normalizedEmail);
           setMfaDestination(result.maskedDestination);
           setMfaApiError(null);
           setCurrentScreen('mfa');
@@ -145,7 +147,7 @@ function MonitoraAppContent() {
             setMfaApiError(result.error);
             return;
           }
-          setCurrentScreen('home-placeholder');
+          setCurrentScreen('shell');
         },
         { label: 'Validando código…', minDurationMs: 650 },
       );
@@ -301,30 +303,15 @@ function MonitoraAppContent() {
     );
   }
 
-  // PROVISIONAL: se reemplaza por Inicio/Perfil/Bottom nav en FE-29 (#89).
   return (
-    <SafeAreaView style={styles.sessionPlaceholder}>
-      <Card style={styles.sessionCard}>
-        <Icon
-          color={baseTokens.colors.successText}
-          name="shield-check"
-          size={28}
-        />
-        <Text style={styles.sessionTitle}>Sesión de Monitora activa</Text>
-        <Text style={styles.sessionBody}>
-          Acceso validado con rol MONITORA. La jornada y navegación principal se
-          conectan en FE-29.
-        </Text>
-      </Card>
-      <Button
-        label="Cerrar sesión"
-        onPress={() => {
-          resetAuthErrors();
-          goToScreen('login', 'Cerrando sesión…');
-        }}
-        variant="primary"
-      />
-    </SafeAreaView>
+    <MonitoraShellContainer
+      onLoggedOut={() => {
+        setAuthenticatedEmail(undefined);
+        resetAuthErrors();
+        goToScreen('login', 'Cerrando sesión…');
+      }}
+      sessionEmail={authenticatedEmail}
+    />
   );
 }
 
@@ -369,26 +356,5 @@ const styles = StyleSheet.create({
   devCatalogLabel: {
     ...baseTokens.typography.fieldLabel,
     color: baseTokens.colors.infoText,
-  },
-  sessionPlaceholder: {
-    backgroundColor: baseTokens.colors.surface,
-    flex: 1,
-    gap: baseTokens.spacing.xl,
-    justifyContent: 'center',
-    paddingHorizontal: baseTokens.spacing.pageMargin,
-  },
-  sessionCard: {
-    alignItems: 'center',
-    padding: baseTokens.spacing.xl,
-  },
-  sessionTitle: {
-    ...baseTokens.typography.section,
-    color: baseTokens.colors.textStrong,
-    textAlign: 'center',
-  },
-  sessionBody: {
-    ...baseTokens.typography.bodySmall,
-    color: baseTokens.colors.textBody,
-    textAlign: 'center',
   },
 });

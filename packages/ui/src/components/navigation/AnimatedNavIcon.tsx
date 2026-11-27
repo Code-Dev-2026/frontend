@@ -1,17 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing } from 'react-native';
+import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
+  StyleSheet,
+  View,
+} from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { baseTokens } from '../../tokens/base';
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-
-export type NavIconName = 'house' | 'map-pin' | 'bell' | 'user-round' | 'users';
+export type NavIconName =
+  'house' | 'map-pin' | 'bell' | 'user-round' | 'users' | 'route';
 
 export type AnimatedNavIconProps = {
   name: NavIconName;
-  /** Cuando es `true`, el ícono pasa de contorno transparente a relleno sólido. */
+  /** Cuando es `true`, el ícono pasa de contorno transparente a relleno sólido sin parpadeos. */
   active: boolean;
-  /** Activa el relleno anticipado mientras se mantiene presionado el tab. */
+  /** Escala táctil sutil mientras el dedo presiona el tab (sin alterar el relleno). */
   pressed?: boolean;
   size?: number;
   activeColor?: string;
@@ -47,7 +52,265 @@ const ICON_PATHS = {
     'M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H6C4.93913 15 3.92172 15.4214 3.17157 16.1716C2.42143 16.9217 2 17.9391 2 19V21Z',
   usersStroke:
     'M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H6C4.93913 15 3.92172 15.4214 3.17157 16.1716C2.42143 16.9217 2 17.9391 2 19V21M16 3.128C16.8578 3.35037 17.6174 3.85126 18.1597 4.55206C18.702 5.25286 18.9962 6.11389 18.9962 7C18.9962 7.88611 18.702 8.74714 18.1597 9.44794C17.6174 10.1487 16.8578 10.6496 16 10.872M22 21V19C21.9993 18.1137 21.7044 17.2528 21.1614 16.5523C20.6184 15.8519 19.8581 15.3516 19 15.13',
+  routeStartDot:
+    'M9 19C9 20.6569 7.65685 22 6 22C4.34315 22 3 20.6569 3 19C3 17.3431 4.34315 16 6 16C7.65685 16 9 17.3431 9 19Z',
+  routeLine:
+    'M9 19H17.5C18.4283 19 19.3185 18.6313 19.9749 17.9749C20.6313 17.3185 21 16.4283 21 15.5C21 14.5717 20.6313 13.6815 19.9749 13.0251C19.3185 12.3687 18.4283 12 17.5 12H6.5C5.57174 12 4.6815 11.6313 4.02513 10.9749C3.36875 10.3185 3 9.42826 3 8.5C3 7.57174 3.36875 6.6815 4.02513 6.02513C4.6815 5.36875 5.57174 5 6.5 5H15',
+  routeEndDot:
+    'M21 5C21 6.65685 19.6569 8 18 8C16.3431 8 15 6.65685 15 5C15 3.34315 16.3431 2 18 2C19.6569 2 21 3.34315 21 5Z',
 } as const;
+
+function renderOutlineIcon(name: NavIconName, size: number, color: string) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      {name === 'house' ? (
+        <>
+          <Path
+            d={ICON_PATHS.houseOuter}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.houseDoorStroke}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : name === 'map-pin' ? (
+        <>
+          <Path
+            d={ICON_PATHS.mapPinOuter}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.mapPinInner}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : name === 'bell' ? (
+        <>
+          <Path
+            d={ICON_PATHS.bellBody}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.bellClapper}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : name === 'user-round' ? (
+        <>
+          <Path
+            d={ICON_PATHS.userHead}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.userBodyStroke}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : name === 'route' ? (
+        <>
+          <Path
+            d={ICON_PATHS.routeStartDot}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.routeLine}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.routeEndDot}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : (
+        <>
+          <Path
+            d={ICON_PATHS.usersPrimaryHead}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.usersStroke}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      )}
+    </Svg>
+  );
+}
+
+function renderFilledIcon(
+  name: NavIconName,
+  size: number,
+  color: string,
+  cutoutColor: string,
+) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      {name === 'house' ? (
+        <>
+          <Path
+            d={ICON_PATHS.houseOuter}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path d={ICON_PATHS.houseDoorFill} fill={cutoutColor} />
+        </>
+      ) : name === 'map-pin' ? (
+        <>
+          <Path
+            d={ICON_PATHS.mapPinOuter}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path d={ICON_PATHS.mapPinInner} fill={cutoutColor} />
+        </>
+      ) : name === 'bell' ? (
+        <>
+          <Path
+            d={ICON_PATHS.bellBody}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.bellClapper}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : name === 'user-round' ? (
+        <>
+          <Path
+            d={ICON_PATHS.userHead}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.userBodyFill}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : name === 'route' ? (
+        <>
+          <Path
+            d={ICON_PATHS.routeStartDot}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path
+            d={ICON_PATHS.routeLine}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2.4}
+          />
+          <Path
+            d={ICON_PATHS.routeEndDot}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      ) : (
+        <>
+          <Path
+            d={ICON_PATHS.usersPrimaryHead}
+            fill={color}
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+          <Path d={ICON_PATHS.usersPrimaryTorsoFill} fill={color} />
+          <Path
+            d={ICON_PATHS.usersStroke}
+            fill="none"
+            stroke={color}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </>
+      )}
+    </Svg>
+  );
+}
 
 export function AnimatedNavIcon({
   name,
@@ -59,9 +322,7 @@ export function AnimatedNavIcon({
   cutoutColor = baseTokens.colors.surface,
 }: AnimatedNavIconProps) {
   const [reduceMotion, setReduceMotion] = useState(false);
-  const isFilled = active || pressed;
-
-  const fillProgress = useRef(new Animated.Value(isFilled ? 1 : 0)).current;
+  const activeOpacity = useRef(new Animated.Value(active ? 1 : 0)).current;
   const iconScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -78,186 +339,79 @@ export function AnimatedNavIcon({
     };
   }, []);
 
+  // Crossfade nativo (GPU) entre el contorno transparente y el relleno sólido:
+  // evita por completo el parpadeo de `react-native-svg` al cambiar de tab.
   useEffect(() => {
     if (reduceMotion) {
-      fillProgress.setValue(isFilled ? 1 : 0);
+      activeOpacity.setValue(active ? 1 : 0);
+      return;
+    }
+
+    Animated.timing(activeOpacity, {
+      toValue: active ? 1 : 0,
+      duration: 180,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+      isInteraction: false,
+    }).start();
+  }, [active, activeOpacity, reduceMotion]);
+
+  useEffect(() => {
+    if (reduceMotion) {
       iconScale.setValue(1);
       return;
     }
 
-    Animated.timing(fillProgress, {
-      toValue: isFilled ? 1 : 0,
-      duration: isFilled ? 190 : 160,
-      easing: isFilled ? Easing.out(Easing.cubic) : Easing.inOut(Easing.quad),
-      useNativeDriver: false,
+    Animated.timing(iconScale, {
+      toValue: pressed ? 0.92 : 1,
+      duration: pressed ? 90 : 140,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
       isInteraction: false,
     }).start();
+  }, [iconScale, pressed, reduceMotion]);
 
-    if (pressed) {
-      Animated.spring(iconScale, {
-        toValue: 0.88,
-        speed: 44,
-        bounciness: 4,
-        useNativeDriver: true,
-        isInteraction: false,
-      }).start();
-    } else if (active) {
-      Animated.sequence([
-        Animated.spring(iconScale, {
-          toValue: 1.08,
-          speed: 38,
-          bounciness: 8,
-          useNativeDriver: true,
-          isInteraction: false,
-        }),
-        Animated.spring(iconScale, {
-          toValue: 1,
-          speed: 28,
-          bounciness: 6,
-          useNativeDriver: true,
-          isInteraction: false,
-        }),
-      ]).start();
-    } else {
-      Animated.spring(iconScale, {
-        toValue: 1,
-        speed: 30,
-        bounciness: 4,
-        useNativeDriver: true,
-        isInteraction: false,
-      }).start();
-    }
-  }, [active, fillProgress, iconScale, isFilled, pressed, reduceMotion]);
-
-  const strokeColor = isFilled ? activeColor : inactiveColor;
-  const outlineOnlyOpacity = fillProgress.interpolate({
+  const outlineOpacity = activeOpacity.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 0],
   });
 
   return (
-    <Animated.View style={{ transform: [{ scale: iconScale }] }}>
-      <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
-        {name === 'house' ? (
-          <>
-            <AnimatedPath
-              d={ICON_PATHS.houseOuter}
-              fill={activeColor}
-              fillOpacity={fillProgress}
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-            <AnimatedPath
-              d={ICON_PATHS.houseDoorFill}
-              fill={cutoutColor}
-              fillOpacity={fillProgress}
-            />
-            <AnimatedPath
-              d={ICON_PATHS.houseDoorStroke}
-              fill="none"
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeOpacity={outlineOnlyOpacity}
-              strokeWidth={2}
-            />
-          </>
-        ) : name === 'map-pin' ? (
-          <>
-            <AnimatedPath
-              d={ICON_PATHS.mapPinOuter}
-              fill={activeColor}
-              fillOpacity={fillProgress}
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-            <AnimatedPath
-              d={ICON_PATHS.mapPinInner}
-              fill={cutoutColor}
-              fillOpacity={fillProgress}
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeOpacity={outlineOnlyOpacity}
-              strokeWidth={2}
-            />
-          </>
-        ) : name === 'bell' ? (
-          <>
-            <AnimatedPath
-              d={ICON_PATHS.bellBody}
-              fill={activeColor}
-              fillOpacity={fillProgress}
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-            <Path
-              d={ICON_PATHS.bellClapper}
-              fill="none"
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-          </>
-        ) : name === 'user-round' ? (
-          <>
-            <AnimatedPath
-              d={ICON_PATHS.userHead}
-              fill={activeColor}
-              fillOpacity={fillProgress}
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-            <AnimatedPath
-              d={ICON_PATHS.userBodyFill}
-              fill={activeColor}
-              fillOpacity={fillProgress}
-            />
-            <Path
-              d={ICON_PATHS.userBodyStroke}
-              fill="none"
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-          </>
-        ) : (
-          <>
-            <AnimatedPath
-              d={ICON_PATHS.usersPrimaryHead}
-              fill={activeColor}
-              fillOpacity={fillProgress}
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-            <AnimatedPath
-              d={ICON_PATHS.usersPrimaryTorsoFill}
-              fill={activeColor}
-              fillOpacity={fillProgress}
-            />
-            <Path
-              d={ICON_PATHS.usersStroke}
-              fill="none"
-              stroke={strokeColor}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-            />
-          </>
-        )}
-      </Svg>
+    <Animated.View
+      style={[
+        styles.wrapper,
+        { height: size, width: size, transform: [{ scale: iconScale }] },
+      ]}
+    >
+      <Animated.View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, { opacity: outlineOpacity }]}
+      >
+        <View style={styles.layer}>
+          {renderOutlineIcon(name, size, inactiveColor)}
+        </View>
+      </Animated.View>
+      <Animated.View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, { opacity: activeOpacity }]}
+      >
+        <View style={styles.layer}>
+          {renderFilledIcon(name, size, activeColor, cutoutColor)}
+        </View>
+      </Animated.View>
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  layer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+});
