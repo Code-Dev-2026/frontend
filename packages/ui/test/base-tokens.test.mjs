@@ -42,16 +42,27 @@ const EXPECTED_EXPORTS = [
   'buttonSize',
   'baseTokens',
   'Button',
+  'InteractivePressable',
+  'AnimatedNavIcon',
+  'BottomNavBar',
+  'SwipeBackView',
   'Card',
   'Badge',
   'Modal',
   'Dialog',
   'Banner',
+  'BrandLoader',
+  'BrandLoadingOverlay',
+  'ScreenLoadingProvider',
+  'useScreenLoading',
   'Input',
   'EmptyState',
   'Icon',
   'ICON_NAMES',
   'UiCatalogScreen',
+  'SplashScreen',
+  'MfaVerificationScreen',
+  'RoleBlockedScreen',
 ];
 
 test('all Icon SVG assets exist and pass svg:check with currentColor', async () => {
@@ -141,4 +152,38 @@ test('packages/ui index exports all 8 base components and preserves legacy token
       `Falta la clave retrocompatible ${legacyKey} en designTokens`,
     );
   }
+});
+
+test('BrandLoader reuses exact paths from logotipo-sin-texto.svg and respects reduced motion', async () => {
+  const [svgSource, loaderSource] = await Promise.all([
+    readFile(
+      path.join(UI_ROOT, 'src', 'svg', 'logotipo-sin-texto.svg'),
+      'utf8',
+    ),
+    readFile(
+      path.join(
+        UI_ROOT,
+        'src',
+        'components',
+        'brand-loader',
+        'BrandLoader.tsx',
+      ),
+      'utf8',
+    ),
+  ]);
+
+  const svgPaths = [...svgSource.matchAll(/d="([^"]+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.equal(svgPaths.length, 6, 'logotipo-sin-texto.svg debe tener 6 paths');
+
+  for (const pathData of svgPaths) {
+    assert.equal(
+      loaderSource.includes(pathData),
+      true,
+      'BrandLoader.tsx debe reutilizar exactamente los trazados de logotipo-sin-texto.svg',
+    );
+  }
+
+  assert.match(loaderSource, /isReduceMotionEnabled/);
 });

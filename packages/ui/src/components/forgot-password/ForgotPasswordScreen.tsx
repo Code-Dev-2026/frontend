@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,6 +9,7 @@ import {
 } from 'react-native';
 import LogoTexto from '../../svg/logo-texto.svg';
 import { forgotPasswordTokens } from '../../tokens/forgot-password';
+import { InteractivePressable } from '../button/InteractivePressable';
 
 export type ForgotPasswordScreenProps = {
   error?: string | null;
@@ -90,15 +90,15 @@ export function ForgotPasswordScreen({
             </View>
           ) : null}
 
-          <Pressable
+          <InteractivePressable
             accessibilityRole="button"
             accessibilityState={{ disabled: isLoading }}
+            borderRadius={forgotPasswordTokens.spacing.fieldRadius}
+            containerStyle={styles.submitButtonWrap}
             disabled={isLoading}
             onPress={handleSubmit}
-            style={({ pressed }) => [
-              styles.submitButton,
-              pressed && styles.submitButtonPressed,
-            ]}
+            pressFillColor="rgba(255, 255, 255, 0.24)"
+            style={styles.submitButton}
           >
             {isLoading ? (
               <View style={styles.buttonContent}>
@@ -114,19 +114,21 @@ export function ForgotPasswordScreen({
                 Enviar enlace de recuperación
               </Text>
             )}
-          </Pressable>
+          </InteractivePressable>
         </View>
 
         <View style={styles.options}>
-          <Pressable
+          <InteractivePressable
             accessibilityRole="button"
             accessibilityState={{ disabled: !onBackToLogin }}
+            borderRadius={forgotPasswordTokens.spacing.fieldRadius}
             disabled={!onBackToLogin}
             onPress={onBackToLogin}
+            pressFillColor="rgba(2, 56, 102, 0.1)"
             style={styles.backButton}
           >
             <Text style={styles.backButtonText}>Volver</Text>
-          </Pressable>
+          </InteractivePressable>
         </View>
       </View>
 
@@ -230,17 +232,17 @@ const styles = StyleSheet.create({
     color: forgotPasswordTokens.colors.success,
     textAlign: 'center',
   },
+  submitButtonWrap: {
+    marginTop: forgotPasswordTokens.spacing.fieldGap,
+    width: '100%',
+  },
   submitButton: {
     alignItems: 'center',
     backgroundColor: forgotPasswordTokens.colors.primary,
     borderRadius: forgotPasswordTokens.spacing.fieldRadius,
     height: forgotPasswordTokens.spacing.touchTarget,
     justifyContent: 'center',
-    marginTop: forgotPasswordTokens.spacing.fieldGap,
     width: '100%',
-  },
-  submitButtonPressed: {
-    backgroundColor: forgotPasswordTokens.colors.primaryPressed,
   },
   buttonContent: {
     alignItems: 'center',

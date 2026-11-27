@@ -6,6 +6,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { baseTokens } from '../../tokens/base';
+import { BrandLoader } from '../brand-loader/BrandLoader';
 import { Button } from '../button/Button';
 import { Icon, type IconName } from '../icon/Icon';
 
@@ -59,7 +60,13 @@ export function EmptyState({
         style,
       ]}
     >
-      {resolvedIcon ? (
+      {isLoading && icon === undefined ? (
+        <BrandLoader
+          accessibilityLabel={title}
+          cycleDurationMs={1800}
+          size={44}
+        />
+      ) : resolvedIcon ? (
         <Icon
           name={resolvedIcon}
           size={baseTokens.sizes.iconDefault}

@@ -37,8 +37,47 @@ export type { BadgeProps, BadgeVariant } from './components/badge/Badge';
 export { Banner } from './components/banner/Banner';
 export type { BannerProps, BannerVariant } from './components/banner/Banner';
 
+export { BrandLoader } from './components/brand-loader/BrandLoader';
+export type { BrandLoaderProps } from './components/brand-loader/BrandLoader';
+
+export { BrandLoadingOverlay } from './components/brand-loader/BrandLoadingOverlay';
+export type {
+  BrandLoadingBackdrop,
+  BrandLoadingOverlayProps,
+} from './components/brand-loader/BrandLoadingOverlay';
+
+export {
+  ScreenLoadingProvider,
+  useScreenLoading,
+} from './components/brand-loader/ScreenLoadingProvider';
+export type {
+  RunWithLoadingOptions,
+  ScreenLoadingContextValue,
+  ScreenLoadingOptions,
+  ScreenLoadingProviderProps,
+  TransitionScreenOptions,
+} from './components/brand-loader/ScreenLoadingProvider';
+
 export { Button } from './components/button/Button';
 export type { ButtonProps, ButtonVariant } from './components/button/Button';
+
+export { InteractivePressable } from './components/button/InteractivePressable';
+export type { InteractivePressableProps } from './components/button/InteractivePressable';
+
+export { AnimatedNavIcon } from './components/navigation/AnimatedNavIcon';
+export type {
+  AnimatedNavIconProps,
+  NavIconName,
+} from './components/navigation/AnimatedNavIcon';
+
+export { BottomNavBar } from './components/navigation/BottomNavBar';
+export type {
+  BottomNavBarProps,
+  BottomNavItem,
+} from './components/navigation/BottomNavBar';
+
+export { SwipeBackView } from './components/navigation/SwipeBackView';
+export type { SwipeBackViewProps } from './components/navigation/SwipeBackView';
 
 export { Card } from './components/card/Card';
 export type { CardProps, CardState } from './components/card/Card';
@@ -67,6 +106,9 @@ export { UiCatalogScreen } from './components/catalog/UiCatalogScreen';
 export type { UiCatalogScreenProps } from './components/catalog/UiCatalogScreen';
 
 // Pantallas existentes y sus tokens por pantalla
+export { SplashScreen } from './components/splash/SplashScreen';
+export type { SplashScreenProps } from './components/splash/SplashScreen';
+
 export { LoginScreen } from './components/login/LoginScreen';
 export type {
   LoginCredentials,
@@ -77,6 +119,12 @@ export { loginTokens } from './tokens/login';
 export { ForgotPasswordScreen } from './components/forgot-password/ForgotPasswordScreen';
 export type { ForgotPasswordScreenProps } from './components/forgot-password/ForgotPasswordScreen';
 export { forgotPasswordTokens } from './tokens/forgot-password';
+
+export { MfaVerificationScreen } from './components/mfa/MfaVerificationScreen';
+export type { MfaVerificationScreenProps } from './components/mfa/MfaVerificationScreen';
+
+export { RoleBlockedScreen } from './components/role-blocked/RoleBlockedScreen';
+export type { RoleBlockedScreenProps } from './components/role-blocked/RoleBlockedScreen';
 
 export { AcudienteHomeScreen } from './components/acudiente-home/AcudienteHomeScreen';
 export type {

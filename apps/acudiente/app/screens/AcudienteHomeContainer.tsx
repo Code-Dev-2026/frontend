@@ -3,6 +3,8 @@ import { shouldShowCustodyMap, type StudentState } from '@camino/domain';
 import {
   AcudienteHomeScreen,
   AcudienteMapScreen,
+  SwipeBackView,
+  useScreenLoading,
   type AcudienteChildSummary,
   type AcudienteNavTab,
 } from '@camino/ui';
@@ -59,6 +61,7 @@ export type AcudienteHomeContainerProps = {
 export function AcudienteHomeContainer({
   onBackToLogin,
 }: AcudienteHomeContainerProps) {
+  const { transitionScreen } = useScreenLoading();
   const [activeTab, setActiveTab] = useState<AcudienteNavTab>('inicio');
   const [selectedMapStudentId, setSelectedMapStudentId] =
     useState<string>('student-lucia');
@@ -90,8 +93,13 @@ export function AcudienteHomeContainer({
     if (!student) return;
 
     if (shouldShowCustodyMap(student.state)) {
-      setSelectedMapStudentId(student.id);
-      setActiveTab('mapa');
+      transitionScreen(
+        () => {
+          setSelectedMapStudentId(student.id);
+          setActiveTab('mapa');
+        },
+        { label: 'Cargando mapa…' },
+      );
       return;
     }
 
@@ -110,12 +118,18 @@ export function AcudienteHomeContainer({
         );
         return;
       }
-      setActiveTab('mapa');
+      if (activeTab !== 'mapa') {
+        transitionScreen(() => setActiveTab('mapa'), {
+          label: 'Cargando mapa…',
+        });
+      }
       return;
     }
 
     if (tab === 'inicio') {
-      setActiveTab('inicio');
+      if (activeTab !== 'inicio') {
+        transitionScreen(() => setActiveTab('inicio'));
+      }
       return;
     }
 
@@ -127,27 +141,32 @@ export function AcudienteHomeContainer({
 
   if (activeTab === 'mapa' && onBoardStudent) {
     return (
-      <AcudienteMapScreen
-        activeTab="mapa"
-        busSummary={onBoardStudent.busSummary ?? onBoardStudent.routeSummary}
-        custodyStatusLabel={onBoardStudent.statusLabel}
-        etaSubtitle={`${onBoardStudent.name} · Llegada estimada a tu parada`}
-        etaValue={onBoardStudent.etaValue ?? '—'}
-        lastUpdatedLabel={
-          onBoardStudent.mapLastUpdatedLabel ?? onBoardStudent.lastUpdateLabel
-        }
-        onPressAlerts={() => handleSelectTab('avisos')}
-        onPressCoverageNotice={() =>
-          Alert.alert(
-            'Zona sin cobertura',
-            'Se notificará si el vehículo ingresa a una zona con señal intermitente.',
-          )
-        }
-        onSelectTab={handleSelectTab}
-        stopSummary={
-          onBoardStudent.stopSummary ?? onBoardStudent.scheduleSummary
-        }
-      />
+      <SwipeBackView
+        enabled
+        onBack={() => transitionScreen(() => setActiveTab('inicio'))}
+      >
+        <AcudienteMapScreen
+          activeTab="mapa"
+          busSummary={onBoardStudent.busSummary ?? onBoardStudent.routeSummary}
+          custodyStatusLabel={onBoardStudent.statusLabel}
+          etaSubtitle={`${onBoardStudent.name} · Llegada estimada a tu parada`}
+          etaValue={onBoardStudent.etaValue ?? '—'}
+          lastUpdatedLabel={
+            onBoardStudent.mapLastUpdatedLabel ?? onBoardStudent.lastUpdateLabel
+          }
+          onPressAlerts={() => handleSelectTab('avisos')}
+          onPressCoverageNotice={() =>
+            Alert.alert(
+              'Zona sin cobertura',
+              'Se notificará si el vehículo ingresa a una zona con señal intermitente.',
+            )
+          }
+          onSelectTab={handleSelectTab}
+          stopSummary={
+            onBoardStudent.stopSummary ?? onBoardStudent.scheduleSummary
+          }
+        />
+      </SwipeBackView>
     );
   }
 
