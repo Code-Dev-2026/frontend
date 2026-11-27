@@ -1,8 +1,8 @@
 # AGENTS.md: portal web (`apps/portal`)
 
 Complementa las reglas compartidas de [`AGENTS.md`](../../AGENTS.md). Estas
-instrucciones aplican solo a `apps/portal`; las reglas móviles de
-[`apps/AGENTS.md`](../AGENTS.md) no aplican aquí. Si hay conflicto con las
+instrucciones aplican solo a `apps/portal`; la sección móvil de
+[`AGENTS.md`](../../AGENTS.md) no aplica aquí. Si hay conflicto con las
 reglas compartidas, prevalece la guía raíz salvo que esta guía indique
 explícitamente una excepción web.
 
