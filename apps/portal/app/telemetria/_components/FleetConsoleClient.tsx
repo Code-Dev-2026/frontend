@@ -168,7 +168,7 @@ export function FleetConsoleClient() {
           id: 'custodia',
           label: 'Custodia',
           icon: '/icons/shield-check.svg',
-          href: null,
+          href: '/custodia' as const,
           active: false,
         },
         {
