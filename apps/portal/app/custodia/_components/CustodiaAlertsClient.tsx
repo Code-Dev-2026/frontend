@@ -3,9 +3,7 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { STUDENT_STATES } from '@camino/domain';
 import {
-  appendDomainTransition,
   filterConsoleAlerts,
   INITIAL_ALERTS,
   INITIAL_TIMELINES,
@@ -54,12 +52,12 @@ function alertIconPath(alert: ConsoleAlert): string {
 }
 
 export function CustodiaAlertsClient() {
-  const [alerts, setAlerts] = useState<ConsoleAlert[]>(() => [
-    ...INITIAL_ALERTS,
-  ]);
-  const [timelines, setTimelines] = useState<
-    Record<string, StudentTransitionEntry[]>
-  >(() => ({ ...INITIAL_TIMELINES }));
+  const [alerts] = useState<ConsoleAlert[]>(() => [...INITIAL_ALERTS]);
+  const [timelines] = useState<Record<string, StudentTransitionEntry[]>>(
+    () => ({
+      ...INITIAL_TIMELINES,
+    }),
+  );
   const [categoryFilter, setCategoryFilter] = useState<AlertCategory | 'all'>(
     'all',
   );
@@ -107,72 +105,6 @@ export function CustodiaAlertsClient() {
   );
 
   const currentTimeline = timelines[selectedStudentRef] ?? [];
-
-  function handleSimulateRedAlert() {
-    const timeLabel = new Date().toTimeString().slice(0, 5);
-    const newAlert: ConsoleAlert = {
-      id: `alert-red-${Date.now()}`,
-      category: 'red_alert',
-      severity: 'critical',
-      status: 'active',
-      badgeLabel: `CRÍTICA · ${timeLabel}`,
-      title: 'Alerta roja · Custodia no validada (simulada)',
-      description:
-        'Entrega bloqueada en Ruta Sur (BUS-03): evento PROVISIONAL con transición a RETORNO_SEDE_POR_FALLA_ENTREGA.',
-      routeName: 'Ruta Sur',
-      unitCode: 'BUS-03',
-      studentRef: '#E-104',
-      highlightOnMap: false,
-      priorityTag: 'Prioridad Alta',
-      actionLabel: 'Ver transición →',
-      coordinates: { normal: [-75.6968, 4.8128] },
-    };
-
-    setAlerts((prev) => [newAlert, ...prev]);
-    setStatusFilter('active');
-    setCategoryFilter('all');
-    setSelectedStudentRef('#E-104');
-    setTimelines((prev) => ({
-      ...prev,
-      '#E-104': appendDomainTransition(
-        prev['#E-104'] ?? [],
-        STUDENT_STATES[3],
-        timeLabel,
-        'Alerta roja simulada · Retorno a sede',
-      ),
-    }));
-  }
-
-  function handleSimulateDeviation() {
-    const timeLabel = new Date().toTimeString().slice(0, 5);
-    const id = `alert-dev-${Date.now()}`;
-    const newAlert: ConsoleAlert = {
-      id,
-      category: 'deviation',
-      severity: 'high',
-      status: 'active',
-      badgeLabel: `DESVÍO · ${timeLabel}`,
-      title: 'Desvío mayor a 300 m (+465 m)',
-      description:
-        'Backend reporta salida de corredor en Ruta Norte (BUS-01). Resaltado automáticamente en mapa.',
-      routeName: 'Ruta Norte',
-      unitCode: 'BUS-01',
-      studentRef: '#E-112',
-      deviationMeters: 465,
-      highlightOnMap: true,
-      priorityTag: 'Desvío > 300 m',
-      actionLabel: 'Ver en mapa →',
-      coordinates: {
-        normal: [-75.6992, 4.8148],
-        deviated: [-75.6931, 4.8171],
-      },
-    };
-
-    setAlerts((prev) => [newAlert, ...prev]);
-    setStatusFilter('active');
-    setCategoryFilter('all');
-    setFocusedMapAlertId(id);
-  }
 
   function resetFilters() {
     setCategoryFilter('all');
@@ -410,34 +342,15 @@ export function CustodiaAlertsClient() {
         </header>
 
         <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
-          {/* Header + acciones simulación */}
-          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-            <div className="flex flex-col gap-1">
-              <h1 className="text-[24px] font-bold leading-[32px] text-cs-textStrong">
-                Alertas rojas, desvíos y retrasos anómalos
-              </h1>
-              <p className="text-[14px] leading-[20px] text-cs-textMuted">
-                Desvíos &gt; 300 m y holgura &gt; 25 min reportados por backend;
-                eventos PROVISIONAL simulados.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                className="h-11 rounded-cs-button bg-[#dc2626] px-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#b91c1c]"
-                onClick={handleSimulateRedAlert}
-                type="button"
-              >
-                Simular alerta roja
-              </button>
-              <button
-                className="h-11 rounded-cs-button border border-cs-successBorder bg-cs-successBg px-4 text-[15px] font-semibold text-cs-successText transition-colors hover:bg-emerald-100"
-                onClick={handleSimulateDeviation}
-                type="button"
-              >
-                Simular desvío &gt;300m
-              </button>
-            </div>
+          {/* Header */}
+          <div className="flex flex-col gap-1">
+            <h1 className="text-[24px] font-bold leading-[32px] text-cs-textStrong">
+              Alertas rojas, desvíos y retrasos anómalos
+            </h1>
+            <p className="text-[14px] leading-[20px] text-cs-textMuted">
+              Monitoreo de desvíos de ruta, retrasos anómalos y alertas de
+              custodia activas.
+            </p>
           </div>
 
           {/* Alarma de retraso anómalo (> 25 min) */}
@@ -461,8 +374,7 @@ export function CustodiaAlertsClient() {
                 <p>
                   {delayBannerAlert.routeName} ({delayBannerAlert.unitCode})
                   supera los 25 minutos de holgura operativa (+
-                  {delayBannerAlert.delayMinutes ?? 29} min). Regla evaluada por
-                  el backend.
+                  {delayBannerAlert.delayMinutes ?? 29} min).
                 </p>
               </div>
             </div>
@@ -688,19 +600,19 @@ export function CustodiaAlertsClient() {
                     </div>
                   </div>
                   <div className="border-t border-cs-criticalBorder bg-cs-criticalBg px-4 py-2.5 text-[13px] font-medium text-cs-criticalText">
-                    Backend reporta desvío &gt; 300 m (
+                    Desvío superior a 300 m (
                     {focusedMapAlert?.routeName ?? 'Ruta Sur'})
                   </div>
                 </div>
 
-                {/* Línea de tiempo de transiciones (@camino/domain) */}
+                {/* Línea de tiempo de transiciones */}
                 <div className="flex flex-col gap-3 rounded-cs-card border border-cs-borderSoft bg-cs-surface p-5">
                   <div className="flex items-center justify-between gap-2">
                     <h2 className="text-[18px] font-semibold text-cs-textStrong">
                       Transiciones · {selectedStudentRef}
                     </h2>
                     <span className="rounded-full bg-cs-infoBg px-3 py-1 text-[12px] font-medium text-cs-navy">
-                      @camino/domain
+                      {currentTimeline.length} registros
                     </span>
                   </div>
 
@@ -714,7 +626,7 @@ export function CustodiaAlertsClient() {
                         >
                           <div className="flex flex-col gap-0.5">
                             <span className="text-[13px] font-semibold text-cs-textStrong">
-                              {entry.time} · {entry.state}
+                              {entry.time} · {chip.label}
                             </span>
                             <span className="text-[12px] text-cs-textMuted">
                               {entry.detail}

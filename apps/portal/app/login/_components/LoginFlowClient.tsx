@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import {
   getAuthAlert,
@@ -13,29 +15,14 @@ import {
   ROLE_DENIED_MESSAGE,
   type LoginAlertState,
   type LoginCredentialsValues,
-  type LoginDynamicStateId,
   type LoginScreenView,
 } from '../login-state';
 
 const EMPTY_OTP: string[] = ['', '', '', '', '', ''];
 
-const STATE_OPTIONS: ReadonlyArray<{ id: LoginDynamicStateId; label: string }> =
-  [
-    { id: 'login-empty', label: 'Login vacío' },
-    { id: 'login-loading', label: 'Login cargando' },
-    { id: 'login-error', label: 'Error auth' },
-    { id: 'mfa-empty', label: 'MFA vacío' },
-    { id: 'mfa-loading', label: 'MFA cargando' },
-    { id: 'mfa-error', label: 'MFA inválido' },
-    { id: 'mfa-rate-limited', label: 'MFA bloqueado' },
-    { id: 'role-not-allowed', label: 'Rol sin acceso' },
-    { id: 'forgot-password', label: 'Recuperar clave' },
-  ];
-
 export function LoginFlowClient() {
+  const router = useRouter();
   const [view, setView] = useState<LoginScreenView>('login');
-  const [activePreset, setActivePreset] =
-    useState<LoginDynamicStateId>('login-empty');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alertState, setAlertState] = useState<LoginAlertState | null>(null);
@@ -65,7 +52,6 @@ export function LoginFlowClient() {
     handleSubmit,
     setError,
     clearErrors,
-    setValue,
     formState: { errors },
   } = useForm<LoginCredentialsValues>({
     defaultValues: {
@@ -84,7 +70,6 @@ export function LoginFlowClient() {
   function resetToLogin() {
     clearPendingTimer();
     setView('login');
-    setActivePreset('login-empty');
     setIsSubmitting(false);
     setAlertState(null);
     setOtpDigits(EMPTY_OTP);
@@ -93,63 +78,6 @@ export function LoginFlowClient() {
     setRecoverySent(false);
     setRecoveryError(null);
     clearErrors();
-  }
-
-  function applyDynamicPreset(preset: LoginDynamicStateId) {
-    clearPendingTimer();
-    setActivePreset(preset);
-    setIsSubmitting(false);
-    setAlertState(null);
-    setOtpError(null);
-    setRecoverySent(false);
-    setRecoveryError(null);
-    clearErrors();
-
-    switch (preset) {
-      case 'login-empty':
-        setView('login');
-        setValue('email', '');
-        setValue('password', '');
-        break;
-      case 'login-loading':
-        setView('login');
-        setValue('email', 'coordinacion@colegio.edu.co');
-        setValue('password', 'Camino2026!');
-        setIsSubmitting(true);
-        break;
-      case 'login-error':
-        setView('login');
-        setValue('email', 'coordinacion@colegio.edu.co');
-        setValue('password', 'error123');
-        setAlertState(getAuthAlert('auth_failed'));
-        break;
-      case 'mfa-empty':
-        setView('mfa');
-        setOtpDigits(EMPTY_OTP);
-        break;
-      case 'mfa-loading':
-        setView('mfa');
-        setOtpDigits(['4', '8', '2', '1', '9', '5']);
-        setIsSubmitting(true);
-        break;
-      case 'mfa-error':
-        setView('mfa');
-        setOtpDigits(['4', '8', '2', '1', '9', '0']);
-        setOtpError(MFA_INVALID_MESSAGE);
-        break;
-      case 'mfa-rate-limited':
-        setView('mfa');
-        setOtpDigits(['4', '8', '2', '1', '9', '0']);
-        setAlertState(getAuthAlert('rate_limited'));
-        break;
-      case 'role-not-allowed':
-        setView('role_not_allowed');
-        break;
-      case 'forgot-password':
-        setView('forgot_password');
-        setRecoveryEmail('');
-        break;
-    }
   }
 
   const onSubmitCredentials = handleSubmit((rawValues) => {
@@ -169,7 +97,6 @@ export function LoginFlowClient() {
     }
 
     setIsSubmitting(true);
-    setActivePreset('login-loading');
     setSignedInEmail(parsed.data.email);
 
     timeoutRef.current = setTimeout(() => {
@@ -178,13 +105,11 @@ export function LoginFlowClient() {
 
       if (outcome === 'auth_failed') {
         setAlertState(getAuthAlert('auth_failed'));
-        setActivePreset('login-error');
         return;
       }
 
       if (outcome === 'role_not_allowed') {
         setView('role_not_allowed');
-        setActivePreset('role-not-allowed');
         return;
       }
 
@@ -192,7 +117,6 @@ export function LoginFlowClient() {
       setOtpError(null);
       setMfaAttempts(0);
       setView('mfa');
-      setActivePreset('mfa-empty');
     }, 550);
   });
 
@@ -253,7 +177,6 @@ export function LoginFlowClient() {
     }
 
     setIsSubmitting(true);
-    setActivePreset('mfa-loading');
 
     timeoutRef.current = setTimeout(() => {
       setIsSubmitting(false);
@@ -262,18 +185,17 @@ export function LoginFlowClient() {
       if (outcome === 'mfa_invalid') {
         setMfaAttempts((prev) => prev + 1);
         setOtpError(MFA_INVALID_MESSAGE);
-        setActivePreset('mfa-error');
         return;
       }
 
       if (outcome === 'rate_limited') {
         setMfaAttempts((prev) => prev + 1);
         setAlertState(getAuthAlert('rate_limited'));
-        setActivePreset('mfa-rate-limited');
         return;
       }
 
       setView('authenticated');
+      router.push('/');
     }, 550);
   }
 
@@ -439,7 +361,15 @@ export function LoginFlowClient() {
                   <button
                     className="text-[14px] font-medium leading-[20px] text-cs-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cs-primary"
                     disabled={isSubmitting}
-                    onClick={() => applyDynamicPreset('forgot-password')}
+                    onClick={() => {
+                      clearPendingTimer();
+                      clearErrors();
+                      setAlertState(null);
+                      setRecoverySent(false);
+                      setRecoveryError(null);
+                      setRecoveryEmail('');
+                      setView('forgot_password');
+                    }}
                     type="button"
                   >
                     ¿Olvidaste tu contraseña?
@@ -713,56 +643,25 @@ export function LoginFlowClient() {
               </div>
               <div className="flex flex-col gap-2">
                 <h1 className="text-[24px] font-bold leading-[32px] text-cs-textStrong">
-                  Verificación completada
+                  Sesión iniciada
                 </h1>
                 <p className="text-[14px] font-normal leading-[20px] text-cs-textMuted">
-                  Vista previa de flujo completado para{' '}
+                  Bienvenido,{' '}
                   <span className="font-medium text-cs-textStrong">
                     {signedInEmail}
                   </span>
-                  . La redirección por rol queda sujeta a la integración de
-                  sesión por cookies httpOnly.
+                  . Redirigiendo al portal operativo…
                 </p>
               </div>
-              <button
+              <Link
                 className="flex h-12 w-full items-center justify-center rounded-cs-button bg-cs-primary px-3 text-[16px] font-semibold leading-[24px] text-white transition-colors hover:bg-cs-primaryHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cs-primary"
-                onClick={resetToLogin}
-                type="button"
+                href="/"
               >
-                Volver a iniciar sesión
-              </button>
+                Ir al panel principal
+              </Link>
             </div>
           )}
         </section>
-
-        {/* Selector discreto para inspeccionar todos los estados dinámicos del diseño */}
-        <nav
-          aria-label="Estados dinámicos de la interfaz de acceso"
-          className="flex max-w-[680px] flex-wrap items-center justify-center gap-2 rounded-cs-card border border-cs-borderSoft bg-cs-surface px-4 py-3"
-        >
-          <span className="mr-1 text-[12px] font-medium text-cs-textMuted">
-            Estados:
-          </span>
-          {STATE_OPTIONS.map((option) => {
-            const isSelected =
-              activePreset === option.id && view !== 'authenticated';
-            return (
-              <button
-                aria-pressed={isSelected}
-                className={`rounded-full border px-3 py-1 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cs-primary ${
-                  isSelected
-                    ? 'border-cs-primary bg-cs-infoBg text-cs-navy'
-                    : 'border-cs-borderSoft bg-cs-surfaceInput text-cs-textBody hover:border-cs-borderStrong'
-                }`}
-                key={option.id}
-                onClick={() => applyDynamicPreset(option.id)}
-                type="button"
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </nav>
       </div>
 
       <footer className="mt-6 w-full text-center text-[13px] font-normal leading-[18px] text-cs-textMuted">

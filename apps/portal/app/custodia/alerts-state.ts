@@ -60,7 +60,7 @@ export const INITIAL_ALERTS: ReadonlyArray<ConsoleAlert> = [
     badgeLabel: 'CRÍTICA · 07:52',
     title: 'Alerta roja · Custodia no validada',
     description:
-      'Entrega bloqueada en Ruta Sur (BUS-03): adulto no autorizado. Transición a RETORNO_SEDE_POR_FALLA_ENTREGA.',
+      'Entrega bloqueada en Ruta Sur (BUS-03): adulto no autorizado. Retorno preventivo a sede educativa.',
     routeName: 'Ruta Sur',
     unitCode: 'BUS-03',
     studentRef: '#E-104',
@@ -100,7 +100,7 @@ export const INITIAL_ALERTS: ReadonlyArray<ConsoleAlert> = [
     badgeLabel: 'RETRASO · 07:44',
     title: 'Retraso anómalo (+29 min)',
     description:
-      'La unidad BUS-02 superó la holgura máxima de 25 minutos reportada por backend.',
+      'La unidad BUS-02 superó la holgura máxima de 25 minutos sobre el horario programado.',
     routeName: 'Ruta Centro',
     unitCode: 'BUS-02',
     studentRef: '#E-109',

@@ -70,7 +70,7 @@ export const INITIAL_PROVISIONAL_FLEET: ReadonlyArray<ProvisionalFleetVehicle> =
       capacityLabel: 'Buseta 18 pax',
       occupancyLabel: '14 / 18 estudiantes a bordo',
       lastStop: 'Av. Circunvalar #14-20',
-      lastPacketLabel: 'Hace 8 s (simulado)',
+      lastPacketLabel: 'Hace 8 s',
       status: 'En ruta',
       latitude: 4.8148,
       longitude: -75.6992,
@@ -84,7 +84,7 @@ export const INITIAL_PROVISIONAL_FLEET: ReadonlyArray<ProvisionalFleetVehicle> =
       capacityLabel: 'Buseta 22 pax',
       occupancyLabel: '18 / 22 estudiantes a bordo',
       lastStop: 'Parque La Libertad',
-      lastPacketLabel: 'Hace 5 s (simulado)',
+      lastPacketLabel: 'Hace 5 s',
       status: 'Normal',
       latitude: 4.8124,
       longitude: -75.6915,
@@ -98,7 +98,7 @@ export const INITIAL_PROVISIONAL_FLEET: ReadonlyArray<ProvisionalFleetVehicle> =
       capacityLabel: 'Van 15 pax',
       occupancyLabel: '9 / 15 estudiantes a bordo',
       lastStop: 'Av. 30 de Agosto #42-10',
-      lastPacketLabel: 'Hace 46 s (simulado)',
+      lastPacketLabel: 'Hace 46 s',
       status: 'Detenido',
       latitude: 4.8089,
       longitude: -75.7024,
@@ -176,8 +176,8 @@ export function applySimulatedTelemetryPulse(
       longitude: Number((vehicle.longitude + deltaLng).toFixed(5)),
       lastPacketLabel:
         vehicle.status === 'Detenido'
-          ? `Hace ${46 + pulseCount * 5} s (simulado)`
-          : 'Justo ahora (simulado)',
+          ? `Hace ${46 + pulseCount * 5} s`
+          : 'Justo ahora',
     };
   });
 }
