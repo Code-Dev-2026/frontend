@@ -11,7 +11,8 @@ interface ModuleCardItem {
   icon: string;
   statusLabel: string;
   isActive: boolean;
-  href: '/estudiantes-rutas' | '/custodia' | '/telemetria' | null;
+  href:
+    '/estudiantes-rutas' | '/custodia' | '/telemetria' | '/comunicacion' | null;
 }
 
 const MODULE_CARDS: ReadonlyArray<ModuleCardItem> = [
@@ -48,9 +49,9 @@ const MODULE_CARDS: ReadonlyArray<ModuleCardItem> = [
     title: 'Comunicación',
     description: 'Comunicados informativos y urgentes del colegio.',
     icon: '/icons/bell.svg',
-    statusLabel: 'Próximamente',
-    isActive: false,
-    href: null,
+    statusLabel: 'Activo',
+    isActive: true,
+    href: '/comunicacion',
   },
   {
     id: 'cartera',
@@ -140,7 +141,7 @@ export function PortalHomeClient() {
       id: 'comunicacion',
       label: 'Comunicación',
       icon: '/icons/bell.svg',
-      href: null,
+      href: '/comunicacion' as const,
       active: false,
     },
     {
