@@ -26,11 +26,3 @@ Este documento define las reglas oficiales para traducir pantallas diseñadas en
   ```bash
   pnpm --filter @camino/ui svg:check
   ```
-
-## 3. Referencias de diseño en el repositorio (Opcional)
-
-Si deseas dejar una copia de referencia del diseño dentro del repositorio:
-- Ubicación: `docs/design/<app-o-base>/<pantalla>/` (ej: `docs/design/base/login/`).
-- Archivos admitidos:
-  - `frame.png`: captura visual de referencia para comparar con el emulador.
-  - `tokens.json`: valores extraídos de Figma (opcional, una vez ya definidos en código).

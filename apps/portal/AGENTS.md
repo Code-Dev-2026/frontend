@@ -96,8 +96,7 @@ no se generan. Hasta que se corrija, no confíes en estilos de componentes de
 ## 5. Diseño: Figma → web
 
 - Antes de tocar una pantalla, lee [`docs/design/README.md`](../../docs/design/README.md):
-  explica cómo interpretar el enlace de Figma, cómo exportar el frame y qué hacer
-  si falta un asset.
+  define el flujo para traducir pantallas de Figma a SVG, tokens y componentes.
 - Exporta los **tokens** (colores, tipografía, radios, espaciados) y cárgalos en
   `tailwind.config.ts` (`theme.extend`) y en variables CSS de shadcn/ui. Los
   valores deben ser **idénticos a Figma**.
@@ -106,11 +105,10 @@ no se generan. Hasta que se corrija, no confíes en estilos de componentes de
   **sin** `react-native-svg`. Nombres en kebab-case. No rasterices SVG.
 - Los componentes se construyen con shadcn/ui y se ajustan al diseño; no copies
   estilos "aproximados".
-- Si falta un asset, un dato o una decisión: aplica
-  [`docs/design/README.md`](../../docs/design/README.md) §8, con esta precisión
-  web: compara en el navegador contra el frame a 1440 px y a 768 px, con
-  tolerancia de 1-2 px en espaciados y tamaños. No afirmes fidelidad visual sin
-  haber tenido el frame para comparar.
+- Si falta un asset, un dato o una decisión, no inventes ni aproximes el diseño;
+  enumera lo que falta y espera indicaciones. Compara en el navegador contra
+  Figma a 1440 px y a 768 px, con tolerancia de 1-2 px en espaciados y tamaños.
+  No afirmes fidelidad visual sin haber comparado contra el diseño.
 
 ## 6. Entrega específica del portal
 
