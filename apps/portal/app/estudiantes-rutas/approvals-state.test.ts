@@ -9,7 +9,7 @@ import {
   validateRejectionReason,
 } from './approvals-state';
 
-describe('FE-23 Bandeja de aprobaciones (RF-04 · RF-05)', () => {
+describe('FE-23 Bandeja de aprobaciones', () => {
   it('filtra por estado, tipo y búsqueda', () => {
     expect(
       filterApprovalRequests(INITIAL_APPROVAL_REQUESTS, {
@@ -17,7 +17,7 @@ describe('FE-23 Bandeja de aprobaciones (RF-04 · RF-05)', () => {
         type: 'all',
         query: '',
       }),
-    ).toHaveLength(2);
+    ).toHaveLength(3);
 
     expect(
       filterApprovalRequests(INITIAL_APPROVAL_REQUESTS, {

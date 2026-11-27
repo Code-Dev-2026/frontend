@@ -43,6 +43,9 @@ export function ApprovalsClient() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [reasonError, setReasonError] = useState<string | null>(null);
   const [overlayMode, setOverlayMode] = useState<PanelOverlayMode>('none');
+  const [triggeredErrorCode, setTriggeredErrorCode] = useState<
+    'CAPACIDAD_AGOTADA' | 'ANTICIPACION_INSUFICIENTE' | null
+  >(null);
   const [qrTarget, setQrTarget] = useState<{
     code: string;
     requestCode: string;
@@ -90,6 +93,12 @@ export function ApprovalsClient() {
 
   function handleApprove(item: ApprovalRequestItem) {
     setReasonError(null);
+    if (item.simulateBackendError) {
+      setTriggeredErrorCode(item.simulateBackendError);
+      setOverlayMode('backend_errors');
+      return;
+    }
+    setTriggeredErrorCode(null);
     setRequests((prev) => approveApprovalRequest(prev, item.id));
     if (item.type === 'Ocasional') {
       setQrTarget({
@@ -346,42 +355,33 @@ export function ApprovalsClient() {
         </header>
 
         <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
-          {/* Header + buscador + simular validaciones backend */}
+          {/* Header + buscador */}
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
             <div className="flex flex-col gap-1">
               <h1 className="text-[24px] font-bold leading-[32px] text-cs-textStrong">
-                Bandeja de aprobaciones (RF-04 · RF-05)
+                Bandeja de aprobaciones
               </h1>
               <p className="text-[14px] leading-[20px] text-cs-textMuted">
-                Pasajeros ocasionales y verificación de documentos/fotos de
-                adultos autorizados.
+                Pasajeros ocasionales y verificación de documentos de adultos
+                autorizados.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex w-full flex-col gap-1.5 sm:w-[280px]">
-                <label
-                  className="text-[14px] font-medium text-cs-textBody"
-                  htmlFor="approvals-search-input"
-                >
-                  Buscar solicitud
-                </label>
-                <input
-                  className="h-[45px] w-full rounded-cs-input border border-cs-borderStrong bg-cs-surfaceInput px-4 text-[14px] text-cs-textStrong placeholder:text-cs-textMuted focus:outline-none focus:ring-2 focus:ring-cs-primary"
-                  id="approvals-search-input"
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="#SOL-204, Ruta Sur..."
-                  type="text"
-                  value={searchQuery}
-                />
-              </div>
-              <button
-                className="h-[45px] rounded-cs-button border border-cs-borderSoft bg-cs-surface px-4 text-[13px] font-medium text-cs-textBody hover:border-cs-borderStrong"
-                onClick={() => setOverlayMode('backend_errors')}
-                type="button"
+            <div className="flex w-full flex-col gap-1.5 sm:w-[300px]">
+              <label
+                className="text-[14px] font-medium text-cs-textBody"
+                htmlFor="approvals-search-input"
               >
-                Errores cupo / RN-03
-              </button>
+                Buscar solicitud
+              </label>
+              <input
+                className="h-[45px] w-full rounded-cs-input border border-cs-borderStrong bg-cs-surfaceInput px-4 text-[14px] text-cs-textStrong placeholder:text-cs-textMuted focus:outline-none focus:ring-2 focus:ring-cs-primary"
+                id="approvals-search-input"
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="#SOL-204, Ruta Sur..."
+                type="text"
+                value={searchQuery}
+              />
             </div>
           </div>
 
@@ -459,16 +459,19 @@ export function ApprovalsClient() {
               <div className="flex w-full max-w-[560px] flex-col gap-4 rounded-cs-card border border-cs-borderSoft bg-cs-surface p-6">
                 <div className="flex flex-col gap-1">
                   <h2 className="text-[20px] font-bold text-cs-textStrong">
-                    Validaciones del backend al aprobar ocasional
+                    No fue posible aprobar la solicitud
                   </h2>
                   <p className="text-[14px] text-cs-textMuted">
-                    El portal no valida cupos ni anticipación localmente;
-                    muestra ApiError.message del catálogo.
+                    La ruta no cumple los requisitos de cupo u horario para este
+                    abordaje ocasional.
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  {BACKEND_APPROVAL_ERRORS.map((err) => (
+                  {BACKEND_APPROVAL_ERRORS.filter(
+                    (err) =>
+                      !triggeredErrorCode || err.code === triggeredErrorCode,
+                  ).map((err) => (
                     <div
                       className="flex items-start gap-3 rounded-[12px] border border-cs-criticalBorder bg-cs-criticalBg p-4"
                       key={err.code}
@@ -484,7 +487,9 @@ export function ApprovalsClient() {
                       />
                       <div className="flex flex-col gap-1 text-[14px]">
                         <p className="font-semibold text-cs-criticalText">
-                          {err.httpLabel}
+                          {err.code === 'CAPACIDAD_AGOTADA'
+                            ? 'Cupo máximo alcanzado en el vehículo'
+                            : 'Fuera de la ventana mínima de anticipación'}
                         </p>
                         <p className="text-cs-textBody">{err.message}</p>
                       </div>
@@ -531,7 +536,7 @@ export function ApprovalsClient() {
               >
                 <div className="flex items-center justify-between border-b border-cs-borderSoft px-5 py-4">
                   <h2 className="text-[18px] font-semibold text-cs-textStrong">
-                    Bandeja de solicitudes (RF-04 · RF-05)
+                    Bandeja de solicitudes
                   </h2>
                   <span className="rounded-full border border-cs-borderSoft bg-cs-surfaceInput px-3 py-1 text-[13px] text-cs-textMuted">
                     {visibleRequests.length} registros
@@ -734,8 +739,7 @@ export function ApprovalsClient() {
                         </span>
                       </div>
                       <p className="mt-1 text-[12px] text-cs-textMuted">
-                        La disponibilidad de cupo y la regla de 2 h (RN-03) las
-                        valida el backend al aprobar.
+                        Sujeto a cupo disponible y horario mínimo de solicitud.
                       </p>
                     </div>
                   )}
@@ -826,7 +830,7 @@ export function ApprovalsClient() {
                   Pasajero ocasional aprobado
                 </p>
                 <p className="text-[13px] text-cs-textMuted">
-                  El backend emitió el código QR provisional para el abordaje.
+                  Código QR provisional generado para el abordaje.
                 </p>
               </div>
             </div>
@@ -852,8 +856,8 @@ export function ApprovalsClient() {
                 Código: {qrTarget.code} · Solicitud {qrTarget.requestCode}
               </p>
               <p className="text-[13px] text-cs-textMuted">
-                Válido únicamente para {qrTarget.routeName} · Ventana autorizada
-                por backend.
+                Válido únicamente para {qrTarget.routeName} en la jornada
+                autorizada.
               </p>
             </div>
 
