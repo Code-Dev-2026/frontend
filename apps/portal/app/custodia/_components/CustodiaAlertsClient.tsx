@@ -337,14 +337,11 @@ export function CustodiaAlertsClient() {
               {activeCount} alertas activas
             </span>
             <span className="hidden rounded-full bg-cs-infoBg px-3 py-1 text-[13px] text-cs-navy lg:inline-flex">
-              En línea · :3100
+              Monitoreo activo
             </span>
-            <Link
-              className="hidden h-10 items-center justify-center rounded-[12px] border border-cs-successBorder bg-cs-successBg px-4 text-[16px] font-semibold text-cs-successText lg:inline-flex"
-              href="/health"
-            >
-              Estado /health
-            </Link>
+            <span className="hidden h-10 items-center justify-center rounded-[12px] border border-cs-successBorder bg-cs-successBg px-4 text-[14px] font-semibold text-cs-successText lg:inline-flex">
+              Canal activo
+            </span>
           </div>
         </header>
 

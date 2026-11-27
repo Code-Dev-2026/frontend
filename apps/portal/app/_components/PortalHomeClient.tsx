@@ -363,12 +363,9 @@ export function PortalHomeClient() {
             >
               Iniciar sesión
             </Link>
-            <Link
-              className="hidden h-10 items-center justify-center rounded-[12px] border border-cs-successBorder bg-cs-successBg px-4 text-[14px] font-semibold text-cs-successText sm:inline-flex"
-              href="/health"
-            >
-              Estado del servicio
-            </Link>
+            <span className="hidden h-10 items-center justify-center rounded-[12px] border border-cs-successBorder bg-cs-successBg px-4 text-[14px] font-semibold text-cs-successText sm:inline-flex">
+              Operación activa
+            </span>
           </div>
         </header>
 

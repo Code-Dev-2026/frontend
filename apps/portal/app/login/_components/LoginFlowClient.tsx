@@ -564,7 +564,7 @@ export function LoginFlowClient() {
                 </h1>
                 <p className="text-[14px] font-normal leading-[20px] text-cs-textMuted">
                   Ingresa tu correo institucional para solicitar el
-                  restablecimiento al equipo de soporte o backend.
+                  restablecimiento al equipo de soporte institucional.
                 </p>
               </div>
 

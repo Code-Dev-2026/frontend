@@ -329,12 +329,9 @@ export function FleetConsoleClient() {
             <span className="rounded-full bg-cs-infoBg px-3 py-1 text-[13px] leading-[18px] text-cs-navy sm:hidden">
               En vivo
             </span>
-            <Link
-              className="hidden h-10 items-center justify-center rounded-[12px] border border-cs-successBorder bg-cs-successBg px-4 text-[16px] font-semibold text-cs-successText sm:inline-flex"
-              href="/health"
-            >
-              Estado /health
-            </Link>
+            <span className="hidden h-10 items-center justify-center rounded-[12px] border border-cs-successBorder bg-cs-successBg px-4 text-[14px] font-semibold text-cs-successText sm:inline-flex">
+              Canal activo
+            </span>
           </div>
         </header>
 
