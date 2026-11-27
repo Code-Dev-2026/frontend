@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@camino/contracts'],
+  transpilePackages: ['@camino/contracts', '@camino/domain'],
   experimental: {
     typedRoutes: true,
   },
