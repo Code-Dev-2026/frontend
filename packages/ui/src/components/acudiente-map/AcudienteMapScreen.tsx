@@ -1,6 +1,5 @@
 import {
   Platform,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -9,13 +8,12 @@ import {
   View,
 } from 'react-native';
 import Svg, { Path, Polygon, Rect } from 'react-native-svg';
-import IconBell from '../../svg/icon-bell.svg';
 import IconBusFront from '../../svg/icon-bus-front.svg';
-import IconHouse from '../../svg/icon-house.svg';
 import IconMapPin from '../../svg/icon-map-pin.svg';
-import IconUserRound from '../../svg/icon-user-round.svg';
 import { acudienteMapTokens } from '../../tokens/acudiente-map';
 import type { AcudienteNavTab } from '../acudiente-home/AcudienteHomeScreen';
+import { InteractivePressable } from '../button/InteractivePressable';
+import { BottomNavBar, type BottomNavItem } from '../navigation/BottomNavBar';
 
 export type AcudienteMapScreenProps = {
   headerTitle?: string;
@@ -33,31 +31,12 @@ export type AcudienteMapScreenProps = {
   onSelectTab?: (tab: AcudienteNavTab) => void;
 };
 
-const NAV_ITEMS: ReadonlyArray<{
-  id: AcudienteNavTab;
-  label: string;
-}> = [
-  { id: 'inicio', label: 'Inicio' },
-  { id: 'mapa', label: 'Mapa' },
-  { id: 'avisos', label: 'Avisos' },
-  { id: 'perfil', label: 'Perfil' },
+const NAV_ITEMS: ReadonlyArray<BottomNavItem<AcudienteNavTab>> = [
+  { id: 'inicio', label: 'Inicio', icon: 'house' },
+  { id: 'mapa', label: 'Mapa', icon: 'map-pin' },
+  { id: 'avisos', label: 'Avisos', icon: 'bell' },
+  { id: 'perfil', label: 'Perfil', icon: 'user-round' },
 ];
-
-function renderNavIcon(tab: AcudienteNavTab) {
-  const size = acudienteMapTokens.spacing.iconSize;
-  const color = acudienteMapTokens.colors.navy;
-
-  switch (tab) {
-    case 'inicio':
-      return <IconHouse width={size} height={size} color={color} />;
-    case 'mapa':
-      return <IconMapPin width={size} height={size} color={color} />;
-    case 'avisos':
-      return <IconBell width={size} height={size} color={color} />;
-    case 'perfil':
-      return <IconUserRound width={size} height={size} color={color} />;
-  }
-}
 
 export function AcudienteMapScreen({
   headerTitle = 'Mapa en vivo',
@@ -196,58 +175,36 @@ export function AcudienteMapScreen({
       </ScrollView>
 
       <View style={styles.bottomActions}>
-        <Pressable
+        <InteractivePressable
           accessibilityRole="button"
           accessibilityState={{ disabled: !onPressAlerts }}
+          borderRadius={acudienteMapTokens.spacing.buttonRadius}
           disabled={!onPressAlerts}
           onPress={onPressAlerts}
-          style={({ pressed }) => [
-            styles.primaryButton,
-            pressed && styles.primaryButtonPressed,
-          ]}
+          pressFillColor="rgba(255, 255, 255, 0.24)"
+          style={styles.primaryButton}
         >
           <Text style={styles.primaryButtonText}>{primaryActionLabel}</Text>
-        </Pressable>
+        </InteractivePressable>
 
-        <Pressable
+        <InteractivePressable
           accessibilityRole="button"
           accessibilityState={{ disabled: !onPressCoverageNotice }}
+          borderRadius={acudienteMapTokens.spacing.buttonRadius}
           disabled={!onPressCoverageNotice}
           onPress={onPressCoverageNotice}
-          style={({ pressed }) => [
-            styles.secondaryButton,
-            pressed && styles.secondaryButtonPressed,
-          ]}
+          pressFillColor="rgba(22, 163, 74, 0.12)"
+          style={styles.secondaryButton}
         >
           <Text style={styles.secondaryButtonText}>{coverageActionLabel}</Text>
-        </Pressable>
+        </InteractivePressable>
       </View>
 
-      <View style={styles.bottomNav}>
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeTab === item.id;
-
-          return (
-            <Pressable
-              key={item.id}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: isActive }}
-              onPress={() => onSelectTab?.(item.id)}
-              style={[styles.navItem, isActive && styles.navItemActive]}
-            >
-              {renderNavIcon(item.id)}
-              <Text
-                style={[
-                  styles.navItemLabel,
-                  isActive && styles.navItemLabelActive,
-                ]}
-              >
-                {item.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <BottomNavBar
+        activeId={activeTab}
+        items={NAV_ITEMS}
+        onSelect={onSelectTab}
+      />
     </SafeAreaView>
   );
 }
@@ -392,9 +349,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: acudienteMapTokens.spacing.buttonPadding,
     width: '100%',
   },
-  primaryButtonPressed: {
-    backgroundColor: acudienteMapTokens.colors.primaryPressed,
-  },
   primaryButtonText: {
     ...acudienteMapTokens.typography.button,
     color: acudienteMapTokens.colors.background,
@@ -411,42 +365,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: acudienteMapTokens.spacing.buttonPadding,
     width: '100%',
   },
-  secondaryButtonPressed: {
-    backgroundColor: acudienteMapTokens.colors.successBackgroundPressed,
-  },
   secondaryButtonText: {
     ...acudienteMapTokens.typography.button,
     color: acudienteMapTokens.colors.successText,
     textAlign: 'center',
-  },
-  bottomNav: {
-    alignItems: 'center',
-    backgroundColor: acudienteMapTokens.colors.background,
-    borderTopColor: acudienteMapTokens.colors.borderSoft,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    height: acudienteMapTokens.spacing.navHeight,
-    padding: acudienteMapTokens.spacing.navPadding,
-    width: '100%',
-  },
-  navItem: {
-    alignItems: 'center',
-    borderRadius: acudienteMapTokens.spacing.navItemRadius,
-    flex: 1,
-    gap: acudienteMapTokens.spacing.navItemGap,
-    height: acudienteMapTokens.spacing.navItemHeight,
-    justifyContent: 'center',
-    padding: acudienteMapTokens.spacing.navItemPadding,
-  },
-  navItemActive: {
-    backgroundColor: acudienteMapTokens.colors.infoBackground,
-  },
-  navItemLabel: {
-    ...acudienteMapTokens.typography.caption,
-    color: acudienteMapTokens.colors.textMuted,
-    textAlign: 'center',
-  },
-  navItemLabelActive: {
-    color: acudienteMapTokens.colors.navy,
   },
 });

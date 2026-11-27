@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Platform,
   Pressable,
@@ -12,12 +12,24 @@ import {
 import { baseTokens } from '../../tokens/base';
 import { Badge } from '../badge/Badge';
 import { Banner } from '../banner/Banner';
+import { BrandLoader } from '../brand-loader/BrandLoader';
+import { BrandLoadingOverlay } from '../brand-loader/BrandLoadingOverlay';
 import { Button } from '../button/Button';
 import { Card } from '../card/Card';
 import { Modal } from '../dialog/Modal';
 import { EmptyState } from '../empty-state/EmptyState';
 import { ICON_NAMES, Icon } from '../icon/Icon';
 import { Input } from '../input/Input';
+import { BottomNavBar, type BottomNavItem } from '../navigation/BottomNavBar';
+
+type CatalogNavTab = 'inicio' | 'mapa' | 'avisos' | 'perfil';
+
+const CATALOG_NAV_ITEMS: ReadonlyArray<BottomNavItem<CatalogNavTab>> = [
+  { id: 'inicio', label: 'Inicio', icon: 'house' },
+  { id: 'mapa', label: 'Mapa', icon: 'map-pin' },
+  { id: 'avisos', label: 'Avisos', icon: 'bell' },
+  { id: 'perfil', label: 'Perfil', icon: 'user-round' },
+];
 
 export type UiCatalogScreenProps = {
   onBack?: () => void;
@@ -43,6 +55,25 @@ export function UiCatalogScreen({ onBack }: UiCatalogScreenProps) {
   const [password, setPassword] = useState('');
   const [isStandardModalVisible, setIsStandardModalVisible] = useState(false);
   const [isCriticalModalVisible, setIsCriticalModalVisible] = useState(false);
+  const [isOverlayPreviewVisible, setIsOverlayPreviewVisible] = useState(false);
+  const [catalogNavTab, setCatalogNavTab] = useState<CatalogNavTab>('inicio');
+  const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    return () => {
+      if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+    };
+  }, []);
+
+  function previewLoadingOverlay() {
+    if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+    setIsOverlayPreviewVisible(true);
+    overlayTimerRef.current = setTimeout(() => {
+      setIsOverlayPreviewVisible(false);
+    }, 2200);
+  }
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -300,7 +331,39 @@ export function UiCatalogScreen({ onBack }: UiCatalogScreenProps) {
             variant="critical"
           />
         </View>
+
+        {/* 11 BrandLoader */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>11 · BrandLoader (Carga)</Text>
+          <Card>
+            <BrandLoader label="Cargando pantalla…" size={56} />
+          </Card>
+          <Button
+            label="Probar overlay de transición (2 s)"
+            onPress={previewLoadingOverlay}
+            variant="secondary"
+          />
+        </View>
+
+        {/* 12 BottomNavBar */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            12 · BottomNavBar (Outline → Relleno)
+          </Text>
+          <Card>
+            <BottomNavBar
+              activeId={catalogNavTab}
+              items={CATALOG_NAV_ITEMS}
+              onSelect={setCatalogNavTab}
+            />
+          </Card>
+        </View>
       </ScrollView>
+
+      <BrandLoadingOverlay
+        label="Cargando pantalla…"
+        visible={isOverlayPreviewVisible}
+      />
 
       <Modal
         message="Revisa los datos antes de confirmar la operación."

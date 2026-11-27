@@ -83,3 +83,12 @@ export const STUDENT_ROLES = [
 ] as const;
 
 export type StudentRole = (typeof STUDENT_ROLES)[number];
+
+export type MobileAppRole = Extract<StudentRole, 'ACUDIENTE' | 'MONITORA'>;
+
+export const canAccessMobileApp = (
+  role: StudentRole,
+  targetApp: MobileAppRole,
+): boolean => {
+  return role === targetApp;
+};

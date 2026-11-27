@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Pressable,
   StyleSheet,
   Text,
   type StyleProp,
@@ -8,6 +7,7 @@ import {
 } from 'react-native';
 import { baseTokens } from '../../tokens/base';
 import { Icon, type IconName } from '../icon/Icon';
+import { InteractivePressable } from './InteractivePressable';
 
 export type ButtonVariant =
   | 'primary'
@@ -50,7 +50,7 @@ const VARIANT_MAP: Record<ButtonVariant, CanonicalButtonVariant> = {
 
 type VariantPalette = {
   background: string;
-  pressedBackground: string;
+  pressFillColor: string;
   borderColor?: string;
   textColor: string;
   pressedTextColor: string;
@@ -60,27 +60,27 @@ type VariantPalette = {
 const VARIANT_PALETTES: Record<CanonicalButtonVariant, VariantPalette> = {
   primary: {
     background: baseTokens.colors.actionPrimary,
-    pressedBackground: baseTokens.colors.actionPrimaryPressed,
+    pressFillColor: 'rgba(255, 255, 255, 0.22)',
     textColor: baseTokens.colors.surface,
     pressedTextColor: baseTokens.colors.surface,
   },
   soft: {
     background: baseTokens.colors.surface,
-    pressedBackground: baseTokens.colors.disabledBg,
+    pressFillColor: 'rgba(2, 56, 102, 0.1)',
     borderColor: baseTokens.colors.borderSoft,
     textColor: baseTokens.colors.textStrong,
-    pressedTextColor: baseTokens.colors.textStrong,
+    pressedTextColor: baseTokens.colors.navy900,
     disabledBorderColor: baseTokens.colors.borderSoft,
   },
   tertiary: {
     background: baseTokens.colors.surface,
-    pressedBackground: baseTokens.colors.disabledBg,
+    pressFillColor: 'rgba(37, 99, 235, 0.1)',
     textColor: baseTokens.colors.link600,
-    pressedTextColor: baseTokens.colors.link600,
+    pressedTextColor: baseTokens.colors.actionPrimaryPressed,
   },
   destructive: {
     background: baseTokens.colors.surface,
-    pressedBackground: baseTokens.colors.disabledBg,
+    pressFillColor: 'rgba(2, 56, 102, 0.1)',
     borderColor: baseTokens.colors.borderStrong,
     textColor: baseTokens.colors.textStrong,
     pressedTextColor: baseTokens.colors.textStrong,
@@ -117,60 +117,57 @@ export function Button({
       ? errorLabel
       : label;
 
+  const containerColors: ViewStyle = isVisuallyDisabled
+    ? {
+        backgroundColor: baseTokens.colors.disabledBg,
+        ...(palette.disabledBorderColor
+          ? {
+              borderColor: palette.disabledBorderColor,
+              borderWidth: baseTokens.borderWidth.default,
+            }
+          : {}),
+      }
+    : {
+        backgroundColor: palette.background,
+        ...(palette.borderColor
+          ? {
+              borderColor: palette.borderColor,
+              borderWidth: baseTokens.borderWidth.default,
+            }
+          : {}),
+      };
+
+  const stateBorder: ViewStyle | undefined = error
+    ? {
+        borderColor: baseTokens.colors.criticalText,
+        borderWidth: baseTokens.borderWidth.error,
+      }
+    : focused && !isVisuallyDisabled
+      ? {
+          borderColor: baseTokens.colors.navy900,
+          borderWidth: baseTokens.borderWidth.focus,
+        }
+      : undefined;
+
   return (
-    <Pressable
+    <InteractivePressable
       accessibilityHint={accessibilityHint}
       accessibilityLabel={accessibilityLabel ?? displayLabel}
       accessibilityRole="button"
       accessibilityState={{ busy: loading, disabled: isDisabled }}
+      borderRadius={baseTokens.radii.control}
+      containerStyle={fullWidth ? styles.fullWidth : undefined}
       disabled={isDisabled}
       onPress={onPress}
+      pressFillColor={error ? 'transparent' : palette.pressFillColor}
+      style={[
+        styles.base,
+        fullWidth && styles.fullWidth,
+        containerColors,
+        stateBorder,
+        style,
+      ]}
       testID={testID}
-      style={({ pressed }) => {
-        const activePressed = pressed && !isDisabled && !error;
-
-        const containerColors: ViewStyle = isVisuallyDisabled
-          ? {
-              backgroundColor: baseTokens.colors.disabledBg,
-              ...(palette.disabledBorderColor
-                ? {
-                    borderColor: palette.disabledBorderColor,
-                    borderWidth: baseTokens.borderWidth.default,
-                  }
-                : {}),
-            }
-          : {
-              backgroundColor: activePressed
-                ? palette.pressedBackground
-                : palette.background,
-              ...(palette.borderColor
-                ? {
-                    borderColor: palette.borderColor,
-                    borderWidth: baseTokens.borderWidth.default,
-                  }
-                : {}),
-            };
-
-        const stateBorder: ViewStyle | undefined = error
-          ? {
-              borderColor: baseTokens.colors.criticalText,
-              borderWidth: baseTokens.borderWidth.error,
-            }
-          : focused && !isVisuallyDisabled
-            ? {
-                borderColor: baseTokens.colors.navy900,
-                borderWidth: baseTokens.borderWidth.focus,
-              }
-            : undefined;
-
-        return [
-          styles.base,
-          fullWidth && styles.fullWidth,
-          containerColors,
-          stateBorder,
-          style,
-        ];
-      }}
     >
       {({ pressed }) => {
         const activePressed = pressed && !isDisabled && !error;
@@ -217,7 +214,7 @@ export function Button({
           </>
         );
       }}
-    </Pressable>
+    </InteractivePressable>
   );
 }
 

@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,7 +8,10 @@ import {
   View,
 } from 'react-native';
 import LogoTexto from '../../svg/logo-texto.svg';
+import { baseTokens } from '../../tokens/base';
 import { loginTokens } from '../../tokens/login';
+import { InteractivePressable } from '../button/InteractivePressable';
+import { Icon } from '../icon/Icon';
 
 export type LoginCredentials = {
   email: string;
@@ -18,6 +20,7 @@ export type LoginCredentials = {
 
 export type LoginScreenProps = {
   error?: string | null;
+  errorNode?: ReactNode;
   isLoading?: boolean;
   onSubmit?: (credentials: LoginCredentials) => void;
   onForgotPassword?: () => void;
@@ -26,6 +29,7 @@ export type LoginScreenProps = {
 
 export function LoginScreen({
   error,
+  errorNode,
   isLoading = false,
   onSubmit,
   onForgotPassword,
@@ -33,7 +37,7 @@ export function LoginScreen({
 }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const hasError = Boolean(error);
+  const hasError = Boolean(error || errorNode);
 
   return (
     <ScrollView
@@ -77,6 +81,9 @@ export function LoginScreen({
               autoCapitalize="none"
               autoComplete="current-password"
               onChangeText={setPassword}
+              onSubmitEditing={() => {
+                if (!isLoading) onSubmit?.({ email, password });
+              }}
               placeholder="Ingresa tu contraseña"
               placeholderTextColor={loginTokens.colors.placeholder}
               returnKeyType="done"
@@ -87,31 +94,46 @@ export function LoginScreen({
             />
           </View>
 
-          <Pressable
+          <InteractivePressable
             accessibilityRole="button"
             accessibilityState={{ disabled: !onForgotPassword }}
+            borderRadius={baseTokens.radii.control}
             disabled={!onForgotPassword}
             onPress={onForgotPassword}
+            pressFillColor="rgba(37, 99, 235, 0.08)"
             style={styles.forgotTarget}
           >
             <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
-          </Pressable>
+          </InteractivePressable>
 
           {hasError ? (
-            <Text accessibilityRole="alert" style={styles.errorText}>
-              {error}
-            </Text>
+            <View accessibilityRole="alert" style={styles.errorBox}>
+              <Icon
+                color={baseTokens.colors.criticalSolid}
+                name="triangle-alert"
+                size={18}
+              />
+              <View style={styles.errorContent}>
+                {errorNode ? (
+                  errorNode
+                ) : (
+                  <Text style={styles.errorText}>{error}</Text>
+                )}
+              </View>
+            </View>
           ) : null}
 
-          <Pressable
+          <InteractivePressable
             accessibilityRole="button"
             accessibilityState={{ disabled: !onSubmit || isLoading }}
+            borderRadius={loginTokens.spacing.fieldRadius}
+            containerStyle={
+              hasError ? styles.loginButtonAfterError : styles.loginButtonWrap
+            }
             disabled={!onSubmit || isLoading}
             onPress={() => onSubmit?.({ email, password })}
-            style={[
-              styles.loginButton,
-              hasError && styles.loginButtonAfterError,
-            ]}
+            pressFillColor="rgba(255, 255, 255, 0.24)"
+            style={styles.loginButton}
           >
             {isLoading ? (
               <View style={styles.buttonContent}>
@@ -126,19 +148,21 @@ export function LoginScreen({
             ) : (
               <Text style={styles.loginButtonText}>Iniciar sesión</Text>
             )}
-          </Pressable>
+          </InteractivePressable>
 
           <View style={styles.accountOptions}>
             <View style={styles.divider} />
-            <Pressable
+            <InteractivePressable
               accessibilityRole="button"
               accessibilityState={{ disabled: !onCreateAccount }}
+              borderRadius={loginTokens.spacing.fieldRadius}
               disabled={!onCreateAccount}
               onPress={onCreateAccount}
+              pressFillColor="rgba(2, 56, 102, 0.1)"
               style={styles.createButton}
             >
               <Text style={styles.createButtonText}>Crear cuenta nueva</Text>
-            </Pressable>
+            </InteractivePressable>
           </View>
         </View>
       </View>
@@ -190,14 +214,15 @@ const styles = StyleSheet.create({
     borderColor: loginTokens.colors.fieldBorder,
     borderRadius: loginTokens.spacing.fieldRadius,
     borderWidth: 1,
-    color: loginTokens.colors.placeholder,
+    color: loginTokens.colors.text,
     height: loginTokens.spacing.fieldHeight,
     paddingHorizontal: 15,
     paddingVertical: 0,
     textAlignVertical: 'center',
   },
   inputError: {
-    borderColor: loginTokens.colors.error,
+    borderColor: baseTokens.colors.borderStrong,
+    borderWidth: baseTokens.borderWidth.focus,
   },
   forgotTarget: {
     alignItems: 'flex-end',
@@ -209,9 +234,26 @@ const styles = StyleSheet.create({
     color: loginTokens.colors.link,
     textAlign: 'right',
   },
+  errorBox: {
+    alignItems: 'center',
+    backgroundColor: baseTokens.colors.surface,
+    borderColor: baseTokens.colors.borderSoft,
+    borderRadius: baseTokens.radii.input,
+    borderWidth: baseTokens.borderWidth.default,
+    flexDirection: 'row',
+    gap: baseTokens.spacing.sm,
+    marginTop: 4,
+    paddingHorizontal: baseTokens.spacing.md,
+    paddingVertical: baseTokens.spacing.sm,
+  },
+  errorContent: {
+    flex: 1,
+  },
   errorText: {
     ...loginTokens.typography.error,
-    color: loginTokens.colors.error,
+    color: baseTokens.colors.textStrong,
+  },
+  loginButtonWrap: {
     marginTop: 1,
   },
   loginButton: {
@@ -220,7 +262,6 @@ const styles = StyleSheet.create({
     borderRadius: loginTokens.spacing.fieldRadius,
     height: loginTokens.spacing.touchTarget,
     justifyContent: 'center',
-    marginTop: 1,
   },
   loginButtonAfterError: {
     marginTop: loginTokens.spacing.errorGap,

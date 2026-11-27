@@ -1,6 +1,5 @@
 import {
   Platform,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -9,13 +8,13 @@ import {
   View,
 } from 'react-native';
 import IconArrowLeft from '../../svg/icon-arrow-left.svg';
-import IconBell from '../../svg/icon-bell.svg';
 import IconBusFront from '../../svg/icon-bus-front.svg';
 import IconHouse from '../../svg/icon-house.svg';
-import IconMapPin from '../../svg/icon-map-pin.svg';
 import IconUserRound from '../../svg/icon-user-round.svg';
 import LogotipoSinTexto from '../../svg/logotipo-sin-texto.svg';
 import { acudienteHomeTokens } from '../../tokens/acudiente-home';
+import { InteractivePressable } from '../button/InteractivePressable';
+import { BottomNavBar, type BottomNavItem } from '../navigation/BottomNavBar';
 
 export type AcudienteNavTab = 'inicio' | 'mapa' | 'avisos' | 'perfil';
 
@@ -44,31 +43,12 @@ export type AcudienteHomeScreenProps = {
   onSelectTab?: (tab: AcudienteNavTab) => void;
 };
 
-const NAV_ITEMS: ReadonlyArray<{
-  id: AcudienteNavTab;
-  label: string;
-}> = [
-  { id: 'inicio', label: 'Inicio' },
-  { id: 'mapa', label: 'Mapa' },
-  { id: 'avisos', label: 'Avisos' },
-  { id: 'perfil', label: 'Perfil' },
+const NAV_ITEMS: ReadonlyArray<BottomNavItem<AcudienteNavTab>> = [
+  { id: 'inicio', label: 'Inicio', icon: 'house' },
+  { id: 'mapa', label: 'Mapa', icon: 'map-pin' },
+  { id: 'avisos', label: 'Avisos', icon: 'bell' },
+  { id: 'perfil', label: 'Perfil', icon: 'user-round' },
 ];
-
-function renderNavIcon(tab: AcudienteNavTab) {
-  const size = acudienteHomeTokens.spacing.iconSize;
-  const color = acudienteHomeTokens.colors.navy;
-
-  switch (tab) {
-    case 'inicio':
-      return <IconHouse width={size} height={size} color={color} />;
-    case 'mapa':
-      return <IconMapPin width={size} height={size} color={color} />;
-    case 'avisos':
-      return <IconBell width={size} height={size} color={color} />;
-    case 'perfil':
-      return <IconUserRound width={size} height={size} color={color} />;
-  }
-}
 
 export function AcudienteHomeScreen({
   avatarInitials,
@@ -84,12 +64,14 @@ export function AcudienteHomeScreen({
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.header}>
-        <Pressable
+        <InteractivePressable
           accessibilityLabel="Volver"
           accessibilityRole="button"
           accessibilityState={{ disabled: !onBack }}
+          borderRadius={9999}
           disabled={!onBack}
           onPress={onBack}
+          pressFillColor="rgba(2, 56, 102, 0.1)"
           style={styles.headerLeftAction}
         >
           <View style={styles.backButtonCircle}>
@@ -99,7 +81,7 @@ export function AcudienteHomeScreen({
               color={acudienteHomeTokens.colors.backIcon}
             />
           </View>
-        </Pressable>
+        </InteractivePressable>
 
         <View style={styles.headerLogo}>
           <LogotipoSinTexto
@@ -109,18 +91,20 @@ export function AcudienteHomeScreen({
           />
         </View>
 
-        <Pressable
+        <InteractivePressable
           accessibilityLabel="Perfil de acudiente"
           accessibilityRole="button"
           accessibilityState={{ disabled: !onPressAvatar }}
+          borderRadius={9999}
           disabled={!onPressAvatar}
           onPress={onPressAvatar}
+          pressFillColor="rgba(2, 56, 102, 0.1)"
           style={styles.headerRightAction}
         >
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{avatarInitials}</Text>
           </View>
-        </Pressable>
+        </InteractivePressable>
       </View>
 
       <ScrollView
@@ -185,75 +169,55 @@ export function AcudienteHomeScreen({
 
               <Text style={styles.caption}>{child.lastUpdateLabel}</Text>
 
-              <Pressable
+              <InteractivePressable
                 accessibilityRole="button"
                 accessibilityState={{ disabled: !onPressChildAction }}
+                borderRadius={acudienteHomeTokens.spacing.buttonRadius}
                 disabled={!onPressChildAction}
                 onPress={() => onPressChildAction?.(child.id)}
+                pressFillColor="rgba(37, 99, 235, 0.12)"
                 style={styles.cardActionButton}
               >
                 <Text style={styles.cardActionText}>{child.actionLabel}</Text>
-              </Pressable>
+              </InteractivePressable>
             </View>
           );
         })}
       </ScrollView>
 
       <View style={styles.bottomActions}>
-        <Pressable
+        <InteractivePressable
           accessibilityRole="button"
           accessibilityState={{ disabled: !onRequestOccasionalPassenger }}
+          borderRadius={acudienteHomeTokens.spacing.buttonRadius}
           disabled={!onRequestOccasionalPassenger}
           onPress={onRequestOccasionalPassenger}
-          style={({ pressed }) => [
-            styles.primaryButton,
-            pressed && styles.primaryButtonPressed,
-          ]}
+          pressFillColor="rgba(255, 255, 255, 0.24)"
+          style={styles.primaryButton}
         >
           <Text style={styles.primaryButtonText}>
             Solicitar pasajero ocasional
           </Text>
-        </Pressable>
+        </InteractivePressable>
 
-        <Pressable
+        <InteractivePressable
           accessibilityRole="button"
           accessibilityState={{ disabled: !onReportAbsence }}
+          borderRadius={acudienteHomeTokens.spacing.buttonRadius}
           disabled={!onReportAbsence}
           onPress={onReportAbsence}
-          style={({ pressed }) => [
-            styles.secondaryButton,
-            pressed && styles.secondaryButtonPressed,
-          ]}
+          pressFillColor="rgba(22, 163, 74, 0.12)"
+          style={styles.secondaryButton}
         >
           <Text style={styles.secondaryButtonText}>Reportar inasistencia</Text>
-        </Pressable>
+        </InteractivePressable>
       </View>
 
-      <View style={styles.bottomNav}>
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeTab === item.id;
-
-          return (
-            <Pressable
-              key={item.id}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: isActive }}
-              onPress={() => onSelectTab?.(item.id)}
-              style={[styles.navItem, isActive && styles.navItemActive]}
-            >
-              {renderNavIcon(item.id)}
-              <Text
-                style={[
-                  styles.navItemLabel,
-                  isActive && styles.navItemLabelActive,
-                ]}
-              >
-                {item.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <BottomNavBar
+        activeId={activeTab}
+        items={NAV_ITEMS}
+        onSelect={onSelectTab}
+      />
     </SafeAreaView>
   );
 }
@@ -410,9 +374,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: acudienteHomeTokens.spacing.buttonPadding,
     width: '100%',
   },
-  primaryButtonPressed: {
-    backgroundColor: acudienteHomeTokens.colors.primaryPressed,
-  },
   primaryButtonText: {
     ...acudienteHomeTokens.typography.button,
     color: acudienteHomeTokens.colors.background,
@@ -429,42 +390,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: acudienteHomeTokens.spacing.buttonPadding,
     width: '100%',
   },
-  secondaryButtonPressed: {
-    backgroundColor: acudienteHomeTokens.colors.successBackgroundPressed,
-  },
   secondaryButtonText: {
     ...acudienteHomeTokens.typography.button,
     color: acudienteHomeTokens.colors.successText,
     textAlign: 'center',
-  },
-  bottomNav: {
-    alignItems: 'center',
-    backgroundColor: acudienteHomeTokens.colors.background,
-    borderTopColor: acudienteHomeTokens.colors.navBorder,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    height: acudienteHomeTokens.spacing.navHeight,
-    padding: acudienteHomeTokens.spacing.navPadding,
-    width: '100%',
-  },
-  navItem: {
-    alignItems: 'center',
-    borderRadius: acudienteHomeTokens.spacing.navItemRadius,
-    flex: 1,
-    gap: acudienteHomeTokens.spacing.navItemGap,
-    height: acudienteHomeTokens.spacing.navItemHeight,
-    justifyContent: 'center',
-    padding: acudienteHomeTokens.spacing.navItemPadding,
-  },
-  navItemActive: {
-    backgroundColor: acudienteHomeTokens.colors.infoBackground,
-  },
-  navItemLabel: {
-    ...acudienteHomeTokens.typography.caption,
-    color: acudienteHomeTokens.colors.textMuted,
-    textAlign: 'center',
-  },
-  navItemLabelActive: {
-    color: acudienteHomeTokens.colors.navy,
   },
 });
