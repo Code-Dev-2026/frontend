@@ -27,6 +27,8 @@
   --cs-critical-border: #fca5a5;
   --cs-critical-text: #b91c1c;
   --cs-critical-solid: #dc2626;
+  --cs-warning-bg: #fff7ed;
+  --cs-warning-text: #9a3412;
   --cs-info-bg: #e6f8fd;
   --cs-info-text: #023866;
   --cs-action-primary: #1464cf;

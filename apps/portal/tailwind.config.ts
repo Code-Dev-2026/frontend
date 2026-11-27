@@ -28,6 +28,8 @@ const config: Config = {
           successBg: '#ecfdf5',
           successBorder: '#6ee7b7',
           successText: '#047857',
+          warningBg: '#fff7ed',
+          warningText: '#9a3412',
           infoBg: '#e6f8fd',
           disabledBg: '#e2e8f0',
         },
