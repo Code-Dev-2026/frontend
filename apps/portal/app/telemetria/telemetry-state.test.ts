@@ -36,8 +36,8 @@ describe('FE-21 Consola de Coordinación — mapa global y RF-19', () => {
     expect(updated[0]?.latitude).not.toBe(
       INITIAL_PROVISIONAL_FLEET[0]?.latitude,
     );
-    expect(updated[0]?.lastPacketLabel).toBe('Justo ahora (simulado)');
+    expect(updated[0]?.lastPacketLabel).toBe('Justo ahora');
     expect(updated[2]?.latitude).toBe(INITIAL_PROVISIONAL_FLEET[2]?.latitude);
-    expect(updated[2]?.lastPacketLabel).toContain('simulado');
+    expect(updated[2]?.lastPacketLabel).toContain('Hace');
   });
 });

@@ -3,36 +3,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { StudentRole } from '@camino/domain';
 import {
   applySimulatedTelemetryPulse,
   canAccessFleetConsole,
   filterFleetUnits,
   INITIAL_PROVISIONAL_FLEET,
   ROLE_DENIED_RF19_MESSAGE,
-  ROLE_LABELS,
   type FleetConsoleViewState,
   type FleetVehicleStatus,
   type ProvisionalFleetVehicle,
 } from '../telemetry-state';
 import { FleetMapCanvas } from './FleetMapCanvas';
-
-const VIEW_STATE_OPTIONS: ReadonlyArray<{
-  id: FleetConsoleViewState;
-  label: string;
-}> = [
-  { id: 'active', label: 'Activo' },
-  { id: 'loading', label: 'Cargando' },
-  { id: 'empty', label: 'Vacío' },
-  { id: 'error', label: 'Error mapa' },
-  { id: 'denied', label: 'Acceso denegado (RF-19)' },
-];
-
-const ROLE_OPTIONS: ReadonlyArray<StudentRole> = [
-  'COORDINADORA_CONVIVENCIA',
-  'GERENCIA_TRANSPORTE',
-  'ADMINISTRADOR_CARTERA',
-];
 
 function statusBadgeStyle(status: FleetVehicleStatus): string {
   switch (status) {
@@ -46,9 +27,6 @@ function statusBadgeStyle(status: FleetVehicleStatus): string {
 }
 
 export function FleetConsoleClient() {
-  const [activeRole, setActiveRole] = useState<StudentRole>(
-    'COORDINADORA_CONVIVENCIA',
-  );
   const [viewState, setViewState] = useState<FleetConsoleViewState>('active');
   const [searchQuery, setSearchQuery] = useState('');
   const [vehicles, setVehicles] = useState<ProvisionalFleetVehicle[]>(() => [
@@ -59,10 +37,9 @@ export function FleetConsoleClient() {
   );
   const pulseCountRef = useRef(0);
   const [focusSequence, setFocusSequence] = useState(0);
-  const [useFallbackCanvas, setUseFallbackCanvas] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const hasAccess = canAccessFleetConsole(activeRole) && viewState !== 'denied';
+  const hasAccess = canAccessFleetConsole('COORDINADORA_CONVIVENCIA');
 
   const visibleVehicles = useMemo(() => {
     if (viewState === 'empty') return [];
@@ -84,37 +61,10 @@ export function FleetConsoleClient() {
       pulseCountRef.current += 1;
       const next = pulseCountRef.current;
       setVehicles((current) => applySimulatedTelemetryPulse(current, next));
-    }, 8000);
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [viewState, hasAccess]);
-
-  function handleRoleChange(role: StudentRole) {
-    setActiveRole(role);
-    if (!canAccessFleetConsole(role)) {
-      setViewState('denied');
-    } else if (viewState === 'denied') {
-      setViewState('active');
-    }
-  }
-
-  function handleViewStateChange(nextState: FleetConsoleViewState) {
-    setViewState(nextState);
-    if (nextState === 'denied') {
-      setActiveRole('ADMINISTRADOR_CARTERA');
-    } else if (!canAccessFleetConsole(activeRole)) {
-      setActiveRole('COORDINADORA_CONVIVENCIA');
-    }
-  }
-
-  function handleSimulatePulse() {
-    pulseCountRef.current += 1;
-    const next = pulseCountRef.current;
-    setVehicles((current) => applySimulatedTelemetryPulse(current, next));
-    if (viewState !== 'active') {
-      handleViewStateChange('active');
-    }
-  }
 
   const topbarTitle = (() => {
     if (!hasAccess) return 'Telemetría · Acceso restringido';
@@ -216,7 +166,7 @@ export function FleetConsoleClient() {
           </p>
           <div>
             <span className="inline-flex items-center rounded-full bg-cs-infoBg px-3 py-1 text-[13px] leading-[18px] text-cs-navy">
-              {ROLE_LABELS[activeRole]}
+              COORDINACIÓN
             </span>
           </div>
 
@@ -293,7 +243,7 @@ export function FleetConsoleClient() {
                 </button>
               </div>
               <span className="inline-flex w-fit items-center rounded-full bg-cs-infoBg px-3 py-1 text-[13px] text-cs-navy">
-                {ROLE_LABELS[activeRole]}
+                COORDINACIÓN
               </span>
               <nav className="mt-2 flex flex-col gap-1">
                 {navItems.map((item) =>
@@ -367,10 +317,10 @@ export function FleetConsoleClient() {
 
           <div className="flex items-center gap-3">
             <span className="hidden rounded-full bg-cs-infoBg px-3 py-1 text-[13px] leading-[18px] text-cs-navy sm:inline-flex">
-              En línea · :3100
+              En línea
             </span>
-            <span className="rounded-full bg-cs-warningBg px-3 py-1 text-[13px] leading-[18px] text-cs-warningText sm:hidden">
-              PROVISIONAL
+            <span className="rounded-full bg-cs-infoBg px-3 py-1 text-[13px] leading-[18px] text-cs-navy sm:hidden">
+              En vivo
             </span>
             <Link
               className="hidden h-10 items-center justify-center rounded-[12px] border border-cs-successBorder bg-cs-successBg px-4 text-[16px] font-semibold text-cs-successText sm:inline-flex"
@@ -383,57 +333,7 @@ export function FleetConsoleClient() {
 
         {/* Contenido principal */}
         <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
-          {/* Barra discreta de control de rol y estados para pruebas FE-21 */}
-          <section
-            aria-label="Controles de simulación y rol RF-19"
-            className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-cs-borderSoft bg-cs-surface px-4 py-2.5"
-          >
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[12px] font-medium text-cs-textMuted">
-                Estado:
-              </span>
-              {VIEW_STATE_OPTIONS.map((opt) => (
-                <button
-                  aria-pressed={viewState === opt.id}
-                  className={`rounded-full border px-3 py-1 text-[12px] font-medium transition-colors ${
-                    viewState === opt.id
-                      ? 'border-cs-primary bg-cs-infoBg text-cs-navy'
-                      : 'border-cs-borderSoft bg-cs-surfaceInput text-cs-textBody hover:border-cs-borderStrong'
-                  }`}
-                  key={opt.id}
-                  onClick={() => handleViewStateChange(opt.id)}
-                  type="button"
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label
-                className="text-[12px] font-medium text-cs-textMuted"
-                htmlFor="fleet-role-select"
-              >
-                Rol (RF-19):
-              </label>
-              <select
-                className="rounded-lg border border-cs-borderStrong bg-cs-surfaceInput px-2.5 py-1 text-[12px] font-medium text-cs-textStrong"
-                id="fleet-role-select"
-                onChange={(e) =>
-                  handleRoleChange(e.target.value as StudentRole)
-                }
-                value={activeRole}
-              >
-                {ROLE_OPTIONS.map((role) => (
-                  <option key={role} value={role}>
-                    {ROLE_LABELS[role]}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </section>
-
-          {/* ESTADO: ACCESO DENEGADO (RF-19) */}
+          {/* ESTADO: ACCESO DENEGADO */}
           {!hasAccess && (
             <section className="flex flex-1 items-center justify-center rounded-cs-card border border-cs-borderSoft bg-cs-surface p-8">
               <div className="flex max-w-[440px] flex-col items-center gap-4 text-center">
@@ -450,11 +350,11 @@ export function FleetConsoleClient() {
                   Acceso denegado a la consola de flota
                 </h1>
                 <p className="rounded-full bg-cs-criticalBg px-3 py-1 text-[13px] font-medium text-cs-criticalText">
-                  Rol sin permiso (role_not_allowed): {ROLE_DENIED_RF19_MESSAGE}
+                  {ROLE_DENIED_RF19_MESSAGE}
                 </p>
                 <p className="text-[14px] leading-[20px] text-cs-textMuted">
-                  La vista global de flota es exclusiva para Coordinación y
-                  Gerencia de Transporte (RF-19).
+                  La vista global de flota está disponible solo para
+                  Coordinación y Gerencia de Transporte.
                 </p>
                 <Link
                   className="inline-flex h-12 items-center justify-center rounded-cs-button bg-cs-primary px-6 text-[16px] font-semibold text-white hover:bg-cs-primaryHover"
@@ -466,7 +366,7 @@ export function FleetConsoleClient() {
             </section>
           )}
 
-          {/* ESTADO: CARGANDO (solo cliente, sin SSR) */}
+          {/* ESTADO: CARGANDO */}
           {hasAccess && viewState === 'loading' && (
             <section
               aria-busy="true"
@@ -477,11 +377,10 @@ export function FleetConsoleClient() {
                 className="h-10 w-10 animate-spin rounded-full border-4 border-cs-infoBg border-t-cs-primary"
               />
               <h1 className="text-[20px] font-semibold text-cs-textStrong">
-                Cargando mapa de flota (solo cliente)
+                Cargando mapa de flota
               </h1>
               <p className="max-w-[480px] text-[14px] text-cs-textMuted">
-                Importación dinámica sin SSR de maplibre-gl y sincronización
-                inicial.
+                Obteniendo la ubicación actual de las unidades en ruta.
               </p>
             </section>
           )}
@@ -502,33 +401,16 @@ export function FleetConsoleClient() {
                 <h1 className="text-[22px] font-bold text-cs-textStrong">
                   No fue posible cargar el mapa de flota
                 </h1>
-                <p className="text-[14px] font-medium text-cs-criticalText">
-                  Error al inicializar MapLibre / telemetría
-                </p>
                 <p className="text-[14px] text-cs-textMuted">
-                  Verifica NEXT_PUBLIC_MAPLIBRE_STYLE_URL o la conexión del
-                  servicio.
+                  Comprueba tu conexión e intenta cargar la vista nuevamente.
                 </p>
                 <div className="mt-2 flex flex-wrap justify-center gap-3">
                   <button
                     className="h-11 rounded-cs-button bg-cs-primary px-5 text-[15px] font-semibold text-white hover:bg-cs-primaryHover"
-                    onClick={() => {
-                      setUseFallbackCanvas(false);
-                      handleViewStateChange('active');
-                    }}
+                    onClick={() => setViewState('active')}
                     type="button"
                   >
                     Reintentar
-                  </button>
-                  <button
-                    className="h-11 rounded-cs-button border border-cs-successBorder bg-cs-successBg px-5 text-[15px] font-semibold text-cs-successText"
-                    onClick={() => {
-                      setUseFallbackCanvas(true);
-                      handleViewStateChange('active');
-                    }}
-                    type="button"
-                  >
-                    Activar simulador
                   </button>
                 </div>
               </div>
@@ -545,41 +427,32 @@ export function FleetConsoleClient() {
                     Consola de Coordinación · Flota en vivo
                   </h1>
                   <p className="text-[14px] leading-[20px] text-cs-textMuted">
-                    Acceso exclusivo para Coordinación y Gerencia de Transporte
-                    (RF-19).
+                    Monitoreo en tiempo real de unidades, rutas y ocupación
+                    reportada.
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-end gap-3">
-                  <div className="flex w-full flex-col gap-2 sm:w-[340px]">
-                    <label
-                      className="text-[14px] font-medium leading-[20px] text-cs-textBody"
-                      htmlFor="fleet-filter-input"
-                    >
-                      Filtrar ruta o unidad
-                    </label>
-                    <input
-                      className="h-[45px] w-full rounded-cs-input border border-cs-borderStrong bg-cs-surfaceInput px-4 text-[14px] text-cs-textStrong placeholder:text-cs-textMuted focus:outline-none focus:ring-2 focus:ring-cs-primary"
-                      id="fleet-filter-input"
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="BUS-01, Ruta Norte..."
-                      type="text"
-                      value={searchQuery}
-                    />
-                  </div>
-                  <button
-                    className="h-12 w-full rounded-cs-button bg-cs-primary px-5 text-[16px] font-semibold text-white transition-colors hover:bg-cs-primaryHover sm:w-[168px]"
-                    onClick={handleSimulatePulse}
-                    type="button"
+                <div className="flex w-full flex-col gap-2 sm:w-[340px]">
+                  <label
+                    className="text-[14px] font-medium leading-[20px] text-cs-textBody"
+                    htmlFor="fleet-filter-input"
                   >
-                    Simular pulso
-                  </button>
+                    Filtrar ruta o unidad
+                  </label>
+                  <input
+                    className="h-[45px] w-full rounded-cs-input border border-cs-borderStrong bg-cs-surfaceInput px-4 text-[14px] text-cs-textStrong placeholder:text-cs-textMuted focus:outline-none focus:ring-2 focus:ring-cs-primary"
+                    id="fleet-filter-input"
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="BUS-01, Ruta Norte..."
+                    type="text"
+                    value={searchQuery}
+                  />
                 </div>
               </div>
 
               {/* Split Mapa + Panel de detalle (Desktop) / Apilado (Tablet) */}
               <div className="flex flex-1 flex-col gap-5 lg:flex-row">
-                {/* Contenedor Mapa MapLibre GL */}
+                {/* Contenedor Mapa */}
                 <section
                   aria-label="Mapa de flota"
                   className="flex min-h-[472px] flex-1 flex-col overflow-hidden rounded-cs-card border border-cs-borderSoft bg-cs-surface"
@@ -591,14 +464,14 @@ export function FleetConsoleClient() {
                           Sin recorridos para mostrar
                         </h2>
                         <p className="max-w-[360px] text-[14px] text-cs-textMuted">
-                          No hay vehículos reportando recorridos activos en este
-                          momento.
+                          No hay vehículos reportando recorridos activos con el
+                          filtro actual.
                         </p>
                         <button
                           className="mt-1 h-11 rounded-cs-button bg-cs-primary px-5 text-[15px] font-semibold text-white hover:bg-cs-primaryHover"
                           onClick={() => {
                             setSearchQuery('');
-                            handleViewStateChange('active');
+                            setViewState('active');
                           }}
                           type="button"
                         >
@@ -612,13 +485,12 @@ export function FleetConsoleClient() {
                           onMapLoadError={() => setViewState('error')}
                           onSelectVehicle={(id) => setSelectedVehicleId(id)}
                           selectedVehicleId={selectedVehicle?.id ?? null}
-                          useFallbackCanvas={useFallbackCanvas}
+                          useFallbackCanvas={true}
                           vehicles={visibleVehicles}
                         />
                         <div className="pointer-events-none absolute left-4 top-4 z-10">
-                          <span className="inline-flex items-center rounded-full bg-cs-warningBg px-3 py-1 text-[13px] leading-[18px] text-cs-warningText shadow-sm">
-                            Posiciones simuladas PROVISIONAL · Socket.IO
-                            pendiente
+                          <span className="inline-flex items-center rounded-full bg-cs-infoBg px-3 py-1 text-[13px] leading-[18px] text-cs-navy shadow-sm">
+                            Flota en vivo · {visibleVehicles.length} unidades
                           </span>
                         </div>
                       </>
@@ -639,7 +511,7 @@ export function FleetConsoleClient() {
                       </span>
                     </div>
                     <span className="text-[13px] leading-[18px] text-cs-textMuted">
-                      MapLibre GL · Solo cliente
+                      Mapa operativo de flota
                     </span>
                   </div>
                 </section>
@@ -690,9 +562,10 @@ export function FleetConsoleClient() {
                           width={24}
                         />
                         <div className="flex flex-col gap-1 text-[14px] leading-[20px]">
-                          <p className="font-medium">Telemetría PROVISIONAL</p>
+                          <p className="font-medium">Seguimiento en vivo</p>
                           <p className="font-normal">
-                            Sin cálculo de ETA en el cliente (RF-19).
+                            Posición actualizada automáticamente desde las
+                            unidades en ruta.
                           </p>
                         </div>
                       </div>
