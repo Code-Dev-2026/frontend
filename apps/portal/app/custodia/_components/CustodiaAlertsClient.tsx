@@ -193,7 +193,7 @@ export function CustodiaAlertsClient() {
       id: 'rutas',
       label: 'Estudiantes y rutas',
       icon: '/icons/route.svg',
-      href: null,
+      href: '/estudiantes-rutas' as const,
       active: false,
     },
     {
