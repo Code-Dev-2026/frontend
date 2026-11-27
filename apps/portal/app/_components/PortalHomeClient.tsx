@@ -158,26 +158,20 @@ export function PortalHomeClient() {
   return (
     <div className="flex min-h-screen w-full bg-cs-bg">
       {/* Sidebar Desktop (240 px) */}
-      <aside className="hidden w-[240px] shrink-0 flex-col justify-between border-r border-cs-borderSoft bg-cs-surface px-4 py-6 lg:flex">
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-3 px-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cs-infoBg">
-              <Image
-                alt="Camino Seguro"
-                height={24}
-                src="/icons/school.svg"
-                width={24}
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[15px] font-bold leading-5 text-cs-navy">
-                Camino Seguro
-              </span>
-              <span className="text-[12px] leading-4 text-cs-textMuted">
-                Portal operativo
-              </span>
-            </div>
+      <aside className="hidden w-[240px] shrink-0 flex-col justify-between border-r border-cs-borderSoft bg-cs-surface px-4 py-5 lg:flex">
+        <div className="flex flex-col gap-4">
+          <div className="flex w-[140px] flex-col items-center p-2">
+            <Image
+              alt="Camino Seguro"
+              height={116}
+              priority
+              src="/logo-camino-seguro.svg"
+              width={104}
+            />
           </div>
+          <p className="px-2 text-[14px] font-medium leading-[20px] text-cs-navy">
+            Portal operativo
+          </p>
 
           <nav
             aria-label="Navegación principal"
@@ -247,9 +241,17 @@ export function PortalHomeClient() {
           <aside className="relative z-50 flex w-[260px] flex-col justify-between bg-cs-surface px-4 py-6 shadow-xl">
             <div className="flex flex-col gap-6">
               <div className="flex items-center justify-between px-2">
-                <span className="text-[15px] font-bold text-cs-navy">
-                  Camino Seguro
-                </span>
+                <div className="flex items-center gap-2.5">
+                  <Image
+                    alt="Camino Seguro"
+                    height={36}
+                    src="/logo-camino-seguro.svg"
+                    width={32}
+                  />
+                  <span className="text-[15px] font-bold text-cs-navy">
+                    Camino Seguro
+                  </span>
+                </div>
                 <button
                   aria-label="Cerrar menú"
                   className="rounded-lg px-2 py-1 text-[16px] text-cs-textMuted hover:bg-cs-surfaceInput"

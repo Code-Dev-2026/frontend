@@ -367,21 +367,29 @@ export function ApprovalsClient() {
               </p>
             </div>
 
-            <div className="flex w-full flex-col gap-1.5 sm:w-[300px]">
-              <label
-                className="text-[14px] font-medium text-cs-textBody"
-                htmlFor="approvals-search-input"
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex w-full flex-col gap-1.5 sm:w-[300px]">
+                <label
+                  className="text-[14px] font-medium text-cs-textBody"
+                  htmlFor="approvals-search-input"
+                >
+                  Buscar solicitud
+                </label>
+                <input
+                  className="h-[45px] w-full rounded-cs-input border border-cs-borderStrong bg-cs-surfaceInput px-4 text-[14px] text-cs-textStrong placeholder:text-cs-textMuted focus:outline-none focus:ring-2 focus:ring-cs-primary"
+                  id="approvals-search-input"
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="#SOL-204, Ruta Sur..."
+                  type="text"
+                  value={searchQuery}
+                />
+              </div>
+              <Link
+                className="inline-flex h-[45px] items-center justify-center rounded-cs-button border border-cs-borderSoft bg-cs-surface px-4 text-[14px] font-semibold text-cs-navy transition-colors hover:border-cs-primary"
+                href="/estudiantes-rutas/importar"
               >
-                Buscar solicitud
-              </label>
-              <input
-                className="h-[45px] w-full rounded-cs-input border border-cs-borderStrong bg-cs-surfaceInput px-4 text-[14px] text-cs-textStrong placeholder:text-cs-textMuted focus:outline-none focus:ring-2 focus:ring-cs-primary"
-                id="approvals-search-input"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="#SOL-204, Ruta Sur..."
-                type="text"
-                value={searchQuery}
-              />
+                Carga masiva CSV/Excel →
+              </Link>
             </div>
           </div>
 
