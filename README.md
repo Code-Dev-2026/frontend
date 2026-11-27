@@ -17,8 +17,7 @@ frontend/
 ├─ apps/
 │  ├─ acudiente/
 │  ├─ monitora/
-│  ├─ portal/
-│  └─ AGENTS.md
+│  └─ portal/
 ├─ docs/
 │  └─ design/
 ├─ packages/
@@ -110,7 +109,6 @@ Consulta la guía completa en [`docs/design/README.md`](./docs/design/README.md)
 
 ## Documentación y guías
 
-- [`AGENTS.md`](./AGENTS.md): Reglas generales del monorepo, seguridad e invariantes.
-- [`apps/AGENTS.md`](./apps/AGENTS.md): Reglas específicas para desarrollo móvil (Expo/React Native).
+- [`AGENTS.md`](./AGENTS.md): Reglas generales del monorepo, apps móviles, seguridad e invariantes.
 - [`apps/portal/AGENTS.md`](./apps/portal/AGENTS.md): Reglas específicas para el portal web (Next.js).
 - [`docs/design/README.md`](./docs/design/README.md): Guía oficial de traducción de Figma a código.
