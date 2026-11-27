@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   assertMaxAuthorizedAdults,
+  canAccessMobileApp,
   canTransitionTo,
   shouldShowCustodyMap,
   STUDENT_STATES,
@@ -31,6 +32,16 @@ describe('domain state machine', () => {
     expect(STUDENT_STATES).toHaveLength(4);
     expect(createUuidV7()).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    );
+  });
+
+  it('restricts mobile app access strictly to the matching role', () => {
+    expect(canAccessMobileApp('ACUDIENTE', 'ACUDIENTE')).toBe(true);
+    expect(canAccessMobileApp('MONITORA', 'MONITORA')).toBe(true);
+    expect(canAccessMobileApp('MONITORA', 'ACUDIENTE')).toBe(false);
+    expect(canAccessMobileApp('ACUDIENTE', 'MONITORA')).toBe(false);
+    expect(canAccessMobileApp('COORDINADORA_CONVIVENCIA', 'MONITORA')).toBe(
+      false,
     );
   });
 });
