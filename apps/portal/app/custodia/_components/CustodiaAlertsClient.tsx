@@ -343,14 +343,23 @@ export function CustodiaAlertsClient() {
 
         <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
           {/* Header */}
-          <div className="flex flex-col gap-1">
-            <h1 className="text-[24px] font-bold leading-[32px] text-cs-textStrong">
-              Alertas rojas, desvíos y retrasos anómalos
-            </h1>
-            <p className="text-[14px] leading-[20px] text-cs-textMuted">
-              Monitoreo de desvíos de ruta, retrasos anómalos y alertas de
-              custodia activas.
-            </p>
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-[24px] font-bold leading-[32px] text-cs-textStrong">
+                Alertas rojas, desvíos y retrasos anómalos
+              </h1>
+              <p className="text-[14px] leading-[20px] text-cs-textMuted">
+                Monitoreo de desvíos de ruta, retrasos anómalos y alertas de
+                custodia activas.
+              </p>
+            </div>
+
+            <Link
+              className="inline-flex h-11 shrink-0 items-center justify-center rounded-cs-button border border-cs-borderSoft bg-cs-surface px-4 text-[14px] font-semibold text-cs-navy transition-colors hover:border-cs-primary"
+              href="/custodia/restricciones"
+            >
+              Restricciones de custodia →
+            </Link>
           </div>
 
           {/* Alarma de retraso anómalo (> 25 min) */}
