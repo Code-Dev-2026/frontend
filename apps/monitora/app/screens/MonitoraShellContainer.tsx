@@ -1,24 +1,29 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { QueueConnectivityState } from '../../src/lib/offline/offline-queue';
 import {
   Alert,
   Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import {
-  Banner,
   BrandLoadingOverlay,
-  Button,
-  Card,
-  Icon,
   SwipeBackView,
   baseTokens,
   useScreenLoading,
 } from '@camino/ui';
+import type { StudentState } from '@camino/domain';
+import { createProvisionalActiveRouteGateway } from '../../src/features/active-route/active-route-gateway';
+import type {
+  ActiveRouteData,
+  ActiveRouteVisualState,
+} from '../../src/features/active-route/active-route-types';
+import {
+  createProvisionalOfflineQueue,
+  type OfflineQueueStats,
+} from '../../src/lib/offline/offline-queue';
 import {
   createProvisionalMonitoraSessionGateway,
   type MonitoraHomeStatus,
@@ -27,7 +32,7 @@ import {
   type MonitoraShiftSummary,
 } from '../../src/features/profile/monitora-session';
 import { useConnectivityStatus } from '../../src/hooks/useConnectivityStatus';
-import { MonitoraAppBar } from './MonitoraAppBar';
+import { MonitoraActiveRouteScreen } from './MonitoraActiveRouteScreen';
 import { MonitoraBottomNav } from './MonitoraBottomNav';
 import { MonitoraHomeScreen } from './MonitoraHomeScreen';
 import { MonitoraProfileScreen } from './MonitoraProfileScreen';
@@ -68,6 +73,20 @@ export function MonitoraShellContainer({
   const [isLoadingShift, setIsLoadingShift] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [shift, setShift] = useState<MonitoraShiftSummary | null>(null);
+
+  const offlineQueue = useMemo(() => createProvisionalOfflineQueue(), []);
+  const routeGateway = useMemo(
+    () => createProvisionalActiveRouteGateway(offlineQueue),
+    [offlineQueue],
+  );
+
+  const [activeRoute, setActiveRoute] = useState<ActiveRouteData | null>(null);
+  const [isLoadingRoute, setIsLoadingRoute] = useState(true);
+  const [isRefreshingRoute, setIsRefreshingRoute] = useState(false);
+  const [queueStats, setQueueStats] = useState<OfflineQueueStats>(() =>
+    offlineQueue.getStats(),
+  );
+
   const [pendingSyncCount, setPendingSyncCount] = useState<number>(
     snapshot.initialPendingSyncCount,
   );
@@ -83,6 +102,36 @@ export function MonitoraShellContainer({
       if (tabTimerRef.current) clearTimeout(tabTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    return offlineQueue.subscribe(() => {
+      const stats = offlineQueue.getStats();
+      setQueueStats(stats);
+      setPendingSyncCount(stats.pendingCount);
+    });
+  }, [offlineQueue]);
+
+  useEffect(() => {
+    offlineQueue.setConnectivityState(
+      connectivity === 'offline' ? 'offline' : 'online',
+    );
+  }, [connectivity, offlineQueue]);
+
+  const loadRoute = useCallback(async () => {
+    setIsLoadingRoute(true);
+    try {
+      const loaded = await routeGateway.fetchRoute();
+      setActiveRoute(loaded);
+    } catch {
+      setActiveRoute(null);
+    } finally {
+      setIsLoadingRoute(false);
+    }
+  }, [routeGateway]);
+
+  useEffect(() => {
+    void loadRoute();
+  }, [loadRoute]);
 
   const loadShift = useCallback(async () => {
     setIsLoadingShift(true);
@@ -106,6 +155,27 @@ export function MonitoraShellContainer({
       setPendingSyncCount((current) => (current === 0 ? 2 : current));
     }
   }, [connectivity, shift]);
+
+  // ── Ciclo automático DEV de conectividad ──────────────────────────────────
+  // Solo activo en __DEV__: online → offline → syncing → online … (sin botones)
+  useEffect(() => {
+    if (!__DEV__) return;
+    const CYCLE: QueueConnectivityState[] = ['online', 'offline', 'syncing'];
+    const DURATIONS = [6000, 4000, 2000]; // ms por estado
+    let idx = 0;
+    let timer: ReturnType<typeof setTimeout>;
+
+    function advance() {
+      idx = (idx + 1) % CYCLE.length;
+      const nextState = CYCLE[idx]!;
+      offlineQueue.setConnectivityState(nextState);
+      setQueueStats(offlineQueue.getStats());
+      timer = setTimeout(advance, DURATIONS[idx]!);
+    }
+
+    timer = setTimeout(advance, DURATIONS[0]!);
+    return () => clearTimeout(timer);
+  }, [offlineQueue]);
 
   const homeStatus: MonitoraHomeStatus = isLoadingShift
     ? 'loading'
@@ -155,6 +225,29 @@ export function MonitoraShellContainer({
     }
   }
 
+  async function handleRefreshRoute() {
+    setIsRefreshingRoute(true);
+    try {
+      await Promise.all([checkConnectivity(), loadRoute()]);
+    } finally {
+      setIsRefreshingRoute(false);
+    }
+  }
+
+  async function handleMarkAttendance(
+    studentId: string,
+    stopId: string,
+    newState: StudentState,
+    note?: string,
+  ) {
+    await routeGateway.updateStudentState(studentId, stopId, newState, note);
+    const reloaded = await routeGateway.fetchRoute();
+    setActiveRoute(reloaded);
+    const stats = offlineQueue.getStats();
+    setQueueStats(stats);
+    setPendingSyncCount(stats.pendingCount);
+  }
+
   async function handleSyncAndStay() {
     const nextConnectivity = await checkConnectivity();
     if (nextConnectivity === 'offline') {
@@ -169,9 +262,14 @@ export function MonitoraShellContainer({
     try {
       await runWithLoading(
         async () => {
-          const result = await sessionGateway.syncOfflineQueue();
-          setPendingSyncCount(result.pendingSyncCount);
-          setLastSyncLabel(result.lastSyncLabel);
+          const syncResult = await offlineQueue.syncPending();
+          const sessionResult = await sessionGateway.syncOfflineQueue();
+          setPendingSyncCount(0);
+          setLastSyncLabel(
+            sessionResult.lastSyncLabel ?? syncResult.lastSyncLabel,
+          );
+          const reloaded = await routeGateway.fetchRoute();
+          setActiveRoute(reloaded);
           setLogoutModalVisible(false);
         },
         { label: 'Sincronizando registros…', minDurationMs: 550 },
@@ -192,7 +290,15 @@ export function MonitoraShellContainer({
     }
   }
 
-  const isOffline = connectivity === 'offline';
+  const isOffline =
+    connectivity === 'offline' || queueStats.connectivity === 'offline';
+  const activeRouteVisualState: ActiveRouteVisualState = isLoadingRoute
+    ? 'loading'
+    : isSyncing
+      ? 'syncing'
+      : isOffline
+        ? 'offline'
+        : 'online';
 
   return (
     <SafeAreaView style={styles.shell}>
@@ -222,64 +328,30 @@ export function MonitoraShellContainer({
             />
           </SwipeBackView>
         ) : activeTab === 'ruta' ? (
-          // PROVISIONAL: puente visual del tab Ruta hasta implementar la lista de
-          // paradas, botón Escanear QR y estados de ruta en FE-09 (#56).
           <SwipeBackView enabled onBack={() => selectTab('inicio')}>
-            <View
-              style={styles.routeScreen}
-              testID="monitora-route-placeholder"
-            >
-              <MonitoraAppBar
-                onBack={() => selectTab('inicio')}
-                testID="monitora-route-appbar"
-              />
-
-              <ScrollView
-                contentContainerStyle={styles.routeContent}
-                showsVerticalScrollIndicator={false}
-              >
-                {isOffline ? (
-                  <Banner
-                    message="Trabajando sin señal. Los registros se guardan en cola local."
-                    title="Modo sin conexión"
-                    variant="warning"
-                  />
-                ) : null}
-
-                <Card style={styles.routeCard}>
-                  <View style={styles.routeHeader}>
-                    <Icon
-                      color={baseTokens.colors.navy900}
-                      name="route"
-                      size={baseTokens.sizes.iconDefault}
-                    />
-                    <Text style={styles.routeTitle}>
-                      {shift
-                        ? `${shift.routeCode} · ${shift.busCode}`
-                        : 'Sin ruta activa'}
-                    </Text>
-                  </View>
-
-                  <Text style={styles.routeBody}>
-                    {shift
-                      ? `${shift.scheduleLabel} · ${shift.campusName} · ${shift.stopsCount} paradas · ${shift.onBoardCount}/${shift.capacity} a bordo.`
-                      : 'No hay una ruta asignada en este momento.'}
-                  </Text>
-
-                  <Text style={styles.routeCaption}>
-                    El listado operativo de paradas, botón Escanear QR y
-                    controles de abordaje se conectan en FE-09 (#56) y FE-10
-                    (#57).
-                  </Text>
-                </Card>
-
-                <Button
-                  label="Volver a Inicio"
-                  onPress={() => selectTab('inicio')}
-                  variant="soft"
-                />
-              </ScrollView>
-            </View>
+            <MonitoraActiveRouteScreen
+              isRefreshing={isRefreshingRoute}
+              onBack={() => selectTab('inicio')}
+              onMarkAttendance={handleMarkAttendance}
+              onPressNotifications={() =>
+                Alert.alert(
+                  'Avisos de jornada',
+                  pendingSyncCount > 0
+                    ? `Tienes ${pendingSyncCount} registros pendientes por sincronizar.`
+                    : 'Sin novedades críticas en tu jornada actual.',
+                )
+              }
+              onRefresh={() => {
+                void handleRefreshRoute();
+              }}
+              onRetryConnectivity={() => {
+                void handleCheckConnectivity();
+              }}
+              pendingSyncCount={queueStats.pendingCount}
+              route={activeRoute}
+              syncedCount={queueStats.syncedCount}
+              visualState={activeRouteVisualState}
+            />
           </SwipeBackView>
         ) : (
           <MonitoraHomeScreen
@@ -336,36 +408,5 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden',
     position: 'relative',
-  },
-  routeScreen: {
-    backgroundColor: baseTokens.colors.surface,
-    flex: 1,
-  },
-  routeContent: {
-    gap: baseTokens.spacing.lg,
-    paddingHorizontal: baseTokens.spacing.pageMargin,
-    paddingVertical: baseTokens.spacing.lg,
-  },
-  routeCard: {
-    gap: baseTokens.spacing.md,
-    padding: baseTokens.spacing.lg,
-  },
-  routeHeader: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: baseTokens.spacing.sm,
-  },
-  routeTitle: {
-    ...baseTokens.typography.section,
-    color: baseTokens.colors.textStrong,
-    flex: 1,
-  },
-  routeBody: {
-    ...baseTokens.typography.bodySmall,
-    color: baseTokens.colors.textBody,
-  },
-  routeCaption: {
-    ...baseTokens.typography.caption,
-    color: baseTokens.colors.textMuted,
   },
 });
