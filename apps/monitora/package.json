@@ -10,7 +10,8 @@
     "android": "npx expo run:android --port 8082",
     "ios": "npx expo run:ios --port 8082",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@camino/contracts": "workspace:*",
